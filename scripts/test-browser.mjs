@@ -39,11 +39,19 @@ if (state.status === 'blocked' || process.argv.includes('--preflight')) {
     const files = ['tests/browser/acceptance.mjs', 'tests/browser/fixture.mjs', 'scripts/test-browser.mjs', 'apps/web/src/app.ts', 'apps/web/src/surfaces/login.ts', 'apps/web/src/tokens.ts', 'apps/web/src/ws-client.ts', 'apps/web/src/login-client.ts', 'packages/db/src/repos/principals.ts', 'apps/api/src/main.ts', 'apps/api/src/server.ts', 'apps/api/src/auth.ts']
     const fingerprints = await Promise.all(files.map(async path => ({ path, sha256: createHash('sha256').update(await readFile(join(root, path))).digest('hex') })))
     const passed = result.outcomes.filter(item => item.status === 'passed').length
-    const failed = result.outcomes.filter(item => item.status === 'failed').length
+    const failedCases = result.outcomes.filter(item => item.status === 'failed')
+    const failed = failedCases.length
     const summary = { schema_version: 1, captured_at: new Date().toISOString(), layer: 'browser', status: failed ? 'failed' : 'passed', runtime: process.version, tests: { total: result.outcomes.length, passed, failed, skipped: 0 }, ...result, files: fingerprints }
     await mkdir(output, { recursive: true })
     await writeFile(join(output, 'browser-results.json'), `${JSON.stringify(summary, null, 2)}\n`)
     report({ layer: 'browser', status: summary.status, tests: summary.tests, evidence: join(output, 'browser-results.json') })
+    // Emit only source-defined case and step labels and validated matcher names to CI logs.
+    for (const { id, failure } of failedCases) {
+      const caseId = /^[A-Z0-9-]{1,64}$/.test(id) ? id : 'unknown'
+      const step = /^(?:[a-z0-9_]{1,64}|\/api\/auth\/[a-z0-9/-]{1,48})$/.test(failure?.step ?? '') ? failure.step : null
+      const assertion = /^to[A-Za-z0-9]{1,62}$/.test(failure?.assertion ?? '') ? failure.assertion : null
+      process.stdout.write(`XPANEL_BROWSER_FAILURE=${JSON.stringify({ id: caseId, step, assertion })}\n`)
+    }
     process.exitCode = failed ? 1 : 0
   } catch (error) {
     // Never print raw browser errors: they may include form credentials or enrollment secrets.
