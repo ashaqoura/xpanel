@@ -122,7 +122,7 @@ export function renderHostDaemons(state: HostDaemons, accounts: ReadonlyMap<stri
 const toml = (value: string): string => JSON.stringify(value)
 const frpUnit = (unit: string, binary: string, config: string, what: string): RenderedFile => unitFile(`${SYSTEMD_UNIT_DIR}/${unit}`, [
   header(what), '[Unit]', `Description=xPanel ${what}`, 'After=network-online.target', 'Wants=network-online.target', `ConditionFileIsExecutable=${FRP_BIN_DIR}/${binary}`, 'StartLimitIntervalSec=0', '',
-  '[Service]', 'Type=simple', 'DynamicUser=yes', `ExecStart=${FRP_BIN_DIR}/${binary} -c %d/frp.toml`, 'Restart=on-failure', 'RestartSec=5', 'NoNewPrivileges=yes', 'ProtectSystem=strict', 'ProtectHome=yes', 'PrivateTmp=yes', `LoadCredential=frp.toml:${config}`, '', '[Install]', 'WantedBy=multi-user.target',
+  '[Service]', 'Type=simple', 'DynamicUser=yes', `ExecStart=${FRP_BIN_DIR}/${binary} -c \${CREDENTIALS_DIRECTORY}/frp.toml`, 'Restart=on-failure', 'RestartSec=5', 'NoNewPrivileges=yes', 'ProtectSystem=strict', 'ProtectHome=yes', 'PrivateTmp=yes', `LoadCredential=frp.toml:${config}`, '', '[Install]', 'WantedBy=multi-user.target',
 ])
 
 /** Both sides keep their token in a root-only file; a disabled side has no file, no unit and no open port. */

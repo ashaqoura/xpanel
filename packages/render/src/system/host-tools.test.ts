@@ -90,7 +90,8 @@ describe('daemons and frp', { tags: ['unit'] }, () => {
     expect(client.content).toContain('remotePort = 7101')
     const unit = files.find(file => file.path.endsWith('xpanel-frps.service'))!.content
     expect(unit).toContain('DynamicUser=yes')
-    expect(unit).toContain('ExecStart=/usr/local/bin/frps -c %d/frp.toml')
+    expect(unit).toContain('ExecStart=/usr/local/bin/frps -c ${CREDENTIALS_DIRECTORY}/frp.toml')
+    expect(unit).not.toContain('%d')
     expect(unit).toContain('LoadCredential=frp.toml:/etc/xpanel/frp/frps.toml')
     expect(unit).not.toContain(state.server.token)
     expect(postActions[0]).toEqual({ kind: 'systemd-daemon-reload' })

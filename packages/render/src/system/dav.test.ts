@@ -65,7 +65,8 @@ describe('renderWebDiskUnits', () => {
       `/etc/xpanel/runtime/alice/webdisk-${r.instance}.conf`,
     ])
     const service = fileAt(r.files, `xpanel-webdiskd-${name}.service`)
-    expect(unitValues(service, 'ExecStart')).toEqual(['/usr/sbin/lighttpd -D -f %d/webdisk.conf'])
+    expect(unitValues(service, 'ExecStart')).toEqual(['/usr/sbin/lighttpd -D -f ${CREDENTIALS_DIRECTORY}/webdisk.conf'])
+    expect(service).not.toContain('%d')
     expect(unitValues(service, 'LoadCredential')).toEqual([`webdisk.conf:/etc/xpanel/runtime/alice/webdisk-${r.instance}.conf`])
     expect(unitValues(service, 'User')).toEqual(['alice'])
     expect(unitValues(service, 'Slice')).toEqual(['xpanel-1001.slice'])
@@ -111,7 +112,8 @@ describe('renderCalDavUnits', () => {
   it('runs Radicale as the account on a root-owned socket with its store in the home', () => {
     expect(r.paths).toEqual(calDavPaths(account))
     const service = fileAt(r.files, 'xpanel-caldav-alice.service')
-    expect(unitValues(service, 'ExecStart')).toEqual(['/usr/bin/python3 /etc/xpanel/runtime/dav-radicale.py %d/caldav.conf "/home/alice/.caldav" 60'])
+    expect(unitValues(service, 'ExecStart')).toEqual(['/usr/bin/python3 /etc/xpanel/runtime/dav-radicale.py ${CREDENTIALS_DIRECTORY}/caldav.conf "/home/alice/.caldav" 60'])
+    expect(service).not.toContain('%d')
     expect(unitValues(service, 'User')).toEqual(['alice'])
     expect(unitValues(service, 'BindPaths')).toEqual(['/home/alice'])
     const socket = fileAt(r.files, 'xpanel-caldav-alice.socket')
