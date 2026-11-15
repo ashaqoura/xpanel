@@ -121,7 +121,7 @@ describe('symlink protection, account root protection, and jailed shell', () => 
 
     const argv = buildJailedFileOpArgv(alice, ['composer', 'install', '--no-dev'], {
       cwdRel: 'public_html',
-      env: { APP_ENV: 'production' },
+      env: { APP_ENV: 'production', HOME: '/nonexistent' },
     })
     expect(argv[0]).toBe('/usr/bin/systemd-run')
     expect(argv).toContain('--working-directory=/home/alice/public_html')
@@ -130,6 +130,7 @@ describe('symlink protection, account root protection, and jailed shell', () => 
     expect(argv).toContain('BindPaths=/home/alice')
     expect(argv).toContain('ProtectProc=invisible')
     expect(argv).toContain('SocketBindDeny=any')
+    expect(argv.filter(value => value.startsWith('--setenv=HOME='))).toEqual(['--setenv=HOME=/nonexistent'])
     expect(argv).not.toContain('/bin/bash')
     expect(argv).not.toContain('-c')
     expect(argv.slice(-3)).toEqual(['/usr/bin/composer', 'install', '--no-dev'])
@@ -141,6 +142,7 @@ describe('symlink protection, account root protection, and jailed shell', () => 
     // Jailed file operation argv runs inside the account's slice and UID
     const fileOpArgv = buildJailedFileOpArgv(alice, ['chmod', '0640', 'public_html/index.php'])
     expect(fileOpArgv).toContain('User=alice')
+    expect(fileOpArgv.filter(value => value.startsWith('--setenv=HOME='))).toEqual(['--setenv=HOME=/home/alice'])
     expect(fileOpArgv).toContain('Slice=xpanel-20000.slice')
     expect(fileOpArgv.slice(-3)).toEqual(['/bin/chmod', '0640', 'public_html/index.php'])
   })
