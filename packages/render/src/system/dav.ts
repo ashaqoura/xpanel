@@ -168,7 +168,8 @@ export const renderWebDiskUnits = (account: AccountRef, login: WebDiskLogin, os:
     '',
     '[Service]',
     'Type=simple',
-    `ExecStart=${LIGHTTPD_BINARY} -D -f %d/webdisk.conf`,
+    // CREDENTIALS_DIRECTORY arrived with LoadCredential= in systemd 247; %d arrived in 251.
+    `ExecStart=${LIGHTTPD_BINARY} -D -f \${CREDENTIALS_DIRECTORY}/webdisk.conf`,
     `LoadCredential=webdisk.conf:${p.config}`,
     `RuntimeDirectory=${p.runtimeDirectory}`,
     'RuntimeDirectoryMode=0700',
@@ -272,7 +273,7 @@ export const renderCalDavUnits = (account: AccountRef, os: OsProfile, opts: DavU
     '',
     '[Service]',
     'Type=simple',
-    `ExecStart=${RUNTIME_BINARIES.python} ${DAV_LAUNCHER_PATH} %d/caldav.conf ${quoteExecArg(p.store)} ${CALDAV_IDLE_SECONDS}`,
+    `ExecStart=${RUNTIME_BINARIES.python} ${DAV_LAUNCHER_PATH} \${CREDENTIALS_DIRECTORY}/caldav.conf ${quoteExecArg(p.store)} ${CALDAV_IDLE_SECONDS}`,
     `LoadCredential=caldav.conf:${p.config}`,
     'Environment=PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1',
     ...NO_TCP_LISTEN,
