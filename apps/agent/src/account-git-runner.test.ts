@@ -9,12 +9,14 @@ describe('exact account Git sandbox admission', () => {
       const command = buildAccountGitCommand(account, operation.op === 'clone' ? '.' : 'repositories/site', operation, 'debian')
       expect(isAccountGitCommand(command)).toBe(true)
       expect(command).toContain('User=1001'); expect(command).toContain('Group=1002'); expect(command).toContain('BindPaths=/home/alice')
-      expect(command).toContain('--setenv=GIT_CONFIG_NOSYSTEM=1'); expect(command).toContain('--setenv=HOME=/nonexistent'); expect(command).toContain('NoExecPaths=/')
+      expect(command).toContain('--setenv=GIT_CONFIG_NOSYSTEM=1'); expect(command.filter(value => value.startsWith('--setenv=HOME='))).toEqual(['--setenv=HOME=/nonexistent']); expect(command).toContain('NoExecPaths=/')
     }
   })
   it('refuses any sandbox, identity, executable or argument tampering', () => {
     const original = buildAccountGitCommand(account, 'repo', { op: 'status' }, 'debian')
     for (const [from, to] of [['User=1001', 'User=0'], ['BindPaths=/home/alice', 'BindPaths=/'], ['NoExecPaths=/', 'NoExecPaths='], ['/usr/bin/git', '/bin/sh'], ['--setenv=HOME=/nonexistent', '--setenv=HOME=/root']] as const) expect(isAccountGitCommand(original.map(value => value === from ? to : value))).toBe(false)
+    const delimiter = original.indexOf('--')
+    expect(isAccountGitCommand([...original.slice(0, delimiter), '--setenv=HOME=/home/alice', ...original.slice(delimiter)])).toBe(false)
     expect(isAccountGitCommand([...original, '--force'])).toBe(false)
     expect(() => buildAccountGitCommand(account, '../bob', { op: 'status' }, 'debian')).toThrow()
   })
