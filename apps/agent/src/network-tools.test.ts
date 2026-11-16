@@ -1,4 +1,5 @@
-import { createServer } from 'node:net'
+import { once } from 'node:events'
+import { connect, createServer } from 'node:net'
 import type { AddressInfo } from 'node:net'
 import { describe, expect, it, vi } from 'vitest'
 import type { Account, Plan } from '@xpanel/core'
@@ -93,11 +94,25 @@ describe('output parsers', () => {
       expect(await lookupDns(fakeHost({ 'example.com': { A: errno(code) } }), 'example.com', 'A')).toEqual({ status, records: [], truncated: false })
   })
   it('classifies real TCP connects as open or closed', async () => {
-    const server = createServer(socket => socket.destroy()); await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
-    const port = (server.address() as AddressInfo).port, host = systemNetworkToolsHost(async () => ({ ok: false, code: 1, stdout: '', stderr: '' }))
-    expect(await host.connect('127.0.0.1', 4, port)).toBe('open')
-    await new Promise(resolve => server.close(resolve))
-    expect(await host.connect('127.0.0.1', 4, port)).toBe('closed')
+    const address = '127.0.0.1'
+    const server = createServer(socket => socket.resume())
+    const listening = once(server, 'listening')
+    server.listen(0, address)
+    await listening
+    const port = (server.address() as AddressInfo).port
+    const client = connect({ host: address, family: 4, port })
+    try {
+      await once(client, 'connect')
+      const reservedPort = client.localPort
+      if (reservedPort === undefined) throw new Error('Connected fixture has no local port')
+      const host = systemNetworkToolsHost(async () => ({ ok: false, code: 1, stdout: '', stderr: '' }))
+      expect(await host.connect(address, 4, port)).toBe('open')
+      // The connected client reserves a port that has no listener.
+      expect(await host.connect(address, 4, reservedPort)).toBe('closed')
+    } finally {
+      client.destroy()
+      await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))
+    }
   })
 })
 
