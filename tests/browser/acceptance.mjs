@@ -90,7 +90,12 @@ export async function runBrowserAcceptance({ chromium, expect }) {
       const result = await globalThis.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } })
       return result.violations.filter(item => item.impact === 'critical' || item.impact === 'serious').map(item => ({ id: item.id, impact: item.impact, nodes: item.nodes.length }))
     })
-    record('axe_serious_critical', { theme: await page.locator('html').getAttribute('data-theme'), violations })
+    const theme = await page.locator('html').getAttribute('data-theme')
+    record('axe_serious_critical', { theme, violations })
+    if (violations.length) {
+      const rules = violations.filter(item => /^[a-z][a-z0-9-]{0,63}$/.test(item.id))
+      process.stdout.write(`XPANEL_BROWSER_AXE=${JSON.stringify({ theme: ['light', 'dark'].includes(theme) ? theme : null, rules })}\n`)
+    }
     expect(violations, 'Visible authentication and unavailable surfaces must have no serious or critical axe violations').toEqual([])
   }
 
@@ -130,6 +135,26 @@ export async function runBrowserAcceptance({ chromium, expect }) {
           expect(Math.abs(alignment.field_right - alignment.label_right)).toBeLessThanOrEqual(1)
         }
         await accessibility(page, record)
+        if (locale === 'en') {
+          const button = page.locator(`${loginForm} button[type="submit"]`)
+          await button.evaluate(async submitButton => {
+            for (const animation of submitButton.getAnimations()) animation.finish()
+            submitButton.disabled = true
+            getComputedStyle(submitButton).backgroundColor
+            await new Promise(resolve => requestAnimationFrame(resolve))
+            submitButton.disabled = false
+            getComputedStyle(submitButton).backgroundColor
+            for (const animation of submitButton.getAnimations()) {
+              animation.pause()
+              animation.currentTime = 50
+            }
+          })
+          try {
+            await accessibility(page, record)
+          } finally {
+            await button.evaluate(submitButton => { for (const animation of submitButton.getAnimations()) animation.finish() })
+          }
+        }
         await page.goto(`${panel.baseUrl}/login?lang=${locale}&theme=light`)
         record('light_theme_login_loaded')
         await accessibility(page, record)
