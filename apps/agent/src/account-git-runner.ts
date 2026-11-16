@@ -61,7 +61,7 @@ function accountGitPrefix(argv: readonly string[], delimiter: number): { account
   const cwd = argv.find(value => value.startsWith('--working-directory='))?.slice(20)
   const user = bind?.match(/^\/home[1-9]?[0-9]?\/([a-z][a-z0-9]{0,15})$/)?.[1]
   const family = (Object.keys(GIT_CORE_DIR) as OsFamily[]).find(key => argv.includes('--setenv=GIT_EXEC_PATH=' + GIT_CORE_DIR[key]))
-  if (delimiter < 1 || !user || !uid || !gid || !family || uid !== uidText || home !== '--setenv=HOME=' + bind || !cwd?.startsWith(bind + '/')) return null
+  if (delimiter < 1 || !user || !uid || !gid || !family || uid !== uidText || home !== '--setenv=HOME=' + environment.HOME || !cwd?.startsWith(bind + '/')) return null
   const account = { username: user, uid: Number(uid), gid: Number(gid), home: bind! }, path = cwd.slice(bind!.length + 1)
   try { return { account, path, family, git: buildAccountGitCommand(account, path, { op: 'status' }, family) } } catch { return null }
 }

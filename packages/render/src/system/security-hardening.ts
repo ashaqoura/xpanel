@@ -366,14 +366,17 @@ const buildSandboxRunPrefix = (
     'SocketBindDeny=any',
   ]
 
-  const envFlags: string[] = [
-    `--setenv=HOME=${home}`,
-    `--setenv=USER=${id.username}`,
-    `--setenv=LOGNAME=${id.username}`,
-    `--setenv=TMPDIR=${home}/tmp`,
-    '--setenv=PATH=/usr/local/bin:/usr/bin:/bin',
-  ]
-  for (const [k, v] of Object.entries(opts.env ?? {})) {
+  // systemd 249 rejects an environment block with duplicate names.
+  const environment = {
+    HOME: home,
+    USER: id.username,
+    LOGNAME: id.username,
+    TMPDIR: home + '/tmp',
+    PATH: '/usr/local/bin:/usr/bin:/bin',
+    ...opts.env,
+  }
+  const envFlags: string[] = []
+  for (const [k, v] of Object.entries(environment)) {
     if (!/^[A-Za-z_][A-Za-z0-9_]{0,63}$/.test(k) || /[\u0000-\u001f\u007f]/.test(v)) {
       invalid(`invalid environment variable ${k}`)
     }
