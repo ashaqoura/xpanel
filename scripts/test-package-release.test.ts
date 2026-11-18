@@ -1018,3 +1018,16 @@ describe('issued audit helper package source closure', () => {
     expect(readdirSync(outputDir)).toEqual([])
   })
 })
+
+describe('workspace dependency patch artifact inclusion', { tags: ['feature'] }, () => {
+  it('ships scripts/patches/picomatch@4.0.7.patch with normalized LF bytes when present', async () => {
+    const sourceRoot = makeSourceFixture()
+    const patchRel = 'scripts/patches/picomatch@4.0.7.patch'
+    const patchCrlf = 'diff --git a/lib/parse.js b/lib/parse.js\r\n--- a/lib/parse.js\r\n+++ b/lib/parse.js\r\n'
+    writeSourceFile(sourceRoot, patchRel, patchCrlf)
+    const built = await buildReleaseArtifact({ sourceRoot, outputDir: makeTempDir(), createTarball: false })
+    expect(built.manifest.files.some(file => file.path === patchRel)).toBe(true)
+    expect(readFileSync(join(built.stagingDir, patchRel), 'utf8')).toBe(patchCrlf.replaceAll('\r\n', '\n'))
+    expect(REQUIRED_ROOT_FILES).not.toContain(patchRel)
+  })
+})

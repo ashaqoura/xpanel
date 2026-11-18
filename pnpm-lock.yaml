@@ -171,6 +171,9 @@ catalogs:
 overrides:
   '@types/tar-stream>@types/node': 26.6.5
 
+patchedDependencies:
+  picomatch@4.0.7: 7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965
+
 importers:
 
   .:
@@ -1711,9 +1714,9 @@ snapshots:
 
   fast-fifo@1.3.2: {}
 
-  fdir@6.5.0(picomatch@4.0.7):
+  fdir@6.5.0(picomatch@4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965)):
     optionalDependencies:
-      picomatch: 4.0.7
+      picomatch: 4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965)
 
   fsevents@2.3.3:
     optional: true
@@ -1827,7 +1830,7 @@ snapshots:
 
   picocolors@1.1.1: {}
 
-  picomatch@4.0.7: {}
+  picomatch@4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965): {}
 
   pixelmatch@8.0.0:
     dependencies:
@@ -1922,8 +1925,8 @@ snapshots:
 
   tinyglobby@0.2.17:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.7)
-      picomatch: 4.0.7
+      fdir: 6.5.0(picomatch@4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965))
+      picomatch: 4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965)
 
   tldts-core@7.4.19:
     optional: true
@@ -1981,7 +1984,7 @@ snapshots:
   vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
-      picomatch: 4.0.7
+      picomatch: 4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965)
       postcss: 8.5.31
       rolldown: 1.2.15
       tinyglobby: 0.2.17
@@ -2002,7 +2005,7 @@ snapshots:
       expect-type: 1.4.0
       magic-string: 1.4.3
       obug: 3.0.0
-      picomatch: 4.0.7
+      picomatch: 4.0.7(patch_hash=7671173a01747e16afb7358c4ce614a76e8f580429a7b7f36b51133649091965)
       std-env: 4.3.0
       tinybench: 6.2.2
       tinyexec: 1.3.1
