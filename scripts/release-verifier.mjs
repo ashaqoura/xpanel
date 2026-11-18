@@ -35,7 +35,8 @@ export const DESIGN_REFERENCE_INPUTS = Object.freeze({ directories: Object.freez
  * The offline production dependency install for an authenticated release. The host PATH has no
  * Node, so pnpm is told the release's pinned runtime to check package engines against.
  */
-export const offlineDependencyInstallArguments = manifest => ['install', '--offline', '--frozen-lockfile', '--prod', '--ignore-scripts', '--verify-store-integrity', `--config.node-version=${manifest.runtime.nodeVersion}`]
+// Offline installs verify the signed lockfile and CAS store integrity directly without registry publish-age metadata.
+export const offlineDependencyInstallArguments = manifest => ['install', '--offline', '--frozen-lockfile', '--prod', '--ignore-scripts', '--verify-store-integrity', `--config.node-version=${manifest.runtime.nodeVersion}`, '--config.minimum-release-age=0']
 
 /**
  * Installed dependencies are public code the unprivileged services read, so their modes are fixed rather than taken
