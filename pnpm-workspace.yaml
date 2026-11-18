@@ -29,6 +29,14 @@ minimumReleaseAgeExclude:
   - '@rolldown/binding-win32-arm64-msvc@1.2.15'
   - '@rolldown/binding-win32-x64-msvc@1.2.15'
 
+# Patch GHSA-fc5q-39xc-vjpf (CVE-2026-112366, dev-only test tooling) until an official release >4.0.7 ships.
+patchedDependencies:
+  picomatch@4.0.7: scripts/patches/picomatch@4.0.7.patch
+
+auditConfig:
+  ignoreGhsas:
+    - GHSA-fc5q-39xc-vjpf
+
 # One exact runtime-aligned type version for the root and tar-stream's permissive wildcard.
 catalog:
   '@types/node': 26.6.5

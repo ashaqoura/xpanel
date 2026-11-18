@@ -191,7 +191,7 @@ const toPosix = (p) => p.replaceAll('\\', '/')
  * @returns {Buffer}
  */
 export const normalizeArtifactBytes = (relPath, raw) => {
-  const isText = /\.(?:ts|js|mjs|cjs|c|h|json|yaml|yml|sql|sh|service|conf|slice|md|css|html|txt)$|^\.node-version$|^VERSION$/.test(relPath)
+  const isText = /\.(?:ts|js|mjs|cjs|c|h|json|yaml|yml|sql|sh|service|conf|slice|md|css|html|txt|patch)$|^\.node-version$|^VERSION$/.test(relPath)
   if (!isText) return raw
   const text = raw.toString('utf8').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n')
   return Buffer.from(text, 'utf8')
@@ -314,6 +314,7 @@ const isIncludedRuntimeSource = (relPath) => {
     'scripts/install-kernel-package.mjs',
     'scripts/selinux-account-homes.sh',
     'scripts/el-source-builds.sh',
+    'scripts/patches/picomatch@4.0.7.patch',
   ].includes(relPath)) return true
   if (REQUIRED_SYSTEMD_UNITS.includes(relPath)) return true
   if (/^(?:apps|packages)\/[^/]+\/package\.json$/.test(relPath)) return true
@@ -341,7 +342,7 @@ const PRIVACY_SKIP_DIRS = new Set([
   'tmp',
 ])
 
-const PRIVACY_TEXT_EXTENSIONS = new Set(['.md', '.po', '.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.css', '.html', '.yml', '.yaml', '.sh', '.c', '.sql', '.txt'])
+const PRIVACY_TEXT_EXTENSIONS = new Set(['.md', '.po', '.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.css', '.html', '.yml', '.yaml', '.sh', '.c', '.sql', '.txt', '.patch'])
 
 /**
  * Names the release privacy scan may see in this checkout. The build runner reads this
