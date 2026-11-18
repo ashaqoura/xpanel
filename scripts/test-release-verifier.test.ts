@@ -62,9 +62,9 @@ const rewriteManifest = (change: (manifest: any) => void): Buffer => rewrite(ent
 })
 
 describe('strict authenticated runtime release verifier, diagnostic archives only', () => {
-  it('installs offline dependencies against the release-pinned Node, not whatever PATH holds', async () => {
+  it('installs offline dependencies against the release-pinned Node without publish-age registry metadata', async () => {
     const report = await verify()
-    expect(offlineDependencyInstallArguments(report.manifest)).toEqual(['install', '--offline', '--frozen-lockfile', '--prod', '--ignore-scripts', '--verify-store-integrity', `--config.node-version=${report.manifest.runtime.nodeVersion}`])
+    expect(offlineDependencyInstallArguments(report.manifest)).toEqual(['install', '--offline', '--frozen-lockfile', '--prod', '--ignore-scripts', '--verify-store-integrity', `--config.node-version=${report.manifest.runtime.nodeVersion}`, '--config.minimum-release-age=0'])
     expect(report.manifest.runtime.nodeVersion).toMatch(/^\d+\.\d+\.\d+$/)
   })
   it.skipIf(process.platform === 'win32')('sets fixed modes on installed dependency trees only, whatever the umask, without following links', async () => {
