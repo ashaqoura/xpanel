@@ -77,11 +77,81 @@ export const accountProbeNginxLocation = (account: Pick<Account, 'username' | 'u
   '}',
 ]
 
+const DISALLOWED_PROBE_DIRECTIVE = /^(?:include|rewrite|auth_request|mirror|error_page|[a-z_]*by_lua[a-z_]*|js_[a-z_]+|perl)$/i
+
+function hasUnsafeNginxDirective(content: string): boolean {
+  if (content.includes('\0')) return true
+  let i = 0, depth = 0, atDirective = true
+  const len = content.length
+  while (i < len) {
+    const ch = content[i]!
+    if (ch === ' ' || ch === '\t' || ch === '\r' || ch === '\n') { i++; continue }
+    if (ch === '#') { while (i < len && content[i] !== '\n') i++; continue }
+    if (ch === ';' || ch === '{' || ch === '}') {
+      if (ch === '{') depth++
+      else if (ch === '}') { if (--depth < 0) return true }
+      atDirective = true
+      i++
+      continue
+    }
+    if (ch === '"' || ch === "'") {
+      // Directive names emitted by xPanel are never quoted; reject quoted directive names outright.
+      if (atDirective) return true
+      const quote = ch
+      i++
+      let closed = false
+      while (i < len) {
+        const c = content[i]!
+        if (c === '\\') {
+          if (i + 1 >= len) return true
+          i += 2
+          continue
+        }
+        if (c === quote) { closed = true; i++; break }
+        i++
+      }
+      if (!closed) return true
+      if (i < len && !' \t\r\n;{})'.includes(content[i]!)) return true
+      continue
+    }
+    const start = i
+    let token = ''
+    while (i < len) {
+      const c = content[i]!
+      if (c === ' ' || c === '\t' || c === '\r' || c === '\n' || c === ';' || c === '{' || c === '}') break
+      if (c === '"' || c === "'") return true
+      if (c === '\\') {
+        if (atDirective || i + 1 >= len) return true
+        const next = content[i + 1]!
+        if (' \t\r\n;{}\'"'.includes(next)) return true
+        token += c + next
+        i += 2
+        continue
+      }
+      if (c === '$' && content[i + 1] === '{') {
+        const close = content.indexOf('}', i + 2)
+        if (close === -1 || !/^[A-Za-z0-9_]+$/.test(content.slice(i + 2, close))) return true
+        token += content.slice(i, close + 1)
+        i = close + 1
+        continue
+      }
+      token += c
+      i++
+    }
+    if (i === start) return true
+    if (atDirective) {
+      if (DISALLOWED_PROBE_DIRECTIVE.test(token)) return true
+      atDirective = false
+    }
+  }
+  return depth !== 0
+}
+
 /** Only the compiler-owned, non-scripted ingress can carry the private admission header. */
 export function assertAccountProbeIngress(content: string, account: Pick<Account, 'username' | 'uid' | 'home'>): void {
   const expected = accountProbeNginxLocation(account).map(line => '    ' + line).join('\n')
   // Unknown includes/rewrite/subrequest scripting are unsupported, rather than trusted from file ownership alone.
-  if (!content.includes(expected) || content.includes('\\') || /(?:^|[;\r\n{}])\s*(?:include|rewrite|auth_request|mirror|error_page|[A-Za-z_]*by_lua[A-Za-z_]*|js_[A-Za-z_]+|perl)(?=\s|;)/.test(content)) {
+  if (!content.includes(expected) || hasUnsafeNginxDirective(content)) {
     fail('PRECONDITION_FAILED', 'the immutable account probe ingress was not verified', { verificationRequired: true })
   }
 }

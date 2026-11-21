@@ -67,11 +67,42 @@ describe('immutable account probe renderer', { tags: ['unit'] }, () => {
     expect(renderNginxSite({ ...actual, status: 'suspended' }, [fpm], settings())).not.toContain(ACCOUNT_PROBE_ROUTE)
     expect(renderNginxSite({ ...actual, bandwidthLimitedMonth: '2026-10' }, [fpm], settings())).not.toContain(ACCOUNT_PROBE_ROUTE)
   })
+  it('accepts compiler-generated mail autoconfig XML escapes and regex path escapes in the FPM vhost', () => {
+    const actual = edgeAccount(), storedDomain = domain(), fpm: Domain = { ...storedDomain, php: { ...storedDomain.php, handler: 'fpm' } }
+    const withAutoconfig = renderNginxSite(actual, [fpm], settings(), cert(), {
+      mailAutoconfig: { hostname: 'mail.example.test', domains: [fpm.name] },
+    })
+    expect(withAutoconfig).toContain('location ~* ^/autodiscover/autodiscover\\.xml$ {')
+    expect(withAutoconfig).toContain('<?xml version=\\"1.0\\"')
+    expect(() => assertAccountProbeIngress(withAutoconfig, actual)).not.toThrow()
+    const withWaf = renderNginxSite(actual, [fpm], settings(), cert(), {
+      waf: { [fpm.name]: { denyPaths: [String.raw`^/xmlrpc\.php$`] } },
+    })
+    expect(withWaf).toContain('xmlrpc')
+    expect(() => assertAccountProbeIngress(withWaf, actual)).not.toThrow()
+  })
   it('refuses a changed ingress, arbitrary include and replay-capable rewrite or subrequest', () => {
     const expected = accountProbeNginxLocation(account).map(line => '    ' + line).join('\n')
     expect(() => assertAccountProbeIngress('server {\n' + expected + '\n}', account)).not.toThrow()
     expect(() => assertAccountProbeIngress('server {\nserver_name rewrite.example.test;\n' + expected + '\n}', account)).not.toThrow()
-    for (const extra of ['include /home/alice/nginx.conf;', 'rewrite ^ /index.php last;', 'server { rewrite ^ /index.php last; }', 'r\\ewrite ^ /index.php last;', 'auth_request /auth;', 'mirror /mirror;', 'rewrite_by_lua_file /home/alice/a.lua;', 'js_access tenant;']) {
+    for (const extra of [
+      'include /home/alice/nginx.conf;',
+      'rewrite ^ /index.php last;',
+      'server { rewrite ^ /index.php last; }',
+      'r\\ewrite ^ /index.php last;',
+      '"rewrite" ^ /index.php last;',
+      "'include' /home/alice/nginx.conf;",
+      'rew"r"ite ^ /index.php last;',
+      'return 200 "ok"; rewrite ^ /index.php last;',
+      'location ~* ^/x\\; { return 200 ok; }',
+      'return 200 "unterminated;',
+      'auth_request /auth;',
+      'mirror /mirror;',
+      'error_page 404 /custom.html;',
+      'rewrite_by_lua_file /home/alice/a.lua;',
+      'js_access tenant;',
+      'perl handler;',
+    ]) {
       expect(() => assertAccountProbeIngress('server {\n' + extra + '\n' + expected + '\n}', account)).toThrow()
     }
     expect(() => assertAccountProbeIngress(expected.replace('ingress.sock', 'foreign.sock'), account)).toThrow()
