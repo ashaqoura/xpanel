@@ -361,7 +361,7 @@ export default [
 
   tool('email-all-resellers', {
     prefix: 'S13T11', as: 'root', needs: ['account', 'mailbox'], probe: '/api/resellers',
-    page: { route: '/whm/resellers/more', read: '/api/domains', shows: () => ['More reseller tools'] },
+    page: { route: '/whm/resellers/more', read: '/api/domains', shows: () => ['Reseller usage & mail'] },
     paths: new RegExp(String.raw`^\/api\/(?:resellers(?:\/email|\/${ID})?|domains)$`), requests: 25,
     unit: [{ id: 'S13T11-UNIT-1', file: 'apps/api/src/reseller-workspace.test.ts', name: 'reseller privilege lists and Email All Resellers sends one message per reseller contact and reports who has none or failed' }],
     checks: ['EMPTY-SUBJECT-REFUSED', 'MULTILINE-SUBJECT-REFUSED', 'RESELLER-CONTACT-DELIVERED'],

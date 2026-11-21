@@ -246,7 +246,7 @@ export default [
 
   tool('backup-restoration', {
     prefix: 'S16T11', as: 'root', needs: ['account'], probe: '/api/backups/workspace',
-    page: { route: '/whm/backups/restore', read: '/api/backups/workspace', shows: () => ['Server backups'] },
+    page: { route: '/whm/backups/restore', read: '/api/backups/workspace', shows: () => ['Restore accounts'] },
     paths: /^\/api\/backups\/(?:workspace(?:\/runs)?|components\/[a-z0-9]{1,16}\/inventory)$/,
     unit: [{ id: 'S16T11-UNIT-1', file: 'apps/agent/src/account-backup-workspace.test.ts', name: 'account archive inspection and ownership inspects real gzip bytes and reports exact file digests' }],
     checks: ['WORKSPACE-AND-RUNS-READ', 'EMPTY-INVENTORY-BODY-VALIDATION', 'MISSING-ACCOUNT-INVENTORY-NOT-FOUND'],
