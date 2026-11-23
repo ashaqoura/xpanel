@@ -315,7 +315,7 @@ export async function runMfaRuntimeAcceptance({ output, screenshotBudget = 8, fi
         assert.deepEqual(fonts.failed_faces, [])
         row.fonts = fonts
         const isV2 = await page.locator('[data-ui-theme="v2"]').count() > 0
-        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans'
+        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans')
         row.fonts.heading = await assertAppliedFont(page, state.screen === 'login' ? '.v2-login h1, .xp-login-shell h1' : '[data-security-page] h1', uiFamily)
         if (state.screen === 'login') {
           row.fonts.wordmark = isV2

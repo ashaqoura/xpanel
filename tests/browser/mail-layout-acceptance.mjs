@@ -26,7 +26,7 @@ async function fontGate(page, locale) {
     let ready = false
     await Promise.race([document.fonts.ready.then(() => { ready = true }), new Promise(resolve => setTimeout(resolve, 10000))])
     const isV2 = document.documentElement.dataset.uiTheme === 'v2' || Boolean(document.querySelector('[data-ui-theme="v2"]'))
-    const family = locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans'
+    const family = locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans')
     const faces = [...document.fonts].map(face => ({ family: face.family.replaceAll('"', '').replaceAll("'", ''), status: face.status }))
     return { ready, isV2, family, faces, body_family: getComputedStyle(document.body).fontFamily, glyph_check: document.fonts.check(family === 'sans-serif' ? '14px sans-serif' : '14px "' + family + '"', locale === 'ar' ? 'الحساب 0123456789' : 'Account 0123456789') }
   }, locale)
@@ -396,7 +396,7 @@ export async function runMailLayoutAcceptance({ output, filter } = {}) {
         outcome.fonts = await fontGate(page, state.locale)
         if (!probeControls) probeControls = await quotaProbeControls(page)
         outcome.applied_fonts = {}
-        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans'
+        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans')
         const brandCheck = isV2
           ? ['brand', state.width >= 960 ? '.v2-side .v2-brand__name' : '.v2-top__brand', uiFamily, 'ordinary']
           : ['brand', '[data-mail-layout="reference"] > header > a:first-of-type > span:last-child', 'IBM Plex Mono', 'mail-wordmark']

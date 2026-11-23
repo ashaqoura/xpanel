@@ -4,6 +4,7 @@
 import { brandingHeadStyle, brandingRootAttributes } from '../../branding.ts'
 import type { DocumentProps } from '../contract.ts'
 import { PLEX_FONTS_STYLESHEET_HREF } from '../../vendor/plex.ts'
+import { METRONIC_ICONS_STYLESHEET_HREF, METRONIC_STYLESHEET_HREF } from '../../vendor/metronic.ts'
 import { v2Stylesheet } from './assets.ts'
 import { v2SharedStylesheets, v2StylesheetsForDocument } from './route-assets.ts'
 import { escapeHtml } from './html.ts'
@@ -19,10 +20,12 @@ export const renderV2Document = (props: V2DocumentProps): string => `<!doctype h
 <title>${escapeHtml(props.title)}</title>
 <link rel="icon"${props.faviconContentType ? ` type="${escapeHtml(props.faviconContentType)}"` : ''} href="${escapeHtml(props.faviconHref)}">
 <link rel="stylesheet" href="${escapeHtml(PLEX_FONTS_STYLESHEET_HREF)}">
+<link rel="stylesheet" href="${escapeHtml(METRONIC_ICONS_STYLESHEET_HREF)}">
+<link rel="stylesheet" href="${escapeHtml(METRONIC_STYLESHEET_HREF)}">
 <link rel="stylesheet" href="${escapeHtml(v2Stylesheet.href)}">
 ${[...v2SharedStylesheets, ...v2StylesheetsForDocument(props)].map(asset => `<link rel="stylesheet" href="${escapeHtml(asset.href)}">`).join('\n')}
 ${brandingHeadStyle(props.branding)}
 ${props.headHtml}
 </head>
-<body>${props.bodyHtml}</body>
+<body class="antialiased text-sm text-foreground bg-muted">${props.bodyHtml}</body>
 </html>`

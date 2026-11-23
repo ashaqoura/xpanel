@@ -33,7 +33,7 @@ export const netTechnical = (value: string | number | undefined | null, fallback
   `<bdi class="v2-mono" dir="ltr">${escapeHtml(value === null || value === undefined ? fallback : value)}</bdi>`
 
 export function netButton(label: string, hooks?: HookAttributes, options: { enabled?: boolean; primary?: boolean; danger?: boolean; submit?: boolean } = {}): string {
-  return `<button type="${options.submit ? 'submit' : 'button'}" class="v2-btn${options.primary ? ' v2-btn--primary' : ''}${options.danger ? ' v2-btn--danger' : ''}"${hookAttrs(hooks)}${options.enabled ? '' : ' disabled'}>${escapeHtml(label)}</button>`
+  return `<button type="${options.submit ? 'submit' : 'button'}" class="v2-btn${options.primary ? ' v2-btn--primary' : ''}${options.danger ? ' v2-btn--danger' : ''} kt-btn ${options.danger ? 'kt-btn-destructive' : options.primary ? 'kt-btn-primary' : 'kt-btn-outline'}"${hookAttrs(hooks)}${options.enabled ? '' : ' disabled'}>${escapeHtml(label)}</button>`
 }
 
 export const netField = (id: string, label: string, control: FieldControl, help?: string, exactId = false): string =>
@@ -47,17 +47,17 @@ export function netTable(t: Translate, key: string, caption: string, columns: re
 }
 
 export const netFacts = (rows: readonly { label: string; valueHtml: string; hooks?: HookAttributes }[]): string =>
-  `<dl class="v2-whm-network__facts">${rows.map(row => `<div><dt>${escapeHtml(row.label)}</dt><dd${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
+  `<dl class="v2-whm-network__facts text-sm">${rows.map(row => `<div><dt>${escapeHtml(row.label)}</dt><dd${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
 
 export function networkPage(t: Translate, route: string, title: string, description: string, bodyHtml: string, canRead: boolean, hooks?: HookAttributes, actionsHtml?: string): string {
-  return `<section class="v2-whm-network" data-whm-detail-route="${escapeHtml(route)}" data-capability-state="${canRead ? 'authorized' : 'unavailable'}"${canRead ? '' : ' data-readonly="true"'}${hookAttrs(hooks)}>${pageHeader(t, { route, title, description, breadcrumb: [{ label: t(msgid('Home')), href: '/whm' }, { label: title }], ...(actionsHtml ? { actionsHtml } : {}) })}${!canRead ? `<p role="status">${escapeHtml(t(msgctxt('theme:v2', 'Authorized data has not been read. Controls remain unavailable.')))}</p>` : ''}${bodyHtml}</section>`
+  return `<section class="v2-whm-network flex flex-col gap-5 lg:gap-7.5" data-whm-detail-route="${escapeHtml(route)}" data-capability-state="${canRead ? 'authorized' : 'unavailable'}"${canRead ? '' : ' data-readonly="true"'}${hookAttrs(hooks)}>${pageHeader(t, { route, title, description, breadcrumb: [{ label: t(msgid('Home')), href: '/whm' }, { label: title }], ...(actionsHtml ? { actionsHtml } : {}) })}${!canRead ? `<p class="kt-alert kt-alert-light kt-alert-warning" role="status">${escapeHtml(t(msgctxt('theme:v2', 'Authorized data has not been read. Controls remain unavailable.')))}</p>` : ''}${bodyHtml}</section>`
 }
 
 // A repainted domain row has no tone class: its status pill follows the row's recorded state, as the server row does.
 export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:flex;flex-direction:column;gap:var(--space-4);min-inline-size:0}
 .v2-whm-network__groups{display:flex;flex-direction:column;gap:var(--space-3);min-inline-size:0}
 .v2-whm-network__records{display:contents}
-.v2-whm-network tr:has([data-whm-filter-row][data-status=suspended]) .v2-pill--state{background:var(--warn-soft);color:var(--warn)}
+.v2-whm-network tr:has([data-whm-filter-row][data-status=suspended]) .v2-pill--state{background:var(--warn-soft)!important;border-color:var(--warn-line)!important;color:var(--warn)!important}
 .v2-whm-network .v2-filter--fields{padding:0}
 .v2-whm-network :is([data-whm-table-workspace],[data-dns-file]){display:flex;flex-direction:column;gap:var(--space-2);min-inline-size:0}
 .v2-whm-network .v2-card__body p:not([role=alert],[data-state=failed],[data-state=error]){font-size:13px;line-height:1.6;color:var(--text-2)}
@@ -70,7 +70,7 @@ export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:f
 .v2-whm-network__facts dd{font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;unicode-bidi:plaintext;text-align:var(--v2-control-align,match-parent)}
 .v2-whm-network__facts bdi{unicode-bidi:isolate}
 .v2-whm-network__actions,.v2-whm-network__chips{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
-.v2-whm-network .v2-btn,.v2-whm-network .v2-segmented>button{min-inline-size:var(--target);min-block-size:var(--target)}
+.v2-whm-network .v2-segmented>button{min-inline-size:var(--target);min-block-size:var(--target)}
 .v2-whm-network select{min-inline-size:0;max-inline-size:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v2-whm-network .v2-muted{font-size:13px;line-height:1.45}
 .v2-whm-network__split--stretch{align-items:stretch}
@@ -105,16 +105,13 @@ export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:f
 .v2-whm-network .v2-kpi[data-state=unread] .v2-kpi__value>:first-child{font-size:18px;line-height:30px;color:var(--muted)}
 .v2-whm-network tr[data-whm-filter-empty]>td{padding:var(--space-3);text-align:center;color:var(--muted)}
 .v2-whm-network .v2-kpi-row{grid-template-columns:repeat(4,minmax(0,1fr))}
-.v2-whm-network [data-domain-bulk]{flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:var(--space-2);padding:12px var(--space-2);border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--subtle)}
-.v2-whm-network [data-domain-bulk]>label{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target);font-size:13px;font-weight:600}
-.v2-whm-network [data-domain-bulk]>output{min-block-size:var(--target);display:flex;align-items:center;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.v2-whm-network [data-domain-bulk]>output{font-variant-numeric:tabular-nums}
 .v2-whm-network [data-domain-bulk]>.v2-whm-network__fields{flex:1 1 360px}
 .v2-whm-network [data-domain-bulk]>:is(p,ul){flex:1 1 100%;margin:0}
 .v2-whm-network [data-domain-bulk]>:is(p,ul):empty{display:none}
 .v2-whm-network [data-whm-filter-table]{min-inline-size:0}
 .v2-whm-network [data-whm-filter-table] :is(th,td){padding-inline:8px;white-space:normal}
 .v2-whm-network [data-whm-filter-table] .v2-cell-lead .v2-cell-lead__text{min-inline-size:180px;max-inline-size:260px;overflow-wrap:anywhere}
-.v2-whm-network__rowactions>a.v2-btn{padding-inline:12px}
 @media(max-width:1400px){.v2-whm-network [data-whm-filter-table] .v2-cell-lead__mark{display:none}}
 .v2-whm-network [data-whm-filter-table] td:first-child{overflow-wrap:break-word}
 .v2-whm-network [data-whm-filter-table] .v2-cell-lead>input{flex:none}
@@ -144,12 +141,13 @@ export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:f
 .v2-whm-network__steps>li{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target);color:var(--muted)}
 .v2-whm-network__steps>li[aria-current=step]{font-weight:600;color:var(--accent)}
 .v2-whm-network__steps>li>span:first-child{inline-size:32px;block-size:32px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center}
+.v2-whm-network__steps>li[aria-current=step]>span:first-child{border-color:var(--accent)}
+.v2-whm-network .v2-card__body :is(h3,h4){font-size:15px;line-height:1.4;font-weight:600;color:var(--text)}
 .v2-whm-network__names label{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target)}
 .v2-whm-network__names{display:flex;flex-direction:column;gap:var(--space-1)}
 .v2-whm-network .v2-table :is(th,td){text-align:start}
 .v2-whm-network .v2-table td{font-variant-numeric:tabular-nums}
 .v2-whm-network .v2-table th{white-space:normal;vertical-align:bottom}
-@media(prefers-reduced-motion:no-preference){.v2-whm-network :is(.v2-btn,.v2-segmented>button){transition:background-color 140ms ease-out,border-color 140ms ease-out,color 140ms ease-out,box-shadow 140ms ease-out,opacity 140ms ease-out,transform 140ms ease-out}}
 .v2-whm-network__split .v2-table :is(th,td){padding-inline:12px}
 .v2-whm-network__split .v2-table td{white-space:normal;overflow-wrap:break-word}
 .v2-whm-network .v2-table-scroll{max-inline-size:100%;min-inline-size:0}

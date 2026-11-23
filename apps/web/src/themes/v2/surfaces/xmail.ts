@@ -29,7 +29,7 @@ export function createV2MailSurface(project: V2MailProjector, unavailable: UiThe
       const values = new URLSearchParams({ lang: locale, theme: scheme, ...(view.kind === 'inbox' ? { folder: view.folder } : view.kind === 'workspace' && view.route === '/mail/search' ? { folder: view.activeFolder } : {}), ...changes })
       return view.route + '?' + values.toString()
     }
-    const breadcrumb = view.kind === 'workspace' ? '' : `<nav class="v2-crumbs" aria-label="${escapeHtml(t('Breadcrumb'))}"><ol><li><a href="/mail/inbox">xMail</a></li><li><span aria-current="page">${escapeHtml(view.title)}</span></li></ol></nav>`
+    const breadcrumb = view.kind === 'workspace' ? '' : `<nav class="v2-crumbs" aria-label="${escapeHtml(t('Breadcrumb'))}"><ol class="kt-breadcrumb"><li class="kt-breadcrumb-item"><a class="kt-breadcrumb-link" href="/mail/inbox">xMail</a>${icon('chevRight', 14)}</li><li class="kt-breadcrumb-item"><span class="kt-breadcrumb-page" aria-current="page">${escapeHtml(view.title)}</span></li></ol></nav>`
     const content = view.kind === 'inbox' ? renderV2MailInbox(t, view) : view.kind === 'compose' ? renderV2MailCompose(t, view)
       : renderV2MailWorkspace({ ...view, locale, ...(view.route === '/mail/settings/security' ? { securityHtml: V2_SECURITY_SLOT } : {}) })
     if (content === undefined) throw new Error('v2_mail_workspace_renderer_missing')
@@ -41,7 +41,7 @@ export function createV2MailSurface(project: V2MailProjector, unavailable: UiThe
       ...(props.branding ? { branding: props.branding } : {}),
       context: { label: t('Mailbox'), title: view.mailbox },
       sidebarHtml: renderV2MailSidebar(t, view, props),
-      ...(searchHref ? { searchHtml: `<a class="v2-btn v2-mail-search" href="${escapeHtml(searchHref)}">${icon('search')}<span>${escapeHtml(t('Search mail'))}</span></a>` } : {}),
+      ...(searchHref ? { searchHtml: `<a class="v2-btn v2-mail-search kt-btn kt-btn-outline justify-start font-normal text-muted-foreground" href="${escapeHtml(searchHref)}">${icon('search')}<span>${escapeHtml(t('Search mail'))}</span></a>` } : {}),
       realtimeEnabled: props.realtimeEnabled === true,
       languages: alternateLocales(locale).map(info => ({ tag: info.tag, href: query({ lang: info.tag }) })),
       scheme: { current: scheme, toggleHref: query({ theme: scheme === 'dark' ? 'light' : 'dark' }) },

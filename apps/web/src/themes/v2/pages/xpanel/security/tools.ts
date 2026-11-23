@@ -3,7 +3,7 @@ import type { PanelSurfaceProps } from '../../../../contract.ts'
 import { kpiCard } from '../../../components/kpi-card.ts'
 import type { IconName } from '../../../icons.ts'
 import { sshKeyClientTemplates, virusScanClientTemplates } from '../settings/utility-client-templates.ts'
-import { actions, area, button, deniedPage, esc, facts, field, input, link, note, page, pair, section, settingsContext, status, table, unreadRow, NO_SETTINGS_AUTHORITY, type PanelSettingsAuthority } from '../settings/common.ts'
+import { actions, area, button, esc, facts, field, link, note, page, pair, section, settingsContext, status, table, unreadRow, NO_SETTINGS_AUTHORITY, type PanelSettingsAuthority } from '../settings/common.ts'
 
 export function renderV2AccountSshPage(props: PanelSurfaceProps, authority: PanelSettingsAuthority = NO_SETTINGS_AUTHORITY): string {
   const c = settingsContext(props, authority), { t } = c, title = t(msgid('SSH access')), description = t(msgid('Manage the public keys that can sign in to this account over SSH.'))
@@ -14,9 +14,9 @@ export function renderV2AccountSshPage(props: PanelSurfaceProps, authority: Pane
   const login = section('v2-ssh-login', t(msgid('SSH login')), facts([{ label: t(msgid('Login')), valueHtml: `<span data-ssh-login>${esc(unread)}</span>` }, { label: t(msgid('Username')), valueHtml: `<bdi dir="ltr" class="v2-mono">${esc((c.account?.username ?? ''))}</bdi>` }, { label: t(msgid('Port')), valueHtml: `<bdi dir="ltr" class="v2-num" data-ssh-port>${esc(unread)}</bdi>` }, { label: t(msgid('Shell (account / plan)')), valueHtml: `<bdi dir="ltr" data-ssh-shell>${esc(unread)}</bdi>` }, { label: t(msgid('Open sessions')), valueHtml: `<bdi dir="ltr" class="v2-num" data-ssh-open-sessions>${esc(openSessionsText)}</bdi>` }]) + note(t(msgid('Login follows the saved account and plan shell settings; the host itself is not checked here. Keys you add take effect only while login is enabled.'))))
   const keys = section('v2-ssh-keys', t(msgid('Authorized keys')), note(t(msgctxt('theme:v2', 'Public keys allowed to sign in as this account are stored in its authorized_keys file.')))
     + table('v2-ssh-key-list', t(msgid('Authorized keys')), [t(msgid('Type')), t(msgid('Fingerprint')), t(msgid('Comment')), t(msgid('Notes')), t(msgid('Actions'))], unreadRow(5, t(msgid('The key list has not been read.'))), { 'data-ssh-rows': true })
-    + `<p class="v2-muted" data-ssh-file>${esc(t(msgid('File state has not been read.')))}</p>`
+    + `<p class="v2-muted text-xs text-muted-foreground" data-ssh-file>${esc(t(msgid('File state has not been read.')))}</p>`
     + status(t(msgid('The key list has not been read.')), { 'data-ssh-status': true }), actions(button(t(msgid('Read keys')), { 'data-ssh-refresh': true }, !c.editable)))
-  const add = section('v2-ssh-add', t(msgid('Add a public key')), field('v2-ssh-key', t(msgid('Public key line')), area('v2-ssh-key', '', ' class="v2-mono" dir="ltr" rows="4" maxlength="8192" spellcheck="false" autocomplete="off" data-ssh-key', !c.editable), t(msgctxt('theme:v2', 'Paste one Ed25519, ECDSA or RSA public key line. RSA requires at least 3072 bits. Key option prefixes are refused.'))), actions(button(t(msgid('Add key')), { 'data-ssh-add': true }, !c.editable, true)))
+  const add = section('v2-ssh-add', t(msgid('Add a public key')), field('v2-ssh-key', t(msgid('Public key line')), area('v2-ssh-key', '', ' class="v2-mono" dir="ltr" rows="4" maxlength="8192" spellcheck="false" autocomplete="off" data-ssh-key', !c.editable), t(msgctxt('theme:v2', 'Paste one Ed25519, ECDSA or RSA public key line. RSA requires at least 3072 bits. Key option prefixes are refused.'))) + actions(button(t(msgid('Add key')), { 'data-ssh-add': true }, !c.editable, true)))
   return page(props, authority, '/security/ssh', title, description, sshKeyClientTemplates() + login + keys + add, { 'data-account-ssh': true, 'data-ssh-manage': String(c.editable) })
 }
 

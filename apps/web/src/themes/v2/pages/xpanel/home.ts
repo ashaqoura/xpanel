@@ -115,28 +115,28 @@ function sites(props: PanelPageProps, t: Translate, routes: ReadonlySet<string>)
     const certificateLabel = t(domain.certificateId === null ? msgctxt('theme:v2', 'No stored certificate')
       : storedCertificate ? msgctxt('theme:v2', 'Stored certificate') : msgctxt('resources-board', 'Not read'))
     const name = routes.has('/domains/site-settings')
-      ? `<a class="v2-mono" href="${escapeHtml(domainHref('/domains/site-settings', domain.name))}"><bdi dir="ltr">${escapeHtml(domain.name)}</bdi></a>`
+      ? `<a class="v2-mono text-mono hover:text-primary" href="${escapeHtml(domainHref('/domains/site-settings', domain.name))}"><bdi dir="ltr">${escapeHtml(domain.name)}</bdi></a>`
       : `<bdi dir="ltr" class="v2-mono">${escapeHtml(domain.name)}</bdi>`
-    const identity = `<div class="v2-home-site"><span class="v2-home-site__mark" aria-hidden="true">${icon('globe', 18)}</span><div class="v2-home-site__text"><span class="v2-home-site__name">${name}<span class="v2-home-site__kind">${escapeHtml(t(domain.kind === 'primary' ? 'Primary' : domain.kind === 'addon' ? 'Addon' : domain.kind === 'alias' ? 'Alias' : 'Subdomain'))}</span></span><bdi dir="ltr" class="v2-home-site__root v2-mono">${escapeHtml(domain.docRoot)}</bdi></div></div>`
+    const identity = `<div class="v2-home-site"><span class="v2-home-site__mark" aria-hidden="true">${icon('globe', 18)}</span><div class="v2-home-site__text"><span class="v2-home-site__name">${name}<span class="v2-home-site__kind kt-badge kt-badge-sm kt-badge-outline">${escapeHtml(t(domain.kind === 'primary' ? 'Primary' : domain.kind === 'addon' ? 'Addon' : domain.kind === 'alias' ? 'Alias' : 'Subdomain'))}</span></span><bdi dir="ltr" class="v2-home-site__root v2-mono text-xs text-muted-foreground">${escapeHtml(domain.docRoot)}</bdi></div></div>`
     return {
       cellsHtml: [
         identity,
         `<bdi dir="ltr" class="v2-mono">${escapeHtml(`${domain.php.version} · ${domain.php.handler}`)}</bdi>`,
-        `<span class="v2-home-site__certificate">${icon('shield', 16)}<span>${escapeHtml(certificateLabel)}</span></span>${expires ? `<span class="v2-home-site__expiry v2-num" data-home-site-expiry>${escapeHtml(t('Expires (UTC)'))} <bdi dir="ltr">${expires}</bdi></span>` : ''}`,
+        `<span class="v2-home-site__certificate text-sm text-foreground">${icon('shield', 16)}<span>${escapeHtml(certificateLabel)}</span></span>${expires ? `<span class="v2-home-site__expiry v2-num text-xs text-muted-foreground" data-home-site-expiry>${escapeHtml(t('Expires (UTC)'))} <bdi dir="ltr">${expires}</bdi></span>` : ''}`,
         statusPill({ tone: domain.suspended ? 'warn' : 'info', label: t(domain.suspended ? msgid('Suspended') : msgctxt('theme:v2', 'Saved active configuration')) }),
       ],
       actionsHtml: (placement: 'table' | 'card'): string =>
-        `${routes.has('/domains/site-settings') ? `<a class="v2-btn" href="${escapeHtml(domainHref('/domains/site-settings', domain.name))}" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Manage {domain}'), { domain: domain.name }))}">${escapeHtml(t('Manage'))}</a>` : manageAuthorized ? `<button type="button" class="v2-btn" disabled aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Manage {domain}'), { domain: domain.name }))}">${escapeHtml(t('Manage'))}</button>` : ''}${links.length ? rowMenu({ id: `v2-home-site-${placement}-${index}`, label: t(msgctxt('theme:v2', 'More actions for {domain}'), { domain: domain.name }), items: links }) : ''}`,
+        `${routes.has('/domains/site-settings') ? `<a class="v2-btn kt-btn kt-btn-outline kt-btn-sm" href="${escapeHtml(domainHref('/domains/site-settings', domain.name))}" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Manage {domain}'), { domain: domain.name }))}">${escapeHtml(t('Manage'))}</a>` : manageAuthorized ? `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" disabled aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Manage {domain}'), { domain: domain.name }))}">${escapeHtml(t('Manage'))}</button>` : ''}${links.length ? rowMenu({ id: `v2-home-site-${placement}-${index}`, label: t(msgctxt('theme:v2', 'More actions for {domain}'), { domain: domain.name }), items: links }) : ''}`,
     }
   })
   const rows = siteRows.map(row => ({ cellsHtml: row.cellsHtml, actionsHtml: row.actionsHtml('table') }))
   const mobile = domains === undefined ? errorState(t, { lead: t(msgctxt('theme:v2', 'The account domain list was not read.')) })
     : siteRows.length === 0 ? emptyState({ icon: 'globe', title: t(msgctxt('theme:v2', 'No domains.')) })
-      : `<ul class="v2-home-site-cards">${siteRows.map(row => `<li class="v2-home-site-card"><div class="v2-home-site-card__head">${row.cellsHtml[0]}</div><dl class="v2-home-site-card__facts"><div><dt>${escapeHtml(t(msgid('Status')))}</dt><dd>${row.cellsHtml[3]}</dd></div><div><dt>${escapeHtml(t('PHP'))}</dt><dd>${row.cellsHtml[1]}</dd></div><div><dt>${escapeHtml(t(msgid('Certificate')))}</dt><dd>${row.cellsHtml[2]}</dd></div></dl>${row.actionsHtml('card') ? `<div class="v2-home-site-card__actions">${row.actionsHtml('card')}</div>` : ''}</li>`).join('')}</ul>`
+      : `<ul class="v2-home-site-cards">${siteRows.map(row => `<li class="v2-home-site-card kt-card"><div class="v2-home-site-card__head">${row.cellsHtml[0]}</div><dl class="v2-home-site-card__facts"><div><dt class="text-xs text-secondary-foreground">${escapeHtml(t(msgid('Status')))}</dt><dd class="text-sm font-medium text-mono">${row.cellsHtml[3]}</dd></div><div><dt class="text-xs text-secondary-foreground">${escapeHtml(t('PHP'))}</dt><dd class="text-sm font-medium text-mono">${row.cellsHtml[1]}</dd></div><div><dt class="text-xs text-secondary-foreground">${escapeHtml(t(msgid('Certificate')))}</dt><dd class="text-sm font-medium text-mono">${row.cellsHtml[2]}</dd></div></dl>${row.actionsHtml('card') ? `<div class="v2-home-site-card__actions">${row.actionsHtml('card')}</div>` : ''}</li>`).join('')}</ul>`
   return card({ title: t(msgctxt('theme:v2', 'Your sites')), titleId: 'v2-home-sites-title', flush: true,
     hooks: { 'data-home-sites': true },
     description: t(msgctxt('theme:v2', 'Saved site configuration. Serving status and TLS are verified separately.')),
-    ...(routes.has('/domains') ? { actionsHtml: `<a class="v2-btn" href="/domains">${icon('plus', 16)}${escapeHtml(t(msgctxt('theme:v2', 'Manage domains')))}</a>` } : {}),
+    ...(routes.has('/domains') ? { actionsHtml: `<a class="v2-btn kt-btn kt-btn-outline kt-btn-sm" href="/domains">${icon('gear', 16)}${escapeHtml(t(msgctxt('theme:v2', 'Manage domains')))}</a>` } : {}),
     bodyHtml: `<div class="v2-home-sites-desktop">${dataTable(t, { id: 'v2-home-sites', caption: t(msgctxt('theme:v2', 'Your sites')),
       columns: [{ label: t(msgid('Site')) }, { label: t('PHP') }, { label: t(msgid('Certificate')) }, { label: t(msgid('Status')) }],
       rows, actions: true,
@@ -249,7 +249,7 @@ function tools(props: PanelPageProps, t: Translate, visitors: number | undefined
   const body = groups.map((group, index) => {
     const label = t(group.label)
     const rest = t('{count, plural, one {# tool} other {# tools}}', { count: group.tools.length })
-    return `<details class="v2-home-tool-group" open data-home-accordion data-home-collapse-below="600" data-tool-group data-group-label="${escapeHtml(label)}" data-size="${group.tools.length}" aria-labelledby="v2-home-tools-${index}"><summary class="v2-home-tool-heading"><span class="v2-home-tool-heading__title" id="v2-home-tools-${index}"><span class="v2-home-group-tile v2-tile v2-tile--${group.tone ?? 'info'}" aria-hidden="true">${icon(group.icon, 16)}</span><span class="v2-home-group-label">${escapeHtml(label)}</span><span class="v2-muted v2-num" data-group-count data-rest="${escapeHtml(rest)}">${escapeHtml(rest)}</span>${icon('chevDown', 16)}</span></summary><div class="v2-home-tool-grid" data-tool-panel>${group.tools.map(item => {
+    return `<details class="v2-home-tool-group kt-card" open data-home-accordion data-home-collapse-below="600" data-tool-group data-group-label="${escapeHtml(label)}" data-size="${group.tools.length}" aria-labelledby="v2-home-tools-${index}"><summary class="v2-home-tool-heading kt-card-header"><span class="v2-home-tool-heading__title kt-card-title text-mono" id="v2-home-tools-${index}"><span class="v2-home-group-tile v2-tile v2-tile--${group.tone ?? 'info'}" aria-hidden="true">${icon(group.icon, 16)}</span><span class="v2-home-group-label">${escapeHtml(label)}</span><span class="v2-muted v2-num text-xs font-normal text-muted-foreground" data-group-count data-rest="${escapeHtml(rest)}">${escapeHtml(rest)}</span>${icon('chevDown', 16)}</span></summary><div class="v2-home-tool-grid kt-card-content p-2.5" data-tool-panel>${group.tools.map(item => {
       const name = t(item.label)
       // Personal documents use registered session admission; host-native cards retain qualification.
       const personal = (item.capability === 'change-language' || item.route === '/security/account')
@@ -261,13 +261,13 @@ function tools(props: PanelPageProps, t: Translate, visitors: number | undefined
         : ''
       const href = item.capability === 'change-language' ? `?lang=${alternateLocales(t.locale)[0]!.tag}` : item.route
       const technicalHint = enabled && item.hint !== undefined && hints[item.hint] !== undefined && /^[ -~]+$/.test(hint) // translated words stay in the reading direction
-      const content = `<span class="v2-home-tool__tile v2-tile v2-tile--${enabled ? group.tone ?? 'info' : 'neutral'}" aria-hidden="true">${icon(item.icon, 16)}</span><span class="v2-home-tool__label">${escapeHtml(name)}</span><span class="v2-home-tool__hint v2-num">${technicalHint ? `<bdi dir="ltr" class="v2-mono">${escapeHtml(hint)}</bdi>` : escapeHtml(hint)}</span>`
+      const content = `<span class="v2-home-tool__tile v2-tile v2-tile--${enabled ? group.tone ?? 'info' : 'neutral'}" aria-hidden="true">${icon(item.icon, 16)}</span><span class="v2-home-tool__label text-sm font-medium text-mono">${escapeHtml(name)}</span><span class="v2-home-tool__hint v2-num text-xs text-muted-foreground">${technicalHint ? `<bdi dir="ltr" class="v2-mono">${escapeHtml(hint)}</bdi>` : escapeHtml(hint)}</span>`
       const attrs = ` data-tool data-tool-capability="${escapeHtml(item.capability)}" data-tool-keys="${escapeHtml([name, item.keywords].join(' '))}"`
-      return enabled ? `<a class="v2-home-tool" href="${escapeHtml(href)}"${attrs}>${content}</a>`
-        : `<button type="button" class="v2-home-tool" disabled${attrs}>${content}</button>`
+      return enabled ? `<a class="v2-home-tool rounded-lg hover:bg-accent/60" href="${escapeHtml(href)}"${attrs}>${content}</a>`
+        : `<button type="button" class="v2-home-tool rounded-lg" disabled${attrs}>${content}</button>`
     }).join('')}</div></details>`
   }).join('')
-  return `<section class="v2-home-tools" data-home-tools aria-labelledby="v2-home-tools-title"><header class="v2-home-tools__head"><div class="v2-home-tools__title"><h2 id="v2-home-tools-title">${escapeHtml(t('Tools'))}</h2><p class="v2-muted v2-num" id="tool-filter-count" role="status" data-rest="${escapeHtml(count)}">${escapeHtml(count)}</p></div><div class="v2-field v2-home-tool-filter"><label for="tool-filter">${escapeHtml(t('Find a tool'))}</label><span class="v2-home-tool-search">${icon('search', 18)}<input type="search" id="tool-filter" autocomplete="off" placeholder="${escapeHtml(t(msgctxt('theme:v2', 'Search tools')))}" data-home-filter aria-controls="v2-home-tool-list" aria-describedby="tool-filter-count"></span></div></header><div id="v2-home-tool-list" class="v2-home-tool-list" data-tool-section>${body || emptyState({ icon: 'tools', title: t(msgctxt('theme:v2', 'No tools are available for this account.')) })}</div><div class="v2-home-filter-empty" data-tool-empty hidden><h3 data-home-empty-title>${escapeHtml(t(msgctxt('theme:v2', 'No matching tools.')))}</h3><p>${escapeHtml(t('Clear the field or try a shorter word, such as “mail”.'))}</p><button type="button" class="v2-btn" data-home-filter-clear>${escapeHtml(t(msgctxt('theme:v2', 'Clear filter')))}</button></div></section>`
+  return `<section class="v2-home-tools" data-home-tools aria-labelledby="v2-home-tools-title"><header class="v2-home-tools__head"><div class="v2-home-tools__title"><h2 class="text-base font-semibold text-mono" id="v2-home-tools-title">${escapeHtml(t('Tools'))}</h2><p class="v2-muted v2-num text-sm text-secondary-foreground" id="tool-filter-count" role="status" data-rest="${escapeHtml(count)}">${escapeHtml(count)}</p></div><div class="v2-field v2-home-tool-filter"><label class="kt-form-label leading-tight" for="tool-filter">${escapeHtml(t('Find a tool'))}</label><span class="v2-home-tool-search kt-input max-[959px]:text-base">${icon('search', 18)}<input type="search" id="tool-filter" autocomplete="off" placeholder="${escapeHtml(t(msgctxt('theme:v2', 'Search tools')))}" data-home-filter aria-controls="v2-home-tool-list" aria-describedby="tool-filter-count"></span></div></header><div id="v2-home-tool-list" class="v2-home-tool-list" data-tool-section>${body || emptyState({ icon: 'tools', title: t(msgctxt('theme:v2', 'No tools are available for this account.')) })}</div><div class="v2-home-filter-empty kt-card items-center gap-3 px-5 py-10 text-center" data-tool-empty hidden><h3 class="text-base font-semibold text-mono" data-home-empty-title>${escapeHtml(t(msgctxt('theme:v2', 'No matching tools.')))}</h3><p class="text-sm text-secondary-foreground">${escapeHtml(t('Clear the field or try a shorter word, such as “mail”.'))}</p><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-home-filter-clear>${escapeHtml(t(msgctxt('theme:v2', 'Clear filter')))}</button></div></section>`
 }
 
 function information(props: PanelPageProps, t: Translate): string {
@@ -291,12 +291,12 @@ function recentChanges(props: PanelPageProps, t: Translate): string {
     ? t(msgctxt('theme:v2', 'Recent account changes were not read.'))
     : t(msgctxt('theme:v2', 'No recent changes.'))
   return card({ title: t('Recent changes'), titleId: 'v2-home-changes-title', bodyHtml:
-    events && events.length ? `<ol class="v2-home-changes">${events.slice(0, 8).map(event => {
+    events && events.length ? `<ol class="v2-home-changes text-sm text-foreground">${events.slice(0, 8).map(event => {
         const target = auditTargetLabel(event.target, t.locale)
         const actor = event.actor ? auditActorLabel(event.actor) : ''
-        return `<li>${icon('activity', 18)}<div><h3>${escapeHtml(auditActionLabel(event.action, t.locale, event))}</h3>${target ? `<p><bdi dir="ltr">${escapeHtml(target)}</bdi></p>` : ''}${actor ? `<p class="v2-muted">${escapeHtml(t('Actor'))}: <bdi dir="ltr">${escapeHtml(actor)}</bdi></p>` : ''}</div></li>`
+        return `<li>${icon('activity', 18)}<div><h3 class="text-sm font-medium text-mono">${escapeHtml(auditActionLabel(event.action, t.locale, event))}</h3>${target ? `<p class="text-xs text-secondary-foreground"><bdi dir="ltr">${escapeHtml(target)}</bdi></p>` : ''}${actor ? `<p class="v2-muted text-xs text-muted-foreground">${escapeHtml(t('Actor'))}: <bdi dir="ltr">${escapeHtml(actor)}</bdi></p>` : ''}</div></li>`
       }).join('')}</ol>`
-      : `<div class="v2-home-changes-state"><span class="v2-tile v2-tile--neutral" aria-hidden="true">${icon('activity', 18)}</span><p class="v2-muted">${escapeHtml(emptyCopy)}</p></div>`,
+      : `<div class="v2-home-changes-state"><span class="v2-tile v2-tile--neutral" aria-hidden="true">${icon('activity', 18)}</span><p class="v2-muted text-sm text-secondary-foreground">${escapeHtml(emptyCopy)}</p></div>`,
   })
 }
 
@@ -377,12 +377,12 @@ export function renderV2PanelHome(props: PanelPageProps, authority?: SurfaceAuth
   const announcementsHtml = props.personal?.notifications.announcements === false ? '' : renderV2AccountAnnouncementsBanner(t, canReadAnnouncements)
   const resourceCard = card({
     title: t('Resource usage'), titleId: 'v2-home-resources-title', bodyHtml: meters.map(item => meter(item)).join(''),
-    ...(routes.has('/resources') ? { footerHtml: `<a href="/resources">${escapeHtml(t('Resources & quotas'))}${icon('arrow', 16)}</a>` } : {}),
+    ...(routes.has('/resources') ? { footerHtml: `<a class="kt-link kt-link-underlined kt-link-dashed" href="/resources">${escapeHtml(t('Resources & quotas'))}${icon('arrow', 16)}</a>` } : {}),
   })
   return `<div class="v2-layout v2-panel-home" data-panel-home ${account ? `${authority?.presentation === 'read-only' ? '' : `data-account="${escapeHtml(account.id)}" `}data-uid="${account.uid}"` : ''}>
 ${pageHeader(t, { breadcrumb: [{ label: t('Home') }], route: '/home', title: t(msgctxt('theme:v2', 'Welcome back, {username}'), { username: account?.username ?? t('Not read') }),
     description: t(msgctxt('theme:v2', 'Your sites, tools and account resources.')),
-    actionsHtml: `<div class="v2-home-page-actions">${generation}<p class="v2-home-selected-domain"><span>${escapeHtml(t('Selected domain'))}</span><bdi dir="ltr" class="v2-mono">${escapeHtml(domain)}</bdi></p>${routes.has('/domains') ? `<a class="v2-btn v2-btn--primary" href="/domains">${icon('plus', 18)}${escapeHtml(t(msgid('Add domain')))}</a>` : domainsAuthorized ? `<button type="button" class="v2-btn" disabled>${icon('plus', 18)}${escapeHtml(t(msgid('Add domain')))}</button>` : ''}</div>` })}
+    actionsHtml: `<div class="v2-home-page-actions">${generation}<p class="v2-home-selected-domain"><span class="text-xs text-muted-foreground">${escapeHtml(t('Selected domain'))}</span><bdi dir="ltr" class="v2-mono text-sm font-medium text-mono">${escapeHtml(domain)}</bdi></p>${routes.has('/domains') ? `<a class="v2-btn v2-btn--primary kt-btn kt-btn-primary" href="/domains">${icon('plus', 18)}${escapeHtml(t(msgid('Add domain')))}</a>` : domainsAuthorized ? `<button type="button" class="v2-btn kt-btn kt-btn-outline" disabled>${icon('plus', 18)}${escapeHtml(t(msgid('Add domain')))}</button>` : ''}</div>` })}
 ${bandwidthNotice}${hasUrgentWarning ? noticesHtml : ''}${certRenewal.urgent ? certRenewal.html : ''}<section class="v2-kpi-row" aria-label="${escapeHtml(t('Account summary'))}">${summary.map(item => kpiCard({ headingLevel: 2, ...item })).join('')}</section>
 ${sites(props, t, routes)}${hasUrgentWarning ? '' : noticesHtml}${certRenewal.urgent ? '' : certRenewal.html}${announcementsHtml}<div class="v2-home-columns">${tools(props, t, traffic?.totals.uniqueVisitors)}<aside class="v2-stack" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Account information')))}">${resourceCard}${information(props, t)}${recentChanges(props, t)}</aside></div>
 ${renderV2AccountPlugins(t, canReadAnnouncements)}
@@ -390,99 +390,85 @@ ${renderV2AccountPlugins(t, canReadAnnouncements)}
 }
 
 export const V2_PANEL_HOME_CSS = V2_HOME_ANNOUNCEMENTS_CSS + V2_HOME_PLUGINS_CSS + '\n' + V2_HOME_NOTICES_CSS + '\n' + `.v2-panel-home :is(.v2-account-announcements__list,[data-account-plugins-list]):empty{display:none}
-.v2-panel-home .v2-account-plugins__link{min-block-size:64px;padding:12px var(--space-2);border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);font-size:14px;font-weight:600;text-decoration:none;transition:border-color 140ms ease-out,background-color 140ms ease-out}.v2-panel-home .v2-account-plugins__link:hover{border-color:var(--line-strong);background:var(--subtle)}.v2-panel-home .v2-account-plugins__link:focus-visible{outline:2px solid var(--accent-fill);outline-offset:2px}.v2-panel-home .v2-account-plugins__link img{inline-size:40px;block-size:40px;border-radius:var(--radius-control);background:var(--sunken)}
+.v2-panel-home .v2-account-plugins__link{min-block-size:4rem;padding:.75rem var(--space-2);border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);font-size:.875rem;font-weight:500;color:var(--mono,var(--text));text-decoration:none;transition:border-color 140ms ease-out,background-color 140ms ease-out}.v2-panel-home .v2-account-plugins__link:hover{border-color:var(--line-strong);background:var(--subtle)}.v2-panel-home .v2-account-plugins__link:focus-visible{outline:2px solid var(--accent-fill);outline-offset:2px}.v2-panel-home .v2-account-plugins__link img{inline-size:2.5rem;block-size:2.5rem;border-radius:var(--radius-control);background:var(--sunken)}
 .v2-panel-home .v2-home-tool__hint:not(:has(.v2-mono)){white-space:nowrap}
 .v2-panel-home .v2-home-columns{display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:stretch}
 .v2-panel-home>.v2-kpi-row{grid-template-columns:repeat(4,minmax(0,1fr))}
-.v2-panel-home .v2-kpi__value>:first-child{font-size:26px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.v2-panel-home .v2-kpi__note{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.v2-panel-home .v2-kpi__value>:first-child,.v2-panel-home .v2-kpi__note{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .v2-panel-home [data-home-generation] .v2-pill,.v2-panel-home [data-cert-renewal-strip] .v2-notice{font-variant-numeric:tabular-nums}
-.v2-panel-home .v2-home-page-actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
+.v2-panel-home .v2-home-page-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem var(--space-3)}
 .v2-panel-home .v2-home-columns>.v2-home-tools{flex:1.75 1 560px;min-inline-size:0}
 .v2-panel-home .v2-home-columns>aside{display:flex;flex-direction:column;flex:1 1 300px;min-inline-size:0;gap:var(--space-3)}
 .v2-panel-home .v2-home-columns>aside>.v2-card:last-child{flex:1;display:flex;flex-direction:column}
 .v2-panel-home .v2-home-columns>aside>.v2-card:last-child>.v2-card__body{flex:1;display:flex;flex-direction:column}
-.v2-panel-home .v2-home-site{display:flex;align-items:center;gap:12px;min-inline-size:0}
-.v2-panel-home .v2-home-site__mark{display:flex;align-items:center;justify-content:center;flex:none;inline-size:34px;block-size:34px;border-radius:8px;background:var(--accent-soft);color:var(--accent)}
-.v2-panel-home .v2-home-site__text{display:flex;flex-direction:column;gap:2px;min-inline-size:0}
-.v2-panel-home #v2-home-sites :is(th,td):not(:first-child){padding-inline-start:12px}.v2-panel-home #v2-home-sites :is(th,td):not(:last-child){padding-inline-end:12px}
+.v2-panel-home .v2-home-site{display:flex;align-items:center;gap:.625rem;min-inline-size:0}
+.v2-panel-home .v2-home-site__mark{display:flex;align-items:center;justify-content:center;flex:none;inline-size:2.25rem;block-size:2.25rem;border-radius:var(--radius-control);background:var(--accent-soft);color:var(--accent)}
+.v2-panel-home .v2-home-site__text{display:flex;flex-direction:column;gap:.125rem;min-inline-size:0}
 .v2-panel-home #v2-home-sites td:is(:nth-child(2),:nth-child(3)){white-space:nowrap}
-.v2-panel-home .v2-home-site__name{display:flex;flex-wrap:wrap;align-items:center;gap:4px var(--space-1);font-size:14px;font-weight:600;overflow-wrap:anywhere}
-.v2-panel-home .v2-home-site__name>a{display:inline-flex;align-items:center;min-inline-size:44px;min-block-size:44px;margin-block:-10px;text-decoration:none;color:var(--text);transition:color 140ms ease-out}
-.v2-panel-home .v2-home-site__name>a:hover{color:var(--accent)}
-.v2-panel-home .v2-home-site__expiry{display:block;margin-block-start:2px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
-.v2-panel-home .v2-home-site__kind{display:inline-flex;align-items:center;white-space:nowrap;padding:2px 8px;border-radius:8px;background:var(--sunken);color:var(--text-2);font-family:var(--font-sans);font-size:12px;font-weight:600}
-.v2-panel-home .v2-home-site__root{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
-.v2-panel-home .v2-home-site__certificate{display:inline-flex;align-items:center;gap:var(--space-1);font-size:13px}
-.v2-home-sites-mobile{display:none}.v2-home-site-cards{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-2)}
-.v2-home-site-card{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--v2-panel-padding);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+.v2-panel-home .v2-home-site__name{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem var(--space-1);font-size:.875rem;font-weight:500;overflow-wrap:anywhere}
+.v2-panel-home .v2-home-site__name>a{display:inline-flex;align-items:center;min-block-size:var(--target);margin-block:-.375rem;text-decoration:none}
+.v2-panel-home .v2-home-site__expiry{display:block;margin-block-start:.125rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.v2-panel-home .v2-home-site__root{overflow-wrap:anywhere}
+.v2-panel-home .v2-home-site__certificate{display:inline-flex;align-items:center;gap:var(--space-1)}
+.v2-home-sites-mobile{display:none}.v2-home-site-cards{display:flex;flex-direction:column;gap:var(--space-2)}
+.v2-home-site-card{gap:var(--space-2);padding:var(--v2-panel-padding)}
 .v2-home-site-card__head{min-inline-size:0;overflow-wrap:anywhere}
 .v2-home-site-card__facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);padding-block-start:var(--space-2);border-block-start:1px solid var(--line)}
 .v2-home-site-card__facts>div{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-1);min-inline-size:0;text-align:start}.v2-home-site-card__facts>div:first-child{grid-column:1/-1}.v2-home-site-card__facts .v2-home-site__expiry{white-space:normal}
-.v2-home-site-card__facts dt{font-size:12px;color:var(--muted)}.v2-home-site-card__facts dd{font-size:13px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:start}
-.v2-home-site-card__actions{display:flex;align-items:center;gap:var(--space-1)}.v2-home-site-card__actions>.v2-btn{flex:1}
-.v2-panel-home .v2-home-tools{display:flex;flex-direction:column;gap:var(--space-2)}
-.v2-panel-home .v2-home-tools__title>h2{font-size:16px}
+.v2-home-site-card__facts dd{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:start}
+.v2-home-site-card__actions{display:flex;align-items:center;justify-content:flex-end;gap:.625rem}
+.v2-panel-home .v2-home-tools{display:flex;flex-direction:column;gap:var(--space-3)}
 .v2-panel-home .v2-home-tools__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-2)}
-.v2-panel-home .v2-home-tools__title{display:flex;flex-direction:column;gap:var(--space-1)}
-.v2-panel-home .v2-home-tools__title>p{font-size:13px;font-variant-numeric:tabular-nums}
-.v2-panel-home .v2-home-tool-filter{flex:0 1 360px;min-inline-size:min(240px,100%)}
-.v2-panel-home .v2-home-tool-search{display:block;position:relative}
-.v2-panel-home .v2-home-tool-search>.v2-icon{position:absolute;inset-inline-end:14px;inset-block-start:13px;color:var(--muted);pointer-events:none}
-.v2-panel-home .v2-home-tool-search>input{inline-size:100%;padding-inline-start:12px;padding-inline-end:42px;text-align:start}
+.v2-panel-home .v2-home-tools__title{display:flex;flex-direction:column;gap:.375rem}
+.v2-panel-home .v2-home-tools__title>p{font-variant-numeric:tabular-nums}
+.v2-panel-home .v2-home-tool-filter{flex:0 1 320px;min-inline-size:min(240px,100%)}
+.v2-panel-home .v2-home-tool-search>input{min-block-size:0;text-align:start}
 .v2-panel-home .v2-home-tool-group:last-child:nth-child(odd){grid-column:1/-1}
 .v2-panel-home .v2-home-tool-group:last-child:nth-child(odd)>.v2-home-tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--space-3)}
-.v2-panel-home .v2-home-tool-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);align-items:stretch;min-inline-size:0}
-.v2-panel-home .v2-home-tool-group{display:block;min-inline-size:0;padding:var(--space-2) 12px 12px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);box-shadow:var(--shadow)}
-.v2-panel-home .v2-home-tool-group:not([open]){align-self:start}
-.v2-home-tool-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--space-1)}
-.v2-home-tool-heading{list-style:none;min-block-size:var(--target);padding-inline:var(--space-1);border-radius:var(--radius-control)}.v2-home-tool-heading::-webkit-details-marker{display:none}
-.v2-home-tool-heading__title{flex:1;display:flex;align-items:center;gap:var(--space-1);font-size:14px;font-weight:600}.v2-home-group-label{flex:1}
-.v2-home-tool-heading__title>.v2-icon{display:none;color:var(--muted);transition:transform 140ms ease-out}.v2-home-tool-group[open]>.v2-home-tool-heading>.v2-home-tool-heading__title>.v2-icon{transform:rotate(180deg)}
-.v2-home-group-tile{display:none}
-.v2-home-tool-heading__title>.v2-muted{font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
-.v2-panel-home .v2-home-tool-grid{display:flex;flex-direction:column;margin-block-start:var(--space-1)}
-.v2-panel-home .v2-home-tool{display:flex;align-items:center;gap:12px;inline-size:100%;min-block-size:44px;padding:6px var(--space-1);border:1px solid transparent;border-radius:var(--radius-control);background:transparent;text-align:start;text-decoration:none;color:var(--text);font-size:14px;transition:background-color 140ms ease-out,border-color 140ms ease-out,color 140ms ease-out}
-.v2-home-tool:is(a):hover{background:var(--subtle);color:var(--text)}
-.v2-panel-home .v2-home-tool__tile{inline-size:30px;block-size:30px;border-radius:8px}
-.v2-panel-home .v2-home-tool__label{flex:1 1 auto;font-weight:500;overflow-wrap:break-word}
-.v2-panel-home .v2-home-tool__hint{flex:0 4 auto;min-inline-size:0;max-inline-size:55%;unicode-bidi:isolate;font-size:12px;font-weight:400;font-variant-numeric:tabular-nums;color:var(--muted);overflow-wrap:anywhere;text-align:end}
+.v2-panel-home .v2-home-tool-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3);align-items:stretch;min-inline-size:0}
+.v2-panel-home .v2-home-tool-group{min-inline-size:0}
+.v2-panel-home .v2-home-tool-group:not([open]){align-self:start}.v2-panel-home .v2-home-tool-group:not([open])>.v2-home-tool-heading{border-block-end-color:transparent}
+.v2-home-tool-heading{list-style:none}.v2-home-tool-heading::-webkit-details-marker{display:none}
+.v2-home-tool-heading__title{flex:1;display:flex;align-items:center;gap:.625rem;min-inline-size:0}.v2-home-group-label{flex:1}
+.v2-home-tool-heading__title>.v2-icon{color:var(--muted);transition:transform 140ms ease-out}.v2-home-tool-group[open]>.v2-home-tool-heading>.v2-home-tool-heading__title>.v2-icon{transform:rotate(180deg)}
+.v2-home-group-tile{inline-size:1.875rem;block-size:1.875rem}
+.v2-home-tool-heading__title>.v2-muted{font-variant-numeric:tabular-nums}
+.v2-panel-home .v2-home-tool-grid{display:flex;flex-direction:column;gap:.125rem}
+.v2-panel-home .v2-home-tool{display:flex;align-items:center;gap:.625rem;inline-size:100%;min-block-size:2.625rem;padding:.375rem .625rem;border:1px solid transparent;background:transparent;text-align:start;text-decoration:none;color:var(--text);transition:background-color 140ms ease-out,border-color 140ms ease-out,color 140ms ease-out}
+.v2-panel-home .v2-home-tool__tile{inline-size:1.875rem;block-size:1.875rem}
+.v2-panel-home .v2-home-tool__label{flex:1 1 auto;overflow-wrap:break-word}
+.v2-panel-home .v2-home-tool__hint{flex:0 4 auto;min-inline-size:0;max-inline-size:55%;unicode-bidi:isolate;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:end}
 .v2-panel-home .v2-home-tool__hint:empty{display:none}
-.v2-panel-home .v2-home-tool__hint>.v2-mono{font-size:12px}
-.v2-home-tool:disabled{cursor:not-allowed;color:var(--muted)}
-.v2-panel-home .v2-meter__row{flex-wrap:wrap;gap:2px var(--space-1)}
+.v2-panel-home .v2-home-tool__hint>.v2-mono{font-size:.75rem}
+.v2-home-tool:disabled{cursor:not-allowed;opacity:.6}
+.v2-panel-home .v2-meter__row{flex-wrap:wrap;gap:.125rem var(--space-1)}
 .v2-panel-home .v2-meter__value{flex-wrap:wrap;min-inline-size:0;white-space:normal;overflow-wrap:anywhere}
 .v2-panel-home .v2-meter__value>span{min-inline-size:0}
 .v2-panel-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:var(--space-2);min-inline-size:0}
-.v2-panel-home .v2-home-columns>aside .v2-panel-facts{grid-template-columns:minmax(0,1fr);gap:10px}
-.v2-panel-home .v2-home-columns>aside .v2-card__foot{justify-content:flex-start}.v2-panel-home .v2-card__foot>a{display:inline-flex;align-items:center;gap:6px;min-inline-size:var(--target);min-block-size:var(--target);font-size:13px;font-weight:600;text-decoration:none}
+.v2-panel-facts>div,.v2-home-selected-domain{display:flex;flex-direction:column;align-items:stretch;gap:.125rem;min-inline-size:0;text-align:start}
+.v2-panel-facts dt{font-size:.875rem;line-height:1.25rem;color:var(--text-2)}.v2-panel-facts dd{font-size:.875rem;line-height:1.25rem;font-weight:500;color:var(--mono,var(--text));font-variant-numeric:tabular-nums;min-inline-size:0;overflow-wrap:break-word;text-align:start}
+.v2-panel-facts bdi{display:inline;unicode-bidi:isolate}
+.v2-panel-home .v2-home-columns>aside .v2-panel-facts{grid-template-columns:minmax(0,1fr);gap:0}
+.v2-panel-home .v2-home-columns>aside .v2-panel-facts>div{display:grid;grid-template-columns:minmax(6.5rem,min(40%,14rem)) minmax(0,1fr);align-items:baseline;gap:.625rem;padding-block:.5rem}
+.v2-panel-home .v2-home-columns>aside .v2-panel-facts>div:first-child{padding-block-start:0}.v2-panel-home .v2-home-columns>aside .v2-panel-facts>div:last-child{padding-block-end:0}
+.v2-panel-home .v2-home-columns>aside .v2-card__foot{justify-content:flex-start}.v2-panel-home .v2-card__foot>a{display:inline-flex;align-items:center;gap:.375rem}
 .v2-panel-home:dir(rtl) .v2-card__foot>a>.v2-icon{transform:scaleX(-1)}
-.v2-panel-facts>div,.v2-home-selected-domain{display:flex;flex-direction:column;align-items:stretch;gap:2px;min-inline-size:0;text-align:start}
-.v2-panel-facts dt{font-size:12px;color:var(--muted)}.v2-panel-facts dd{font-size:13px;font-variant-numeric:tabular-nums;min-inline-size:0;overflow-wrap:break-word;text-align:start}
-.v2-panel-facts bdi{display:inline;unicode-bidi:isolate}.v2-home-selected-domain>span{font-size:12px;color:var(--muted)}
-.v2-home-changes-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-1);padding:var(--space-3);border:1px solid var(--line);border-radius:12px;background:var(--subtle);text-align:center}
-.v2-home-changes-state>p{font-size:13px;line-height:1.6}
-.v2-home-changes{display:flex;flex-direction:column;gap:var(--space-3);list-style:none;margin:0;padding:0}
-.v2-home-changes>li{display:flex;align-items:flex-start;gap:12px}.v2-home-changes>li>.v2-icon{flex:none;inline-size:28px;block-size:28px;padding:6px;border-radius:50%;background:var(--accent-soft);color:var(--accent)}
-.v2-home-changes h3{font-size:14px;line-height:1.4}
-.v2-home-changes>li>div{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0;overflow-wrap:anywhere}
-.v2-home-changes p{font-size:12px}.v2-home-filter-empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px var(--space-3);border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);text-align:center}
-.v2-home-filter-empty[hidden]{display:none}.v2-home-filter-empty>h3{font-size:16px}.v2-home-filter-empty>p{max-inline-size:46ch;font-size:13px;color:var(--muted);line-height:1.6}
+.v2-home-changes-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.625rem;padding:var(--space-4) var(--space-3);text-align:center}
+.v2-home-changes{display:flex;flex-direction:column;gap:var(--space-2)}
+.v2-home-changes>li{display:flex;align-items:flex-start;gap:.625rem}.v2-home-changes>li>.v2-icon{flex:none;display:flex;align-items:center;justify-content:center;inline-size:2.25rem;block-size:2.25rem;border:1px solid var(--line);border-radius:50%;background:var(--subtle);color:var(--text-2)}
+.v2-home-changes>li>div{display:flex;flex-direction:column;gap:.25rem;min-inline-size:0;overflow-wrap:anywhere}
+.v2-home-filter-empty>p{max-inline-size:46ch}
 @media(max-width:1100px){.v2-panel-home>.v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.v2-panel-home>.v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
-.v2-home-sites-desktop{display:none}.v2-home-sites-mobile{display:block}.v2-panel-home [data-home-sites]{padding:0;background:transparent;border:0;box-shadow:none}
-.v2-panel-home [data-home-sites]>.v2-card__head{padding:0;margin-block-end:var(--space-2)}
-.v2-panel-home .v2-home-columns>aside .v2-panel-facts{grid-template-columns:minmax(0,1fr)}
-.v2-panel-home .v2-home-tool-list{grid-template-columns:minmax(0,1fr);gap:var(--space-1)}.v2-panel-home .v2-home-tool-group{padding:0;overflow:hidden}
-.v2-home-tool-heading{min-block-size:52px;padding-inline:var(--space-2);gap:12px;border-radius:0;cursor:pointer}.v2-home-tool-heading__title{gap:12px;font-size:15px}.v2-home-group-tile{display:flex;inline-size:30px;block-size:30px;border-radius:8px}
-.v2-home-tool-heading__title>.v2-icon{display:block}
-.v2-panel-home .v2-home-tool-group>.v2-home-tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-1);margin:0;padding:12px;border-block-start:1px solid var(--line)}
-.v2-panel-home .v2-home-tool{display:grid;grid-template-columns:30px minmax(0,1fr);align-content:center;column-gap:10px;row-gap:2px;min-block-size:64px;padding:10px;border-color:var(--line)}
+@media(max-width:600px){.v2-home-sites-desktop{display:none}.v2-home-sites-mobile{display:block}.v2-home-sites-mobile{padding:var(--v2-panel-padding)}
+.v2-panel-home .v2-home-tool-list{grid-template-columns:minmax(0,1fr);gap:var(--space-1)}.v2-panel-home .v2-home-tool-group{overflow:hidden}
+.v2-home-tool-heading{cursor:pointer}
+.v2-panel-home .v2-home-tool-group>.v2-home-tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-1)}
+.v2-panel-home .v2-home-tool{display:grid;grid-template-columns:1.875rem minmax(0,1fr);align-content:center;column-gap:.625rem;row-gap:.125rem;min-block-size:4rem;padding:.625rem;border-color:var(--line)}
 .v2-panel-home .v2-home-tool__tile{grid-row:1/span 2;align-self:center}
-.v2-panel-home .v2-home-tool__label{grid-column:2;font-size:13px;font-weight:600;line-height:1.3}
+.v2-panel-home .v2-home-tool__label{grid-column:2;line-height:1.3}
 .v2-panel-home .v2-home-tool__hint{grid-column:2;max-inline-size:none;line-height:1.3;text-align:start}
 .v2-home-columns>aside{display:flex}
-.v2-panel-home .v2-home-tool-filter{flex-basis:100%;min-inline-size:0}.v2-panel-home .v2-home-tool-search>input{font-size:16px}}
+.v2-panel-home .v2-home-tool-filter{flex-basis:100%;min-inline-size:0}}
 @media(max-width:359px){.v2-panel-home .v2-home-tool-group>.v2-home-tool-grid{grid-template-columns:minmax(0,1fr)}}
-@media(prefers-reduced-motion:reduce){.v2-panel-home .v2-account-plugins__link,.v2-panel-home .v2-home-site__name>a,.v2-home-tool-heading__title>.v2-icon,.v2-panel-home .v2-home-tool{transition:none}}
+@media(prefers-reduced-motion:reduce){.v2-panel-home .v2-account-plugins__link,.v2-home-tool-heading__title>.v2-icon,.v2-panel-home .v2-home-tool{transition:none}}
 `

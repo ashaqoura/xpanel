@@ -79,7 +79,7 @@ describe.each(['classic', 'v2'] as const)('%s authenticated domain row updates',
     const label = document.querySelector('[data-domain-limits]')!
     if (v2) {
       const cards = [...label.querySelectorAll('[data-domain-limit-kind]')]
-      expect(cards).toHaveLength(4); expect(cards.every(card => card.querySelector('svg'))).toBe(true)
+      expect(cards).toHaveLength(4); expect(cards.every(card => card.querySelector('i.ki-filled[aria-hidden="true"]'))).toBe(true)
       expect(label.querySelectorAll('.v2-kpi__value--text')).toHaveLength(0)
       expect(label.querySelector('[data-domain-limit-kind="primary"] [data-domain-limit-value]')?.textContent).toBe('1')
       expect(label.querySelector('[data-domain-limit-kind="addon"] [data-domain-limit-value]')?.textContent).toBe('1')

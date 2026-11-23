@@ -28,6 +28,7 @@ import { commandPaletteEntries } from './command-palette.ts'
 import { storeRouteSpecs } from './board-port/extensions/store.ts'
 import { getSurfacePageTitle, resolveSurfaceSection } from './shell.ts'
 import { plexFontAsset } from './vendor/plex.ts'
+import { metronicAsset } from './vendor/metronic.ts'
 import { TERMINAL_EMULATOR_ASSETS } from './vendor/xterm.ts'
 import {
   type AsyncActionBannerProps,
@@ -574,7 +575,7 @@ export function serveStaticAsset(pathname: string): Response | null {
   const i18nBody = i18nTag ? I18N_ASSETS().bodies.get(i18nTag as Locale) : undefined
   const asset = i18nBody !== undefined ? { body: i18nBody, contentType: 'application/javascript; charset=utf-8' }
     : Object.prototype.hasOwnProperty.call(PUBLIC_STATIC_ASSETS, pathname) ? PUBLIC_STATIC_ASSETS[pathname]
-      : plexFontAsset(pathname) ?? pageScriptAsset(pathname) ?? findUiThemeAsset(pathname)
+      : plexFontAsset(pathname) ?? metronicAsset(pathname) ?? pageScriptAsset(pathname) ?? findUiThemeAsset(pathname)
   if (!asset) {
     return new Response('Not Found', {
       status: 404,

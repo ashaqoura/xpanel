@@ -306,7 +306,11 @@ describe('v2 account database family', () => {
     }
     expect(PANEL_DATABASES_CSS).not.toMatch(/(?:^|[;{\s])(?:left|right)\s*:/)
     expect(PANEL_DATABASES_CSS).not.toMatch(/text-align:(?:left|right)/)
-    expect(PANEL_DATABASES_CSS).toContain('gap:var(--space-1)')
+    // Spacing follows the Metronic scale: 1.25rem between cards (1.875rem from the large breakpoint), no pixel gaps.
+    expect(PANEL_DATABASES_CSS).toContain('--v2-db-gap:1.25rem')
+    expect(PANEL_DATABASES_CSS).toContain('--v2-db-gap:1.875rem')
+    expect(PANEL_DATABASES_CSS).toContain('gap:.625rem')
+    expect(PANEL_DATABASES_CSS).not.toMatch(/gap:[0-9.]+px/)
     expect(PANEL_DATABASES_CSS).toContain('text-align:var(--v2-control-align,start)')
   })
 

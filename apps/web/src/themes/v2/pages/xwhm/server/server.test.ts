@@ -42,7 +42,7 @@ describe('v2 server administration family', () => {
     for (const html of [unread, saved]) { expect(html.match(/data-setup-step="/g)).toHaveLength(6); expect(html).toContain('data-setup-stepper'); expect(html).toContain('Step 6 of 6'); expect(html).toContain('href="#v2-setup-review"') }
     expect(saved.match(/data-setup-wizard-form/g)).toHaveLength(1)
     // Engine and MPM are radio cards; the review lists the saved values with a link to each step.
-    expect(saved).toContain('<input type="radio" name="engine" value="apache" data-review-label="Apache" checked required>'); expect(saved).toContain('<input type="radio" name="apacheMpm" value="prefork" data-review-label="prefork" required disabled>')
+    expect(saved).toContain('<input class="kt-radio kt-radio-sm" type="radio" name="engine" value="apache" data-review-label="Apache" checked required>'); expect(saved).toContain('<input class="kt-radio kt-radio-sm" type="radio" name="apacheMpm" value="prefork" data-review-label="prefork" required disabled>')
     expect(unread).not.toMatch(/type="radio"[^>]* checked/)
     expect(saved).toMatch(/data-setup-review>.*stored.private.test.*href="#v2-setup-identity"/s); expect(unread).toContain('data-setup-review'); expect(unread).not.toContain('stored.private.test')
     for (const name of ['hostname', 'adminEmail', 'primaryIpv4', 'nameservers', 'engine', 'apacheMpm', 'panelPort', 'sshPort', 'quotaFilesystem']) expect(saved).toContain(`name="${name}"`)

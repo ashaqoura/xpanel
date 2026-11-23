@@ -49,7 +49,8 @@ it('serves installed Classic and V2 styles through the immutable public asset bo
   expect(response.headers.get('cache-control')).toBe('public, max-age=31536000, immutable')
   expect(response.headers.get('x-content-type-options')).toBe('nosniff')
   const css = await response.text()
-  expect(css.startsWith('[data-ui-theme="v2"]{')).toBe(true)
+  // Every v2 rule sits in the `v2` cascade layer, between the Metronic reset and its components.
+  expect(css.startsWith('@layer v2{\n[data-ui-theme="v2"]{')).toBe(true)
   const version = createHash('sha256').update(css).digest('hex').slice(0, 16)
   expect(findUiThemeAsset('/assets/themes/v2/styles.css')?.href).toBe('/assets/themes/v2/styles.css?v=' + version)
   const versioned = await serveWebUi(new Request('http://localhost/assets/themes/v2/styles.css?v=' + version))

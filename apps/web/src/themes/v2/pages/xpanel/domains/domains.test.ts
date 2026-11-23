@@ -43,17 +43,15 @@ const assertUnknownWorkspace = (html: string): void => {
 
 describe('v2 account domain workflows', () => {
   it('renders the approved branch and link paths as decorative icons without mirroring identity symbols', () => {
-    const branch = 'M6 4v10a4 4 0 0 0 4 4h8M15 15l3 3-3 3'
-    const link = 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'
-    for (const [name, path] of [['branch', branch], ['link', link]] as const) {
-      const html = icon(name, 16)
-      const svg = parseMarkup(html).find(node => node.tag === 'svg')!
-      expect(Object.fromEntries(svg.attrs)).toMatchObject({ 'aria-hidden': 'true', focusable: 'false', width: '16', height: '16', viewbox: '0 0 24 24' })
-      expect(html).toContain(`<path d="${path}"/>`)
-      expect(svg.attrs.get('class')).toBe('v2-icon')
-      expect(renderV2DomainsPage(props, authority)).toContain(`<path d="${path}"/>`)
+    for (const name of ['branch', 'link'] as const) {
+      const html = icon(name)
+      const glyph = parseMarkup(html).find(node => node.tag === 'i')!
+      expect(Object.fromEntries(glyph.attrs)).toMatchObject({ 'aria-hidden': 'true' })
+      const classes = glyph.attrs.get('class')!
+      expect(classes).toMatch(/^v2-icon ki-filled ki-[a-z0-9-]+ text-[a-z0-9]+ leading-none$/)
+      expect(renderV2DomainsPage(props, authority)).toContain(`class="${classes}"`)
     }
-    expect(icon('arrow')).toContain('class="v2-icon v2-flip"')
+    expect(icon('arrow')).toMatch(/class="v2-icon [^"]*v2-flip"/)
   })
 
   it('dispatches only the 7 implemented catalog routes without inventing a create route or qualifying unavailable pages', () => {
@@ -90,9 +88,9 @@ describe('v2 account domain workflows', () => {
   it('keeps an unread domain collection distinct from a successfully read empty collection', () => {
     const unread = renderV2DomainsPage({ account }, authority)
     const empty = renderV2DomainsPage({ account, domains: [] }, authority)
-    expect(unread).toContain('<p data-domain-count class="v2-num">Not read</p>')
+    expect(unread).toContain('<p data-domain-count class="v2-num kt-badge kt-badge-outline kt-badge-secondary">Not read</p>')
     expect(unread).not.toContain('No domains were returned.')
-    expect(empty).toContain('<p data-domain-count class="v2-num">0</p>')
+    expect(empty).toContain('<p data-domain-count class="v2-num kt-badge kt-badge-outline kt-badge-secondary">0</p>')
     expect(empty).toContain('No domains were returned.')
   })
 

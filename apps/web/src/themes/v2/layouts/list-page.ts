@@ -60,8 +60,9 @@ export interface ListPageProps extends PageBaseProps {
   drawers?: readonly (DrawerProps & { template?: boolean })[]
 }
 
+/** The Metronic card footer of a list: the shown count in the medium weight at the start, the bounds note at the end. */
 export const listFooter = (footer: ListFooter): string =>
-  `<div class="v2-foot"${hookAttrs(footer.hooks)}>${footer.count ? `<span class="v2-num" aria-live="polite">${escapeHtml(footer.count)}</span>` : ''}${footer.note ? `<span>${escapeHtml(footer.note)}</span>` : ''}</div>`
+  `<div class="v2-foot kt-card-footer flex-wrap justify-between gap-2.5 text-sm text-secondary-foreground"${hookAttrs(footer.hooks)}>${footer.count ? `<span class="v2-num font-medium" aria-live="polite">${escapeHtml(footer.count)}</span>` : ''}${footer.note ? `<span>${escapeHtml(footer.note)}</span>` : ''}</div>`
 
 export function listPage(t: Translate, props: ListPageProps): string {
   const { list } = props

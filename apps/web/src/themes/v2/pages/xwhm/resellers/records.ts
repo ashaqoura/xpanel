@@ -1,4 +1,4 @@
-import { whmStoredFacts, type WhmStoredFactAuthority } from '../stored-facts.ts'
+import { whmStoredFacts } from '../stored-facts.ts'
 import { canOpenRegisteredRoute } from '@xpanel/catalog'
 import { formatDisplayDateTime } from '../../../../../display-format.ts'
 import type { Translate } from '../../../../../i18n.ts'
@@ -26,7 +26,7 @@ export function renderV2WhmResellerRecords(t: Translate, props: WhmSurfaceProps,
         : `<bdi class="v2-mono v2-num" dir="ltr">${escapeHtml(formatDisplayDateTime(reseller.lastSignInAt))}</bdi>`
     return {
       cellsHtml: [
-        `<bdi class="v2-mono v2-num" dir="ltr">${escapeHtml(reseller.username)}</bdi>`,
+        `<span class="flex items-center gap-2.5 min-w-0"><span class="flex items-center justify-center shrink-0 size-9 rounded-full border border-input bg-accent/60 text-secondary-foreground" aria-hidden="true"><i class="ki-filled ki-user text-base"></i></span><bdi class="v2-mono v2-num text-sm font-medium text-mono" dir="ltr">${escapeHtml(reseller.username)}</bdi></span>`,
         reseller.maxAccounts === 'unlimited' ? escapeHtml(t('Unlimited')) : `<bdi class="v2-mono v2-num" dir="ltr">${reseller.maxAccounts}</bdi>`,
         phoneCell(t('Created'), created === '—' ? escapeHtml(t(msgid('Not recorded'))) : `<bdi class="v2-mono v2-num" dir="ltr">${escapeHtml(created)}</bdi>`),
         phoneCell(t('Last sign-in'), lastSignIn),
@@ -37,8 +37,8 @@ export function renderV2WhmResellerRecords(t: Translate, props: WhmSurfaceProps,
   const root = readable && principal.kind === 'root' && authority.canManage
   const records = card({ title, titleId: 'v2-reseller-records-heading', bodyHtml: dataTable(t, { id: 'v2-reseller-records', caption: title, columns: [t('Reseller'), t('Account limit'), t('Created'), t('Last sign-in'), t('Nameservers')].map(label => ({ label })), rows, emptyText: t(resellers === undefined ? msgid('Not read') : msgctxt('theme:v2', 'No resellers were returned.')) }) })
   const scoped = { ...props, resellers }
-  const tools = !readable ? `<p role="status" data-wiring="unavailable">${escapeHtml(t(msgctxt('theme:v2', 'This document shows stored records only. Use the qualified reseller workspace for individual changes.')))}</p>`
+  const tools = !readable ? `<p class="text-sm text-secondary-foreground" role="status" data-wiring="unavailable">${escapeHtml(t(msgctxt('theme:v2', 'This document shows stored records only. Use the qualified reseller workspace for individual changes.')))}</p>`
     : route === '/whm/resellers/more' ? (principal.kind === 'root' ? renderV2ResellerUsage(t, scoped) + renderV2ResellerEmail(t, scoped, root) : '')
     : renderV2ResellerIpsNameservers(t, scoped, root)
-  return `<section class="v2-resellers" data-whm-detail-route="${route}" data-capability-state="${readable ? 'authorized' : 'unavailable'}">${pageHeader(t, { title, route, description: t(route === '/whm/resellers/more' ? msgid('Measured reseller usage, Email All Resellers and stored reseller account limits and nameservers.') : msgid('IPs each reseller may assign, the shared IP of its new accounts and its nameservers.')), breadcrumb: [{ label: t('Home'), href: '/whm' }, { label: t('Resellers'), href: '/whm/resellers' }, { label: title }] })}${route === '/whm/resellers/more' ? records + tools : tools + records}</section>`
+  return `<section class="v2-resellers flex flex-col gap-5 lg:gap-7.5" data-whm-detail-route="${route}" data-capability-state="${readable ? 'authorized' : 'unavailable'}">${pageHeader(t, { title, route, description: t(route === '/whm/resellers/more' ? msgid('Measured reseller usage, Email All Resellers and stored reseller account limits and nameservers.') : msgid('IPs each reseller may assign, the shared IP of its new accounts and its nameservers.')), breadcrumb: [{ label: t('Home'), href: '/whm' }, { label: t('Resellers'), href: '/whm/resellers' }, { label: title }] })}${route === '/whm/resellers/more' ? records + tools : tools + records}</section>`
 }

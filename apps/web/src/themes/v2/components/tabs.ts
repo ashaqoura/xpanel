@@ -19,9 +19,13 @@ export interface TabsProps {
   hooks?: HookAttributes
 }
 
+// Core toggles aria-selected, never a class, so the active Metronic look keys on that attribute.
+const TAB = 'kt-tab-toggle aria-selected:border-b-primary aria-selected:text-primary'
+const COUNT = 'v2-count v2-num kt-badge kt-badge-sm kt-badge-outline rounded-[30px] empty:hidden'
+
 /** Tab list; only the selected tab is in the Tab sequence (arrow keys move between tabs in the core controller). */
 export const tabs = (props: TabsProps): string =>
-  `<div class="v2-tabs" role="tablist" aria-label="${escapeHtml(props.label)}"${hookAttrs(props.hooks)}>${props.tabs.map(tab => `<button type="button" role="tab" id="${escapeHtml(tab.id)}" aria-selected="${tab.selected}" aria-controls="${escapeHtml(tab.panelId)}" tabindex="${tab.selected ? '0' : '-1'}"${hookAttrs(tab.hooks)}>${escapeHtml(tab.label)}${tab.count !== undefined ? `<span class="v2-count v2-num">${tab.count}</span>` : tab.countHooks ? `<span class="v2-count v2-num"${hookAttrs(tab.countHooks)}></span>` : ''}</button>`).join('')}</div>`
+  `<div class="v2-tabs kt-tabs kt-tabs-line" role="tablist" aria-label="${escapeHtml(props.label)}"${hookAttrs(props.hooks)}>${props.tabs.map(tab => `<button type="button" role="tab" id="${escapeHtml(tab.id)}" aria-selected="${tab.selected}" aria-controls="${escapeHtml(tab.panelId)}" tabindex="${tab.selected ? '0' : '-1'}" class="${TAB}"${hookAttrs(tab.hooks)}>${escapeHtml(tab.label)}${tab.count !== undefined ? `<span class="${COUNT}">${tab.count}</span>` : tab.countHooks ? `<span class="${COUNT}"${hookAttrs(tab.countHooks)}></span>` : ''}</button>`).join('')}</div>`
 
 export interface TabPanelProps {
   id: string
@@ -37,14 +41,13 @@ export interface TabPanelProps {
 export const tabPanel = (props: TabPanelProps): string =>
   `<div class="v2-tabpanel${props.sectionSpacing ? ' v2-tabpanel--sections' : ''}" role="tabpanel" id="${escapeHtml(props.id)}" aria-labelledby="${escapeHtml(props.tabId)}" tabindex="0"${props.hidden ? ' hidden' : ''}${hookAttrs(props.hooks)}>${props.bodyHtml}</div>`
 
-export const TABS_CSS = `.v2-tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
-.v2-tabs>[role=tab]{display:inline-flex;align-items:center;gap:var(--space-1);min-height:var(--target);padding:0 12px;margin-bottom:-1px;scroll-margin-block-start:88px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-size:14px;font-weight:500;cursor:pointer;transition:color .14s ease-out,border-color .14s ease-out}
-.v2-tabs>[role=tab]:hover{color:var(--text)}
-.v2-tabs>[role=tab][aria-selected="true"]{border-bottom-color:var(--accent-fill);color:var(--text);font-weight:600}
-.v2-tabs .v2-count{padding:1px 7px;border-radius:var(--radius-pill);background:var(--sunken);color:var(--text-2);font-size:12px;font-weight:600}
-.v2-tabs>[aria-selected="true"] .v2-count{background:var(--accent-soft);color:var(--accent)}
+// The tab list is kt-tabs kt-tabs-line and each tab a kt-tab-toggle (medium, secondary, primary when selected).
+// A count written with the v2 classes alone keeps the small outline badge look and follows the selected tab.
+export const TABS_CSS = `.v2-tabs{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.75rem;border-bottom:1px solid var(--line)}
+.v2-tabs .v2-count{display:inline-flex;align-items:center;justify-content:center;height:1.25rem;min-inline-size:1.25rem;padding:0 .325rem;border-radius:30px;border:1px solid var(--line);background:var(--sunken);color:var(--text-2);font-size:.6875rem;font-weight:500;line-height:.75rem}
+.v2-tabs>[aria-selected="true"] .v2-count{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent)}
 .v2-tabs .v2-count:empty{display:none}
 @media(max-width:600px){.v2-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;scroll-padding-inline:var(--space-2);padding-inline-end:32px;mask-image:linear-gradient(to right,#000 calc(100% - 32px),transparent)}.v2-tabs:dir(rtl){mask-image:linear-gradient(to left,#000 calc(100% - 32px),transparent)}.v2-tabs>[role=tab]{flex:none;white-space:nowrap;scroll-snap-align:start}}
-.v2-tabpanel{display:flex;flex-direction:column;gap:14px;padding-top:14px}
+.v2-tabpanel{display:flex;flex-direction:column;gap:1.25rem;padding-top:1.25rem}
 .v2-tabpanel--sections{gap:var(--space-4);padding-top:0}
 `

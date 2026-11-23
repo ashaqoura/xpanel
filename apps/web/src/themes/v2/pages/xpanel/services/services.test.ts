@@ -111,7 +111,7 @@ describe('v2 xPanel service pages', () => {
     expect(html).not.toContain('timers active')
     // The only outcome word is the board filter option; no row or tile claims a result.
     expect(html.split('Succeeded')).toHaveLength(2)
-    expect(html).toContain('<button type="button" data-list-filter-value="succeeded" aria-pressed="false">Succeeded</button>')
+    expect(html).toContain('<button type="button" class="kt-btn kt-btn-outline aria-pressed:bg-accent aria-pressed:text-mono" data-list-filter-value="succeeded" aria-pressed="false">Succeeded</button>')
     expect(html).toMatch(/<textarea[^>]*data-cron-field="command"[^>]*maxlength="4096"[^>]*disabled>/)
   })
 
@@ -134,7 +134,7 @@ describe('v2 xPanel service pages', () => {
     // One filter root holds the controls and the rows; the cron controller stamps data-list-result on each row.
     expect(html.indexOf('data-list-filter>')).toBeLessThan(html.indexOf('data-list-filter-search'))
     expect(html.indexOf('data-list-filter-search')).toBeLessThan(html.indexOf('data-cron-jobs'))
-    expect(html).toContain('<input id="v2-cron-filter" type="search" autocomplete="off" spellcheck="false" aria-describedby="v2-cron-filter-count" data-list-filter-search>')
+    expect(html).toContain('<input class="kt-input max-[959px]:text-base" id="v2-cron-filter" type="search" autocomplete="off" spellcheck="false" aria-describedby="v2-cron-filter-count" data-list-filter-search>')
     for (const value of ['""', '"succeeded"', '"failed"', '"never"']) expect(html).toContain('data-list-filter-value=' + value)
     expect(html).toContain('data-list-filter-key="result"')
     expect(html).toContain('data-list-filter-count')
@@ -153,7 +153,7 @@ describe('v2 xPanel service pages', () => {
     expect(scope).toBeLessThan(head)
     for (const hook of ['data-dns-zone', 'data-dns-add-record']) expect(html.indexOf(hook)).toBeLessThan(html.indexOf('v2-dns-summary-heading'))
     expect(html.indexOf('data-dnssec')).toBeGreaterThan(html.indexOf('data-dns-delete'))
-    expect(html).toContain('<input id="v2-dns-filter" type="search" autocomplete="off" spellcheck="false" aria-describedby="v2-dns-filter-count" data-list-filter-search>')
+    expect(html).toContain('<input class="kt-input max-[959px]:text-base" id="v2-dns-filter" type="search" autocomplete="off" spellcheck="false" aria-describedby="v2-dns-filter-count" data-list-filter-search>')
     expect(html).toContain('data-list-filter-key="type"')
     for (const type of ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA']) expect(html).toContain(`data-list-filter-value="${type}"`)
     // The record rows come from the template, whose type select names the row type for the filter.
@@ -166,7 +166,7 @@ describe('v2 xPanel service pages', () => {
 
   it('links the certificate wizard and the certificate files from the SSL/TLS header', () => {
     const html = renderV2TlsPage({ account, domains: [domain] }, { canManage: true })
-    expect(html).toContain('<a class="v2-btn" href="/security/ssl/files">Certificate files</a><a class="v2-btn v2-btn--primary" href="/security/ssl/issue">Issue certificate</a>')
+    expect(html).toContain('<a class="v2-btn kt-btn kt-btn-outline" href="/security/ssl/files">Certificate files</a><a class="v2-btn v2-btn--primary kt-btn kt-btn-primary" href="/security/ssl/issue"><i class="ki-filled ki-plus" aria-hidden="true"></i>Issue certificate</a>')
   })
 
 })

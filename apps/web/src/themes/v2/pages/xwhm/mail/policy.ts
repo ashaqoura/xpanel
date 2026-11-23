@@ -1,6 +1,7 @@
 import { formField } from '../../../components/form-field.ts'
 import { escapeHtml } from '../../../html.ts'
-import { button, facts, group, mailContext, page, status, type WhmMailPageInput } from './common.ts'
+import { icon } from '../../../icons.ts'
+import { button, facts, formGroup, group, mailContext, page, rows, status, switchRow, type WhmMailPageInput } from './common.ts'
 
 export type MailPolicyPage = 'spam' | 'relay' | 'bcc' | 'marketing'
 interface Field { key: string; label: string; kind: 'check' | 'text' | 'email' | 'password' | 'number' | 'lines'; help?: string; step?: number; min?: number; max?: number }
@@ -48,7 +49,7 @@ export function renderV2WhmMailPolicy(input: WhmMailPageInput, kind: MailPolicyP
   const { t, locale, dir, canRead, canManage } = mailContext(input)
   const id = (key: string) => `v2-whm-mail-${kind}-${key}`
   const controls = FIELDS[kind].map(field => {
-    if (field.kind === 'check') return `<div class="v2-whm-mail__field"><label class="v2-whm-mail__check" for="${id(field.key)}"><input id="${id(field.key)}" type="checkbox" data-mailx-field="${field.key}"${field.help ? ` aria-describedby="${id(field.key)}-help"` : ''} disabled><span>${escapeHtml(t(field.label))}</span></label>${field.help ? `<p id="${id(field.key)}-help">${escapeHtml(t(field.help))}</p>` : ''}</div>`
+    if (field.kind === 'check') return switchRow(id(field.key), t(field.label), { 'data-mailx-field': field.key }, field.help ? t(field.help) : undefined)
     return formField({ id: id(field.key), label: t(field.label), ...(field.help ? { help: t(field.help) } : {}),
       control: field.kind === 'lines' ? { kind: 'textarea', rows: 4, dir: 'ltr', mono: true, spellcheck: false,
         disabled: true, hooks: { 'data-mailx-field': field.key } } : { kind: 'input', type: field.kind, dir: 'ltr', mono: true,
@@ -61,10 +62,12 @@ export function renderV2WhmMailPolicy(input: WhmMailPageInput, kind: MailPolicyP
 ${facts(t, [['saved', msgid('Saved policy')], ['host', msgid('Host agent')], ['state', msgid('Applied on this server')],
       ...(kind === 'spam' ? [['engine', msgid('Detected filter')], ['wiring', msgid('Postfix passes mail to the filter')]] as const : []),
       ['observed-at', msgid('Observed at (UTC)')], ['updated', msgid('Last saved')]], 'data-mailx-fact')}`,
-    button(t(msgid('Refresh')), { 'data-mailx-refresh': true }, !canRead))
+    button(t(msgid('Refresh')), { 'data-mailx-refresh': true }, !canRead, 'default', icon('refresh', 16)))
+  // A settings card: the rows, then the footer with the secondary action before the primary one.
   const tag = canManage ? 'form' : 'div'
-  const editor = group(`${kind}-policy`, t(TITLES[kind]), `<${tag} data-mailx-form${canManage ? ' novalidate' : ''}><div class="v2-whm-mail__fields">${controls}</div>
-${status('', { 'data-mailx-form-status': true })}<div class="v2-whm-mail__actions"><button type="${canManage ? 'submit' : 'button'}" class="v2-btn v2-btn--primary" data-mailx-save disabled>${escapeHtml(t(msgid('Save and apply')))}</button>${button(t(msgid('Apply saved policy again')), { 'data-mailx-apply': true })}</div></${tag}>`)
+  const editor = formGroup(`${kind}-policy`, t(TITLES[kind]), `<${tag} class="v2-whm-mail__form" data-mailx-form${canManage ? ' novalidate' : ''}>`, `</${tag}>`,
+    `${rows(controls)}${status('', { 'data-mailx-form-status': true })}`,
+    `${button(t(msgid('Apply saved policy again')), { 'data-mailx-apply': true }, true, 'default', icon('refresh', 16))}<button type="${canManage ? 'submit' : 'button'}" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-mailx-save disabled>${escapeHtml(t(msgid('Save and apply')))}</button>`)
   return page(input, `/whm/email/${kind}`, t(TITLES[kind]), t(NOTES[kind]),
     `<div class="v2-whm-mail__stack" data-mailx-whm data-mailx-page="${kind}" data-mailx-can-read="${canRead}" data-mailx-can-manage="${canManage}" lang="${locale}" dir="${dir}">${summary}${editor}</div>`)
 }

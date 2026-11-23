@@ -6,7 +6,7 @@ import { card, pageHeader } from '../../../components/index.ts'
 import { escapeHtml, hookAttrs, type HookAttributes } from '../../../html.ts'
 import { icon } from '../../../icons.ts'
 import { v2Messages } from '../../../messages.ts'
-import { phoneLabels } from '../settings/common.ts'
+import { actionGlyph, actionVariant, phoneLabels } from '../settings/common.ts'
 
 /** These are current core admission decisions, independent of presentation. */
 export interface PanelOperationAuthority {
@@ -35,7 +35,12 @@ export function operationContext(props: PanelSurfaceProps, authority: PanelOpera
 export const technical = (value: string | number): string => `<bdi dir="ltr" class="v2-mono">${escapeHtml(normalizeAsciiDigits(value))}</bdi>`
 
 export function operationButton(label: string, hooks?: HookAttributes, disabled = true, primary = false, hidden = false): string {
-  return `<button type="button" class="v2-btn${primary ? ' v2-btn--primary' : ''}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}${hidden ? ' hidden' : ''}>${escapeHtml(label)}</button>`
+  return `<button type="button" class="${actionVariant(hooks, primary)}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}${hidden ? ' hidden' : ''}>${actionGlyph(hooks)}${escapeHtml(label)}</button>`
+}
+
+/** A table row action: the small Metronic button, soft danger for removal. */
+export function operationRowButton(label: string, hooks?: HookAttributes, disabled = true): string {
+  return `<button type="button" class="${actionVariant(hooks, false)} kt-btn-sm"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${actionGlyph(hooks)}${escapeHtml(label)}</button>`
 }
 
 export function operationSelect(selectHtml: string): string {
@@ -44,7 +49,7 @@ export function operationSelect(selectHtml: string): string {
 
 export function operationField(id: string, label: string, control: string, help?: string): string {
   const described = help ? control.replace(/<(input|select|textarea)\b/, `<$1 aria-describedby="${escapeHtml(id)}-help"`) : control
-  return `<div class="v2-field"><label for="${escapeHtml(id)}">${escapeHtml(label)}</label>${described}${help ? `<p id="${escapeHtml(id)}-help" class="v2-field__help">${escapeHtml(help)}</p>` : ''}</div>`
+  return `<div class="v2-field"><label class="kt-form-label leading-tight" for="${escapeHtml(id)}">${escapeHtml(label)}</label>${described}${help ? `<p id="${escapeHtml(id)}-help" class="v2-field__help">${escapeHtml(help)}</p>` : ''}</div>`
 }
 
 export function operationFacts(facts: readonly { label: string; valueHtml: string }[]): string {
@@ -52,7 +57,7 @@ export function operationFacts(facts: readonly { label: string; valueHtml: strin
 }
 
 export function operationTable(id: string, title: string, heads: readonly string[], bodyHooks: HookAttributes, bodyHtml: string): string {
-  return `<div class="v2-panel-operation-table" role="region" tabindex="0" aria-labelledby="${escapeHtml(id)}-caption"><table id="${escapeHtml(id)}"${phoneLabels(heads)}><caption id="${escapeHtml(id)}-caption" class="v2-sr">${escapeHtml(title)}</caption><thead><tr>${heads.map(label => `<th scope="col">${escapeHtml(label)}</th>`).join('')}</tr></thead><tbody${hookAttrs(bodyHooks)}>${bodyHtml}</tbody></table></div>`
+  return `<div class="v2-panel-operation-table kt-scrollable-x-auto" role="region" tabindex="0" aria-labelledby="${escapeHtml(id)}-caption"><table class="kt-table" id="${escapeHtml(id)}"${phoneLabels(heads)}><caption id="${escapeHtml(id)}-caption" class="v2-sr">${escapeHtml(title)}</caption><thead><tr>${heads.map(label => `<th scope="col">${escapeHtml(label)}</th>`).join('')}</tr></thead><tbody${hookAttrs(bodyHooks)}>${bodyHtml}</tbody></table></div>`
 }
 
 export const unreadRow = (columns: number, message: string): string => `<tr><td colspan="${columns}"><p role="status">${escapeHtml(message)}</p></td></tr>`

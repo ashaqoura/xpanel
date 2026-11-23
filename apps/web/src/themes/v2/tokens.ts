@@ -1,32 +1,43 @@
-// v2 design tokens: colors only through these properties, light by default, dark on
-// `data-theme="dark"`. The sidebar stays navy and code blocks stay dark in both schemes.
+// v2 design tokens carry the Metronic (KTUI) palette: colors only through these properties, light by default, dark on
+// `data-theme="dark"`. They stay the one source of color: the last line of each scheme points Metronic's own
+// variables (--background, --foreground, --card, --primary, --border, --input, --secondary, --kt-muted, --kt-accent,
+// --mono, --radius) at the v2 tokens, so a `kt-*` component, a Tailwind utility and an older v2 rule always agree,
+// and an installed theme package that sets a v2 token recolors all three.
+// Latin text is set in Inter (Metronic's typeface) and Arabic text in IBM Plex Sans Arabic, both self-hosted.
 // Mono ends in the sans family, never the generic monospace: that face often carries
 // disconnected Arabic glyphs, so Arabic inside a mono run takes the joined Arabic sans.
 
 const ROOT = '[data-ui-theme="v2"]'
 
+const METRONIC_BRIDGE = '--background:var(--bg);--foreground:var(--text);--card:var(--surface);--card-foreground:var(--text);--popover:var(--surface);--popover-foreground:var(--text);\
+--primary:var(--accent-fill);--primary-foreground:var(--on-accent);--secondary:var(--sunken);--secondary-foreground:var(--text-2);\
+--kt-muted:var(--sunken);--kt-muted-foreground:var(--muted);--kt-accent:var(--sunken);--kt-accent-foreground:var(--text-2);\
+--mono-foreground:var(--bg);--border:var(--line);--input:var(--line-strong);--radius:calc(var(--radius-control) + 2px)'
+
 export const V2_TOKENS_CSS = `${ROOT}{color-scheme:light;\
---bg:#EEF2F7;--surface:#FFFFFF;--subtle:#F6F8FB;--sunken:#E8EDF5;--line:#DCE3EE;--line-strong:#737F92;\
---text:#0D1626;--text-2:#334155;--muted:#586579;\
---accent:#1D5BD6;--accent-fill:#1D5BD6;--accent-fill-hover:#1546A8;--accent-soft:#EAF1FE;--accent-line:#C3D5FA;--on-accent:#FFFFFF;\
---ok:#0B7A4B;--ok-soft:#E5F4EC;--ok-line:#B0DEC5;--warn:#A84A06;--warn-soft:#FFF3E5;--warn-line:#F5CCA0;\
---bad:#B42318;--bad-soft:#FDECEA;--bad-line:#F4BEBA;\
---nav:#0A1830;--nav-2:#14284B;--nav-line:#1E3660;--nav-text:#C5D0E2;--nav-muted:#8796AE;--nav-strong:#FFFFFF;--nav-ok:#7FD8AC;--nav-warn:#F7B865;--nav-bad:#F47067;--nav-accent:#5B8DF6;--nav-focus:#84A9FA;\
---code:#0B1424;--code-text:#D5DEEB;--code-muted:#8796AE;--chart-2:#0E8F7E;\
---shadow:0 1px 2px rgba(14,23,38,.05),0 3px 10px -2px rgba(14,23,38,.04);--scrim:rgba(7,14,26,.48);--focus:#1D5BD6;\
---font-sans:'IBM Plex Sans','IBM Plex Sans Arabic',system-ui,sans-serif;--font-mono:'IBM Plex Mono','IBM Plex Sans Arabic',ui-monospace,Consolas,'Liberation Mono',sans-serif;\
+--bg:#FFFFFF;--surface:#FFFFFF;--subtle:color-mix(in oklab,var(--sunken) 55%,var(--bg));--sunken:#F4F4F5;--line:#ECECEE;--line-strong:#E4E4E7;\
+--text:#09090B;--text-2:#18181B;--muted:#71717B;\
+--accent:#2B7FFF;--accent-fill:#2B7FFF;--accent-fill-hover:color-mix(in oklab,var(--accent-fill) 88%,#000);--accent-soft:color-mix(in oklab,var(--accent) 10%,transparent);--accent-line:color-mix(in oklab,var(--accent) 28%,transparent);--on-accent:#FFFFFF;\
+--ok:#15803D;--ok-soft:#F0FDF4;--ok-line:#BBF7D0;--warn:#A16207;--warn-soft:#FEFCE8;--warn-line:#FEF08A;\
+--bad:#DC2626;--bad-soft:#FEF2F2;--bad-line:#FECACA;\
+--nav:var(--sunken);--nav-2:var(--bg);--nav-line:var(--line-strong);--nav-text:var(--text-2);--nav-muted:var(--muted);--nav-strong:var(--text);--nav-ok:#16A34A;--nav-warn:#CA8A04;--nav-bad:#DC2626;--nav-accent:var(--accent);--nav-focus:var(--accent);\
+--code:#18181B;--code-text:#E4E4E7;--code-muted:#A1A1AA;--chart-2:#8B5CF6;\
+--shadow:0 1px 2px 0 rgba(0,0,0,.05);--scrim:rgba(0,0,0,.3);--focus:var(--accent);\
+--font-sans:'Inter','IBM Plex Sans Arabic',system-ui,sans-serif;--font-mono:'IBM Plex Mono','IBM Plex Sans Arabic',ui-monospace,Consolas,'Liberation Mono',sans-serif;\
 --lh-body:1.5;--lh-head:1.25;\
---space-1:8px;--space-2:16px;--space-3:24px;--space-4:32px;\
---radius-card:12px;--radius-notice:10px;--radius-control:9px;--radius-chip:7px;--radius-pill:999px;--target:44px}
+--space-1:8px;--space-2:16px;--space-3:20px;--space-4:30px;\
+--radius-card:12px;--radius-notice:8px;--radius-control:6px;--radius-chip:4px;--radius-pill:999px;--target:2.125rem;\
+--mono:var(--text);${METRONIC_BRIDGE}}
 ${ROOT}[data-theme="dark"]{color-scheme:dark;\
---bg:#080F1C;--surface:#101A2C;--subtle:#142138;--sunken:#0B1424;--line:#1E2E47;--line-strong:#627491;\
---text:#EAF0F8;--text-2:#BCC8DA;--muted:#8D9CB3;\
---accent:#84A9FA;--accent-fill:#2F6BE6;--accent-fill-hover:#2559C9;--accent-soft:rgba(132,169,250,.15);--accent-line:rgba(132,169,250,.36);\
---ok:#4CC38A;--ok-soft:rgba(76,195,138,.14);--ok-line:rgba(76,195,138,.36);--warn:#F2A33A;--warn-soft:rgba(242,163,58,.14);--warn-line:rgba(242,163,58,.36);\
---bad:#F47067;--bad-soft:rgba(244,112,103,.14);--bad-line:rgba(244,112,103,.36);\
---nav:#060C17;--nav-2:#122038;--nav-line:#1D2E49;--nav-text:#BCC8DA;--nav-muted:#7E8CA3;\
---code:#060D19;--code-muted:#7E8CA3;--chart-2:#3CC4AE;--shadow:0 1px 2px rgba(0,0,0,.4),0 3px 10px -2px rgba(0,0,0,.28);--scrim:rgba(0,0,0,.64);--focus:#84A9FA}
-${ROOT}:lang(ar){--font-sans:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif}
+--bg:#09090B;--surface:#09090B;--sunken:#18181B;--line:#27272A;--line-strong:#27272A;\
+--text:#FAFAFA;--text-2:#FAFAFA;--muted:#71717B;\
+--accent:#51A2FF;--accent-fill:#155DFC;\
+--ok:#4ADE80;--ok-soft:rgba(34,197,94,.12);--ok-line:rgba(34,197,94,.32);--warn:#FACC15;--warn-soft:rgba(234,179,8,.12);--warn-line:rgba(234,179,8,.32);\
+--bad:#F87171;--bad-soft:rgba(239,68,68,.12);--bad-line:rgba(239,68,68,.32);\
+--nav-ok:#4ADE80;--nav-warn:#FACC15;--nav-bad:#F87171;\
+--code:#09090B;--code-muted:#71717A;--chart-2:#A78BFA;--shadow:0 1px 2px 0 rgba(0,0,0,.4);--scrim:rgba(0,0,0,.6);\
+--mono:color-mix(in oklab,var(--text) 84%,var(--bg))}
+${ROOT}:lang(ar){--font-sans:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}
 ${ROOT}:lang(ar){--lh-body:1.65;--lh-head:1.35}
-${ROOT} [lang="ar"]{font-family:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif}
+${ROOT} [lang="ar"]{font-family:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}
 `

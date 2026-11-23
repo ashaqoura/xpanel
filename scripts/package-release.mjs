@@ -111,6 +111,12 @@ export const REQUIRED_ROOT_FILES = Object.freeze([
   'apps/web/src/vendor/plex/IBMPlexMono-Regular.woff2',
   'apps/web/src/vendor/plex/IBMPlexMono-Medium.woff2',
   'apps/web/src/vendor/plex/IBMPlexMono-SemiBold.woff2',
+  'apps/web/src/vendor/inter/LICENSE',
+  'apps/web/src/vendor/inter/inter-latin-wght-normal.woff2',
+  'apps/web/src/vendor/inter/inter-latin-ext-wght-normal.woff2',
+  'apps/web/src/vendor/metronic/styles.css',
+  'apps/web/src/vendor/metronic/keenicons.css',
+  'apps/web/src/vendor/metronic/keenicons-filled.woff',
 ])
 
 // These files are visual references, never production modules or served assets.

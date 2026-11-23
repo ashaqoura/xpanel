@@ -77,25 +77,29 @@ describe('v2 component kit', () => {
 
   it('carry the ARIA of the kit recipes', () => {
     const header = kit.pageHeader(t, { breadcrumb: [{ label: 'Home', href: '/whm' }, { label: 'Accounts' }], title: 'Accounts', status: { tone: 'ok', label: 'Applied' } })
-    expect(header).toMatch(/<nav class="v2-crumbs" aria-label="Breadcrumb"><ol>/)
-    expect(header).toContain('<span aria-current="page">Accounts</span>')
+    expect(header).toMatch(/<nav class="v2-crumbs" aria-label="Breadcrumb"><ol class="kt-breadcrumb">/)
+    expect(header).toContain('<li class="kt-breadcrumb-item"><span class="kt-breadcrumb-page" aria-current="page">Accounts</span>')
     expect(header).toMatch(/<h1>Accounts<\/h1>/)
 
-    expect(kit.card({ title: 'Usage', titleId: 'usage', bodyHtml: '' })).toMatch(/<section class="v2-card" aria-labelledby="usage"><div class="v2-card__head"><div class="v2-card__title"><h2 id="usage">/)
+    expect(kit.card({ title: 'Usage', titleId: 'usage', bodyHtml: '' })).toMatch(/<section class="v2-card kt-card" aria-labelledby="usage"><div class="v2-card__head kt-card-header"><div class="v2-card__title"><h2 id="usage">/)
+    expect(kit.card({ bodyHtml: 'x', flush: true, footerHtml: 'y' })).toBe('<div class="v2-card v2-card--flush kt-card"><div class="v2-card__body kt-card-table">x</div><div class="v2-card__foot kt-card-footer">y</div></div>')
     expect(() => kit.card({ title: 'Usage', bodyHtml: '' })).toThrow(/titleId/)
 
-    expect(kit.statusPill({ tone: 'neutral', label: 'Not installed', hollow: true })).toMatch(/v2-pill--hollow"><span class="v2-pill__dot" aria-hidden="true"><\/span>Not installed/)
+    expect(kit.statusPill({ tone: 'neutral', label: 'Not installed', hollow: true })).toMatch(/^<span class="v2-pill v2-pill--neutral v2-pill--hollow kt-badge kt-badge-outline kt-badge-secondary rounded-\[30px\]"><span class="v2-pill__dot" aria-hidden="true"><\/span>Not installed/)
+    expect(kit.statusPill({ tone: 'ok', label: 'Active' })).toBe('<span class="v2-pill v2-pill--ok kt-badge kt-badge-outline kt-badge-success rounded-[30px]"><span class="v2-pill__dot kt-badge-dot" aria-hidden="true"></span>Active</span>')
+    expect(kit.notice(t, { tone: 'warn', text: 'x' })).toMatch(/^<div class="v2-notice v2-notice--warn kt-alert kt-alert-light kt-alert-warning" role="status">/)
     expect(kit.notice(t, { tone: 'bad', text: 'x', urgent: true })).toContain('role="alert"')
-    expect(kit.notice(t, { tone: 'ok', text: 'x', dismiss: { 'data-dismiss': true } })).toMatch(/<button type="button" class="v2-notice__dismiss" aria-label="Dismiss" data-dismiss>/)
+    // The dismiss control is a small ghost icon button carrying the ki-cross Keenicon.
+    expect(kit.notice(t, { tone: 'ok', text: 'x', dismiss: { 'data-dismiss': true } })).toMatch(/<button type="button" class="v2-notice__dismiss kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost [^"]*" aria-label="Dismiss" data-dismiss><i class="v2-icon ki-filled ki-cross /)
     expect(kit.notice(t, { tone: 'ok', text: 'x' })).not.toContain('<button')
 
     const table = kit.dataTable(t, { id: 'acc', caption: 'Accounts', columns: [{ label: 'Account' }], actions: true, selectAll: { label: 'Select all' },
       rows: [{ cellsHtml: ['alice'], select: { label: 'Select alice', checked: true }, actionsHtml: '<button type="button">Manage</button>' }], bodyHooks: { 'data-account-rows': true } })
-    expect(table).toMatch(/<div class="v2-table-scroll" role="region" aria-labelledby="acc-caption" tabindex="0">/)
+    expect(table).toMatch(/<div class="v2-table-scroll kt-scrollable-x-auto" role="region" aria-labelledby="acc-caption" tabindex="0"><table id="acc" class="v2-table kt-table text-start">/)
     expect(table).toContain('<caption id="acc-caption" class="v2-sr">Accounts</caption>')
-    expect(table).toContain('<th scope="col" class="v2-table__actions"><span class="v2-sr">Actions</span></th>')
-    expect(table).toContain('<input type="checkbox" aria-label="Select all">')
-    expect(table).toContain('<input type="checkbox" aria-label="Select alice" checked>')
+    expect(table).toContain('<th scope="col" class="v2-table__actions text-end"><span class="v2-sr">Actions</span></th>')
+    expect(table).toContain('<input type="checkbox" class="kt-checkbox kt-checkbox-sm" aria-label="Select all">')
+    expect(table).toContain('<input type="checkbox" class="kt-checkbox kt-checkbox-sm" aria-label="Select alice" checked>')
     expect(table).toContain('<tbody data-account-rows>')
     expect(table.match(/<th scope="col"/g)).toHaveLength(3)
 
@@ -108,24 +112,27 @@ describe('v2 component kit', () => {
     expect(failed).toMatch(/data-table-state="error">.*role="alert".*data-retry>.*Retry/)
 
     expect(kit.bulkBar(t, { countLabel: '2 selected', actions: [], hidden: true })).toMatch(/role="region" aria-label="Bulk actions" hidden>.*role="status"/)
-    expect(kit.drawer(t, { id: 'ed', title: 'Edit', bodyHtml: '', close: { 'data-close': true } })).toMatch(/<aside class="v2-drawer" id="ed" aria-labelledby="ed-title">.*<h2 id="ed-title">Edit<\/h2><button[^>]*aria-label="Close" data-close>/s)
+    expect(kit.drawer(t, { id: 'ed', title: 'Edit', bodyHtml: '', close: { 'data-close': true } })).toMatch(/<aside class="v2-drawer kt-card" id="ed" aria-labelledby="ed-title">.*<h2 id="ed-title">Edit<\/h2><button[^>]*aria-label="Close" data-close>/s)
     expect(kit.dialog(t, { id: 'x', title: 'Terminate?', bodyHtml: '', alert: true, describedBy: 'x-body' })).toMatch(/role="alertdialog" aria-modal="true" aria-labelledby="x-title" aria-describedby="x-body" hidden/)
     expect(kit.dialog(t, { id: 'y', title: 'Y', bodyHtml: '', open: true })).not.toContain(' hidden')
 
     const menu = kit.rowMenu({ id: 'm1', label: 'Actions for alice', items: [{ label: 'Modify', hooks: { 'data-row-action': 'modify' } }, { label: 'Terminate', danger: true, separatorBefore: true, href: '/x' }] })
-    expect(menu).toMatch(/<button type="button" class="v2-btn v2-btn--icon" popovertarget="m1" aria-haspopup="menu" aria-controls="m1" aria-label="Actions for alice">/)
+    // The trigger is the Metronic row kebab: a small ghost icon button with ki-dots-vertical.
+    expect(menu).toMatch(/<button type="button" class="v2-btn v2-btn--icon kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost [^"]*" popovertarget="m1" aria-haspopup="menu" aria-controls="m1" aria-label="Actions for alice"><i class="v2-icon ki-filled ki-dots-vertical [^"]*" aria-hidden="true"><\/i><\/button>/)
     expect(menu).toContain('<ul class="v2-menu__list" id="m1" role="menu" aria-label="Actions for alice" popover>')
-    expect(menu).toContain('<li role="none"><button type="button" role="menuitem" class="v2-menu__item" data-row-action="modify">Modify</button></li>')
+    expect(menu).toContain('<li role="none"><button type="button" role="menuitem" class="v2-menu__item kt-dropdown-menu-link" data-row-action="modify">Modify</button></li>')
+    expect(menu).toContain('class="v2-menu__item v2-menu__item--danger kt-dropdown-menu-link text-destructive hover:text-destructive" href="/x">Terminate</a>')
     expect(menu).toContain('<li role="separator"></li><li role="none"><a role="menuitem"')
 
     const tabList = kit.tabs({ label: 'Site settings', tabs: [{ id: 'a', label: 'A', panelId: 'pa', selected: true }, { id: 'b', label: 'B', panelId: 'pb', selected: false }] })
     expect(tabList).toContain('role="tablist" aria-label="Site settings"')
-    expect(tabList).toContain('<button type="button" role="tab" id="a" aria-selected="true" aria-controls="pa" tabindex="0">')
+    expect(tabList).toContain('<button type="button" role="tab" id="a" aria-selected="true" aria-controls="pa" tabindex="0" class="kt-tab-toggle aria-selected:border-b-primary aria-selected:text-primary">')
+    expect(tabList.startsWith('<div class="v2-tabs kt-tabs kt-tabs-line" role="tablist"')).toBe(true)
     expect(tabList).toContain('id="b" aria-selected="false" aria-controls="pb" tabindex="-1"')
     expect(kit.tabPanel({ id: 'pa', tabId: 'a', bodyHtml: '', hidden: true })).toBe('<div class="v2-tabpanel" role="tabpanel" id="pa" aria-labelledby="a" tabindex="0" hidden></div>')
 
     // A controller fills the empty count slot; a disabled filter bar disables every control it renders.
-    expect(kit.tabs({ label: 'T', tabs: [{ id: 'a', label: 'A', panelId: 'pa', selected: true, countHooks: { 'data-count': 'a' } }] })).toContain('A<span class="v2-count v2-num" data-count="a"></span></button>')
+    expect(kit.tabs({ label: 'T', tabs: [{ id: 'a', label: 'A', panelId: 'pa', selected: true, countHooks: { 'data-count': 'a' } }] })).toContain('A<span class="v2-count v2-num kt-badge kt-badge-sm kt-badge-outline rounded-[30px] empty:hidden" data-count="a"></span></button>')
     const offBar = kit.filterBar({ disabled: true, search: { id: 'q', label: 'Find' }, selects: [{ id: 's', label: 'State', options: [] }], segments: { label: 'Show', options: [{ label: 'All', pressed: true }] } })
     expect(offBar.startsWith('<div class="v2-filter v2-filter--fields" aria-disabled="true">')).toBe(true)
     expect(offBar.split(' disabled').length - 1).toBe(3)
@@ -136,16 +143,23 @@ describe('v2 component kit', () => {
     expect(steps).toContain('data-step-status="current" aria-current="step"')
 
     const pages = kit.pagination(t, { summary: '1-25 of 44', previous: { disabled: true }, next: { href: '?page=2' } })
-    expect(pages).toMatch(/<nav class="v2-pagination" aria-label="Pagination">/)
+    expect(pages).toMatch(/<nav class="v2-pagination kt-card-footer [^"]*" aria-label="Pagination">/)
     expect(pages).toMatch(/aria-label="Previous page" disabled>/)
-    expect(pages).toMatch(/<a class="v2-btn v2-btn--icon" href="\?page=2" aria-label="Next page">/)
+    expect(pages).toMatch(/<a class="v2-btn v2-btn--icon kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" href="\?page=2" aria-label="Next page">/)
+    // kt-select draws its own arrow: the rows-per-page wrapper holds the select alone.
+    expect(kit.pagination(t, { summary: '1-25 of 44', pageSize: { id: 'rows', options: [25, 50], selected: 50 }, previous: {}, next: {} })).toMatch(/<label for="rows">Rows<\/label><span class="v2-select"><select id="rows" class="kt-select [^"]*"><option value="25">25<\/option><option value="50" selected>50<\/option><\/select><\/span>/)
 
     const field = kit.formField({ id: 'dom', label: 'Primary domain', help: 'Lowercase.', error: 'Two dots.', control: { kind: 'input', name: 'domain', mono: true, required: true } })
-    expect(field).toMatch(/<label for="dom">Primary domain<\/label><input id="dom" name="domain" required class="v2-mono" aria-describedby="dom-error dom-help" aria-invalid="true"/)
+    expect(field).toMatch(/<label for="dom" class="kt-form-label leading-tight">Primary domain<\/label><input id="dom" name="domain" required class="v2-mono kt-input max-\[959px\]:text-base" aria-describedby="dom-error dom-help" aria-invalid="true"/)
+    expect(field.startsWith('<div class="v2-field kt-form-item">')).toBe(true)
     expect(field).toContain('id="dom-error"')
     expect(field).toContain('id="dom-help"')
-    expect(kit.formField({ id: 'p', label: 'Plan', control: { kind: 'select', options: [{ value: 'b', label: 'Business', selected: true }] } })).toContain('<option value="b" selected>Business</option>')
-    expect(kit.switchRow({ id: 'ssl', label: 'AutoSSL', checked: true })).toMatch(/<input type="checkbox" role="switch" id="ssl" checked>/)
+    expect(kit.formField({ id: 'p', label: 'Plan', control: { kind: 'select', options: [{ value: 'b', label: 'Business', selected: true }] } })).toContain('<option value="b" selected>Business</option></select></span></div>')
+    // The Metronic settings row keeps the same children: the label takes the first grid column, the rest the second.
+    const rowField = kit.formField({ id: 'dom', label: 'Primary domain', help: 'Lowercase.', layout: 'row', control: { kind: 'input' } })
+    expect(rowField).toMatch(/^<div class="v2-field v2-field--row kt-form-item lg:grid [^"]*"><label for="dom" class="kt-form-label leading-tight max-w-56">Primary domain<\/label><input id="dom" class="kt-input [^"]*" aria-describedby="dom-help" type="text"><span class="v2-field__help kt-form-description block" id="dom-help">Lowercase.<\/span><\/div>$/)
+    // A switch row: label and description at the start, the switch at the end.
+    expect(kit.switchRow({ id: 'ssl', label: 'AutoSSL', help: 'Renews itself.', checked: true })).toMatch(/^<label class="v2-switch-row flex items-center justify-between [^"]*" for="ssl"><span class="v2-switch-row__text [^"]*"><span class="text-sm font-medium text-mono">AutoSSL<\/span><span class="text-sm font-normal text-secondary-foreground" id="ssl-help">Renews itself.<\/span><\/span><input type="checkbox" role="switch" id="ssl" checked aria-describedby="ssl-help" class="kt-switch"><\/label>$/)
 
     expect(kit.codeBlock(t, { title: 'a.slice', code: 'x', copy: { 'data-copy': 'a' } })).toMatch(/dir="ltr".*aria-label="Copy a.slice" data-copy="a"/s)
     expect(kit.codeBlock(t, { code: 'x' })).not.toContain('<button')
@@ -160,7 +174,7 @@ describe('v2 component kit', () => {
     expect(kit.applyBar(t, { pendingCount: 0, discard: {}, apply: {} })).toContain('data-state="clean"')
     expect(bar).toMatch(/role="status"><span class="v2-apply__dot" aria-hidden="true"><\/span><strong>2 pending changes<\/strong>/)
     expect(bar).toContain('Applies as generation 143; generation 142 stays as the rollback target')
-    expect(bar).toMatch(/data-discard>Discard<\/button><button type="button" class="v2-btn v2-btn--primary" data-apply>Review and apply/)
+    expect(bar).toMatch(/class="v2-btn kt-btn kt-btn-outline" data-discard>Discard<\/button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-apply>Review and apply/)
 
     expect(kit.lineChart({ label: 'CPU', max: 100, series: [{ label: 'CPU', values: [0, 50, 100] }, { label: 'Memory', values: [10, 20], dashed: true }] }))
       .toMatch(/role="img" aria-label="CPU".*stroke-dasharray/s)
@@ -179,28 +193,39 @@ describe('v2 component kit', () => {
   it('match the template boards: header pill, labelled filters, inline steps, threshold meters and the review', () => {
     // The page status pill sits beside the title; the generation stamp heads the actions.
     const header = kit.pageHeader(t, { breadcrumb: [{ label: 'Home' }], title: 'API tokens', status: { tone: 'ok', label: '3 active' }, stamp: { tone: 'ok', label: 'Applied · generation 142', meta: '14:05 UTC' }, actionsHtml: '<a class="v2-btn" href="/x">Audit log</a>' })
-    expect(header).toMatch(/<div class="v2-page-head__text"><div class="v2-page-head__title"><h1>API tokens<\/h1><span class="v2-pill v2-pill--ok">.*3 active<\/span><\/div>/)
-    expect(header).toMatch(/<div class="v2-page-head__actions"><div class="v2-page-head__status"><span class="v2-pill v2-pill--ok">.*Applied · generation 142<\/span><span class="v2-num v2-muted">14:05 UTC<\/span><\/div><a class="v2-btn"/)
+    expect(header).toMatch(/<div class="v2-page-head__text"><div class="v2-page-head__title"><h1>API tokens<\/h1><span class="v2-pill v2-pill--ok kt-badge [^"]*">.*3 active<\/span><\/div>/)
+    expect(header).toMatch(/<div class="v2-page-head__actions"><div class="v2-page-head__status"><span class="v2-pill v2-pill--ok kt-badge [^"]*">.*Applied · generation 142<\/span><span class="v2-num v2-muted">14:05 UTC<\/span><\/div><a class="v2-btn"/)
 
     // A bar of fields shows each label above its control; segments alone keep an aria-label only.
     const bar = kit.filterBar({ search: { id: 'q', label: 'Contains text' }, selects: [{ id: 'acct', label: 'Mentions account', options: [{ value: '', label: 'Any' }] }],
       segments: { label: 'Level', options: [{ label: 'All', pressed: true }] }, clear: { label: 'Clear filters' } })
-    expect(bar).toContain('<div class="v2-filter v2-filter--fields"><div class="v2-filter__field v2-filter__search"><label class="v2-filter__label" for="q">Contains text</label><span class="v2-filter__input">')
-    expect(bar).toContain('<div class="v2-filter__field v2-filter__select"><label class="v2-filter__label" for="acct">Mentions account</label><span class="v2-select"><select id="acct">')
-    expect(bar).toContain('<div class="v2-filter__field v2-filter__group"><span class="v2-filter__label" aria-hidden="true">Level</span><div class="v2-segmented" role="group" aria-label="Level">')
+    // The Metronic search input: the magnifier Keenicon inside the kt-input wrapper, directly before the input.
+    expect(bar).toMatch(/<div class="v2-filter v2-filter--fields"><div class="v2-filter__field v2-filter__search"><label class="v2-filter__label kt-form-label" for="q">Contains text<\/label><span class="v2-filter__input kt-input max-\[959px\]:text-base"><i class="v2-icon ki-filled ki-magnifier [^"]*" aria-hidden="true"><\/i><input id="q" type="search" autocomplete="off" spellcheck="false"><\/span><\/div>/)
+    // kt-select draws its own arrow: the wrapper holds the select alone, with no second chevron.
+    expect(bar).toContain('<div class="v2-filter__field v2-filter__select"><label class="v2-filter__label kt-form-label" for="acct">Mentions account</label><span class="v2-select"><select id="acct" class="kt-select max-[959px]:text-base"><option value="">Any</option></select></span></div>')
+    expect(bar).toContain('<div class="v2-filter__field v2-filter__group"><span class="v2-filter__label kt-form-label" aria-hidden="true">Level</span><div class="v2-segmented kt-toggle-group" role="group" aria-label="Level"><button type="button" class="kt-btn kt-btn-outline aria-pressed:bg-accent aria-pressed:text-accent-foreground" aria-pressed="true">All</button></div></div>')
+    expect(bar).toMatch(/<button type="button" class="v2-btn v2-btn--ghost v2-filter__clear kt-btn kt-btn-ghost"><i class="v2-icon ki-filled ki-cross [^"]*" aria-hidden="true"><\/i>Clear filters<\/button>/)
     expect(bar).not.toContain('v2-sr')
-    expect(kit.filterBar({ segments: { label: 'Show', options: [] } })).toBe('<div class="v2-filter"><div class="v2-segmented" role="group" aria-label="Show"></div></div>')
-    // 8px from label to control; the controls themselves take the 44px target from the base styles.
-    expect(FILTER_BAR_CSS).toContain('.v2-filter__field{display:flex;flex-direction:column;gap:var(--space-1);')
-    expect(V2_BASE_CSS).toMatch(/:is\([^)]*\),select,textarea\)\{min-height:var\(--target\)/)
+    expect(kit.filterBar({ segments: { label: 'Show', options: [] } })).toBe('<div class="v2-filter"><div class="v2-segmented kt-toggle-group" role="group" aria-label="Show"></div></div>')
+    // 10px from label to control (kt-form-item); a bare control takes the 34px target from the base styles, a
+    // kt-input, kt-select or kt-textarea keeps its own KTUI size.
+    expect(FILTER_BAR_CSS).toContain('.v2-filter__field{display:flex;flex-direction:column;gap:.625rem;')
+    expect(V2_BASE_CSS).toMatch(/:is\([^)]*\),select,textarea\):where\(:not\(\.kt-input,\.kt-select,\.kt-textarea,\.kt-input>\*\)\)\{min-height:var\(--target\)/)
+    // A bare .v2-btn equals kt-btn (34px high); one that also names kt-btn takes nothing from the fallback, so
+    // kt-btn-sm stays 28px and kt-btn-ghost has no border. Unchecked radio groups are not painted as selected.
+    expect(V2_BASE_CSS).toContain(' .v2-btn:where(:not(.kt-btn)){display:inline-flex;flex:none;align-items:center;justify-content:center;gap:.375rem;height:var(--target);')
+    expect(V2_BASE_CSS).not.toMatch(/\.v2-btn[^{]*\{[^}]*min-height/)
+    expect(V2_BASE_CSS).toContain(' input[type=radio]:indeterminate{border-color:var(--line-strong)!important;background-color:var(--bg)!important}')
+    expect(V2_BASE_CSS).toContain(' :where(td,th){padding:.75rem 1rem;vertical-align:middle}')
+    expect(V2_BASE_CSS).toContain(' .v2-select>:not(select){display:none!important}')
 
     // Inline steps: marker, label and rail side by side.
     expect(kit.stepper({ label: 'Steps', inline: true, steps: [{ label: 'Pick', sub: 'Done', state: 'done' }] }))
       .toMatch(/^<ol class="v2-steps v2-steps--inline" aria-label="Steps"><li class="v2-step" data-step-status="done"><span class="v2-step__dot">.*<\/span><span class="v2-step__text"><span class="v2-step__label" title="Pick">Pick<\/span><span class="v2-step__sub v2-num">Done<\/span><\/span><span class="v2-step__rail" aria-hidden="true"><\/span><\/li><\/ol>$/)
 
     // Meters report their value; a threshold meter adds its scale and the warning and problem ticks.
-    expect(kit.meter({ label: 'Disk', valueText: '3.2 / 10 GB', percent: 32 })).toContain('<div class="v2-bar" role="meter" aria-label="Disk" aria-valuenow="32" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Disk 3.2 / 10 GB">')
-    expect(kit.meter({ label: 'Mail', valueText: '412 MB / unlimited' })).toContain('<div class="v2-bar" aria-hidden="true">')
+    expect(kit.meter({ label: 'Disk', valueText: '3.2 / 10 GB', percent: 32 })).toContain('<div class="v2-bar kt-progress kt-progress-primary" role="meter" aria-label="Disk" aria-valuenow="32" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Disk 3.2 / 10 GB">')
+    expect(kit.meter({ label: 'Mail', valueText: '412 MB / unlimited' })).toContain('<div class="v2-bar kt-progress kt-progress-primary" aria-hidden="true"><span class="v2-bar__fill v2-bar--info kt-progress-indicator" style="inline-size:0%">')
     // Used and limit are isolated so a right-to-left page keeps each part's own reading order.
     expect(kit.meter({ label: 'Disk', valueText: 'Unavailable / 5120 MiB' })).toContain('<span class="v2-meter__pair"><bdi>Unavailable</bdi> / <bdi>5120 MiB</bdi></span>')
     const graded = kit.meter({ label: 'Certificate validity left', valueText: '13 days', unit: 'alice-shop.com', tone: 'warn', scale: { value: 13, max: 60, warn: 14, minText: '0 days', maxText: '60 days' }, note: 'Warning under 14 days' })
@@ -216,12 +241,14 @@ describe('v2 component kit', () => {
     expect(rows).toContain('<template data-xp-template="review-row">')
     const sides = kit.changeReview(t, { title: 'Review changes', titleId: 'rv', tests: [], rows: [{ label: 'Plan', current: 'Starter', proposed: 'Business' }], steps: { label: 'What saving does', items: [{ icon: 'files', text: 'Writes the file.' }] }, actions: { back: { hooks: { 'data-back': true } }, save: { label: 'Save settings', hooks: { 'data-save': true } } } })
     expect(sides).not.toContain('<template')
-    expect(sides).toMatch(/<ul class="v2-review__steps" aria-label="What saving does"><li><svg.*<\/svg><span>Writes the file.<\/span><\/li><\/ul><div class="v2-review__actions"><button type="button" class="v2-btn" data-back>Back to editing<\/button><button type="button" class="v2-btn v2-btn--primary" data-save>Save settings<\/button><\/div>/s)
+    expect(sides).toMatch(/<ul class="v2-review__steps [^"]*" aria-label="What saving does"><li class="[^"]*"><i class="v2-icon [^"]*" aria-hidden="true"[^>]*><\/i><span class="[^"]*">Writes the file.<\/span><\/li><\/ul><div class="v2-review__actions [^"]*"><button type="button" class="v2-btn kt-btn kt-btn-outline" data-back>Back to editing<\/button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-save>Save settings<\/button><\/div>/s)
+    // The review is a Metronic card: header, then one padded body that holds the comparison and the actions.
+    expect(sides).toMatch(/^<section class="v2-card v2-review kt-card" aria-labelledby="rv">\n<div class="v2-card__head kt-card-header"><div class="v2-card__title"><h2 id="rv">Review changes<\/h2><\/div><\/div>\n<div class="v2-card__body kt-card-content"><div class="v2-review__compare /)
   })
 
   it('mirror only directional icons', () => {
     const header = kit.pageHeader(t, { breadcrumb: [{ label: 'Home', href: '/' }, { label: 'Here' }], title: 'T' })
-    expect(header).toMatch(/class="v2-icon v2-flip"/)
+    expect(header).toMatch(/class="v2-icon [^"]*v2-flip"/)
     const notice = kit.notice(t, { tone: 'warn', text: 'x', dismiss: {} })
     expect(notice).not.toContain('v2-flip')
   })

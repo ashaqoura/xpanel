@@ -114,24 +114,24 @@ export function dashboardPage(t: Translate, props: DashboardPageProps): string {
   return layoutRoot(t, props, `${props.meters ? meterCard(t, props.meters) : ''}${charts.length ? sectionGrid(charts) : ''}${lists}${props.sections?.length ? sectionGrid(props.sections) : ''}`, state === 'error' ? stateBlock(t, 'error', props.states) : '')
 }
 
-// Checks sit in a grid of bordered tiles; a tile that needs attention takes its tone on the border.
-export const DASHBOARD_LAYOUT_CSS = `.v2-status-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:var(--space-2)}
-.v2-status-item{display:flex;flex-wrap:wrap;align-content:flex-start;gap:12px;padding:20px var(--space-2);border-radius:var(--radius-notice);border:1px solid var(--line);background:var(--surface)}
+/// Checks sit in a grid of bordered Metronic tiles (20px apart, 20px inside); a tile that needs attention takes its
+// tone on the border. The title is the medium mono name, its cause a secondary line, the metric a muted inset row.
+export const DASHBOARD_LAYOUT_CSS = `.v2-status-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:1.25rem}
+.v2-status-item{display:flex;flex-wrap:wrap;align-content:flex-start;gap:.625rem;padding:1.25rem;border-radius:var(--radius-card);border:1px solid var(--line);background:var(--surface)}
 .v2-status-item[data-state=warn]{border-color:var(--warn-line);background:color-mix(in srgb,var(--warn-soft) 45%,var(--surface))}
 .v2-status-item[data-state=bad]{border-color:var(--bad-line);background:color-mix(in srgb,var(--bad-soft) 45%,var(--surface))}
 ${stateTones('.v2-status-item', 'data-state', { ok: 'ok', warn: 'warn', bad: 'bad', info: 'info', neutral: 'neutral' })}
 .v2-status-item [data-empty]{display:none}
-.v2-status-item__main{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:4px}
-.v2-status-item__title{display:flex;flex-wrap:wrap;align-items:center;gap:4px var(--space-1)}
-.v2-status-item__main>p{font-size:13px;line-height:1.6;color:var(--text-2)}
-.v2-status-item__metric{flex-basis:100%;display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--space-1);padding:10px 12px;border-radius:var(--radius-chip);border:1px solid var(--line);background:var(--subtle);font-size:13px;color:var(--muted)}
-.v2-status-item__metric>.v2-num{font-weight:600;color:var(--text)}
-.v2-card:has(>.v2-card__body>.v2-meters){gap:var(--space-3)}
-.v2-card__head:has(>.v2-card__actions>.v2-legend){align-items:flex-end}
-.v2-meters{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:var(--space-3) var(--space-4)}
-.v2-legend{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-2);font-size:12px;color:var(--text-2)}
-.v2-legend>li{display:inline-flex;align-items:center;gap:var(--space-1)}
-.v2-legend__fill{width:16px;height:6px;border-radius:3px;background:var(--ok)}
-.v2-legend__tick{width:2px;height:14px;border-radius:1px}
-.v2-status-item__actions{flex-basis:100%;display:flex;flex-wrap:wrap;gap:var(--space-1)}
+.v2-status-item__main{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:.25rem}
+.v2-status-item__title{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .5rem}
+.v2-status-item__title>h3{font-weight:500}
+.v2-status-item__main>p{font-size:.875rem;line-height:1.5;color:var(--text-2)}
+.v2-status-item__metric{flex-basis:100%;display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;padding:.625rem .75rem;border-radius:var(--radius-control);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);font-size:.8125rem;color:var(--text-2)}
+.v2-status-item__metric>.v2-num{font-weight:500;color:var(--mono,var(--text))}
+.v2-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1.25rem 1.875rem}
+.v2-legend{display:flex;flex-wrap:wrap;gap:.5rem 1rem;font-size:.75rem;color:var(--text-2)}
+.v2-legend>li{display:inline-flex;align-items:center;gap:.375rem}
+.v2-legend__fill{width:1rem;height:.25rem;border-radius:var(--radius-pill);background:var(--color-green-500,var(--ok))}
+.v2-legend__tick{width:2px;height:.875rem;border-radius:1px}
+.v2-status-item__actions{flex-basis:100%;display:flex;flex-wrap:wrap;gap:.625rem}
 `

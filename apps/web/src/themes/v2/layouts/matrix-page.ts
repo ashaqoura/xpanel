@@ -86,7 +86,7 @@ export interface MatrixPageProps extends PageBaseProps {
 }
 
 const toggle = (item: MatrixSwitch, contentHtml = ''): string =>
-  `<label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="${escapeHtml(item.label)}"${item.checked ? ' checked' : ''}${item.disabled ? ' disabled' : ''}${hookAttrs(item.hooks)}>${contentHtml}</label>`
+  `<label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="${escapeHtml(item.label)}"${item.checked ? ' checked' : ''}${item.disabled ? ' disabled' : ''} class="kt-switch"${hookAttrs(item.hooks)}>${contentHtml}</label>`
 
 export function matrixTable(t: Translate, props: MatrixPageProps['matrix']): string {
   const lead = 1 + (props.leadColumns?.length ?? 0)
@@ -115,7 +115,7 @@ export function matrixTable(t: Translate, props: MatrixPageProps['matrix']): str
     })}</tr>`
   }
   const groups = props.groups.map(group => `<tbody${hookAttrs(group.hooks)}>${groupRow(group)}${group.events.map(eventRow).join('')}</tbody>`).join('')
-  return `<div class="v2-table-scroll" role="region" aria-labelledby="${escapeHtml(captionId)}" tabindex="0"><table class="v2-table v2-matrix"><caption id="${escapeHtml(captionId)}" class="v2-sr">${escapeHtml(props.caption)}</caption><thead>${head}</thead>${groups}</table></div>`
+  return `<div class="v2-table-scroll kt-scrollable-x-auto" role="region" aria-labelledby="${escapeHtml(captionId)}" tabindex="0"><table class="v2-table v2-matrix kt-table text-start"><caption id="${escapeHtml(captionId)}" class="v2-sr">${escapeHtml(props.caption)}</caption><thead>${head}</thead>${groups}</table></div>`
 }
 
 export function matrixPage(t: Translate, props: MatrixPageProps): string {
@@ -131,14 +131,15 @@ export function matrixPage(t: Translate, props: MatrixPageProps): string {
   return layoutRoot(t, props, `${splitWithAside(matrixCard, side ? { label: props.asideLabel ?? matrix.title, html: side } : undefined)}${props.review ? changeReview(t, props.review) : ''}${commitRegion(t('Save changes'), revisionSaveBar(t, { controls: props.review?.id, ...props.save }))}${(props.dialogs ?? []).map(item => dialog(t, item)).join('')}`)
 }
 
-export const MATRIX_LAYOUT_CSS = `.v2-matrix th[scope=row]{background:var(--surface);color:var(--text);font-size:14px;font-weight:400;white-space:normal}
-.v2-matrix tbody tr:hover>th[scope=row]{background:var(--subtle)}
-.v2-matrix__group>*{background:var(--subtle)}
-.v2-matrix__group>th{font-size:13px;font-weight:600;color:var(--text)}
-.v2-matrix__group .v2-num{font-weight:500;color:var(--muted)}
+export const MATRIX_LAYOUT_CSS = `.v2-matrix th[scope=row]{padding:.75rem 1rem;color:var(--text);font-size:.875rem;font-weight:400;white-space:normal}
+.v2-matrix th[scope=row]:first-child{padding-inline-start:var(--v2-panel-padding)}
+.v2-matrix tbody tr:hover>th[scope=row]{background:color-mix(in oklab,var(--kt-muted) 50%,transparent)}
+.v2-matrix__group>*{background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
+.v2-matrix__group>th{font-size:.8125rem;font-weight:500;color:var(--mono,var(--text))}
+.v2-matrix__group .v2-num{font-weight:400;color:var(--muted)}
 .v2-matrix__channel{display:inline-flex;flex-direction:column}
-.v2-matrix__channel>span+span{font-weight:500}
-.v2-matrix__switch{display:inline-flex;align-items:center;gap:var(--space-1);min-height:var(--target);font-size:13px;cursor:pointer}
-.v2-matrix__event{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1) 12px}
-.v2-matrix__fixed{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ok)}
+.v2-matrix__channel>span+span{font-size:.75rem}
+.v2-matrix__switch{display:inline-flex;align-items:center;gap:var(--space-1);min-height:var(--target);font-size:.8125rem;cursor:pointer}
+.v2-matrix__event{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1) .75rem}
+.v2-matrix__fixed{display:inline-flex;align-items:center;gap:.375rem;font-size:.8125rem;color:var(--ok)}
 `

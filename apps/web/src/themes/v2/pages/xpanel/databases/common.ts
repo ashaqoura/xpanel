@@ -51,17 +51,53 @@ export function databaseContext(props: DatabasePageProps, authority: DatabasePag
 export const technical = (value: string | number): string =>
   `<bdi dir="ltr" class="v2-mono">${escapeHtml(normalizeAsciiDigits(value))}</bdi>`
 
-export const dbButton = (label: string, hooks?: HookAttributes, options: { disabled?: boolean; primary?: boolean; submit?: boolean; ariaControls?: string; ariaExpanded?: boolean } = {}): string =>
-  `<button type="${options.submit ? 'submit' : 'button'}" class="v2-btn${options.primary ? ' v2-btn--primary' : ''}"${options.ariaControls ? ` aria-controls="${escapeHtml(options.ariaControls)}"` : ''}${options.ariaExpanded !== undefined ? ` aria-expanded="${options.ariaExpanded}"` : ''}${hookAttrs(hooks)}${options.disabled ? ' disabled' : ''}>${escapeHtml(label)}</button>`
+/** Keenicons the v2 icon set lacks. Inside a button the button sizes the glyph. */
+export const dbGlyph = {
+  trash: '<i class="ki-filled ki-trash" aria-hidden="true"></i>',
+  discard: '<i class="ki-filled ki-arrows-loop" aria-hidden="true"></i>',
+  key: '<i class="ki-filled ki-key" aria-hidden="true"></i>',
+  eye: '<i class="ki-filled ki-eye" aria-hidden="true"></i>',
+  restore: '<i class="ki-filled ki-time" aria-hidden="true"></i>',
+  insights: '<i class="ki-filled ki-chart-simple" aria-hidden="true"></i>',
+} as const
+
+/** The button hierarchy of a database card: one primary, outline for the rest, ghost to step back, soft red to remove. */
+const BUTTON = {
+  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary',
+  outline: 'v2-btn kt-btn kt-btn-outline',
+  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost',
+  danger: 'v2-btn v2-btn--soft-danger kt-btn kt-btn-outline kt-btn-destructive',
+} as const
+
+export interface DbButtonOptions {
+  disabled?: boolean
+  primary?: boolean
+  submit?: boolean
+  ariaControls?: string
+  ariaExpanded?: boolean
+  /** Leading glyph markup: `icon(...)` of the v2 set or a {@link dbGlyph}. */
+  icon?: string
+  kind?: 'outline' | 'ghost' | 'danger'
+  /** Row and toolbar size. */
+  small?: boolean
+}
+
+export const dbButton = (label: string, hooks?: HookAttributes, options: DbButtonOptions = {}): string =>
+  `<button type="${options.submit ? 'submit' : 'button'}" class="${options.primary ? BUTTON.primary : BUTTON[options.kind ?? 'outline']}${options.small ? ' kt-btn-sm' : ''}"${options.ariaControls ? ` aria-controls="${escapeHtml(options.ariaControls)}"` : ''}${options.ariaExpanded !== undefined ? ` aria-expanded="${options.ariaExpanded}"` : ''}${hookAttrs(hooks)}${options.disabled ? ' disabled' : ''}>${options.icon ?? ''}${escapeHtml(label)}</button>`
 
 export const dbSelect = (selectHtml: string): string =>
-  `<span class="v2-select">${selectHtml}${icon('chevDown', 16)}</span>`
+  `<span class="v2-select">${selectHtml}</span>`
 
 export const dbField = (id: string, label: string, controlHtml: string, help?: string): string =>
-  `<div class="v2-field"><label for="${escapeHtml(id)}">${escapeHtml(label)}</label>${controlHtml}${help ? `<p class="v2-field__help">${escapeHtml(help)}</p>` : ''}</div>`
+  `<div class="v2-field"><label class="kt-form-label" for="${escapeHtml(id)}">${escapeHtml(label)}</label>${controlHtml}${help ? `<p class="v2-field__help kt-form-description">${escapeHtml(help)}</p>` : ''}</div>`
 
 export const dbFacts = (rows: readonly { label: string; valueHtml: string; hooks?: HookAttributes }[], hooks?: HookAttributes): string =>
-  `<dl class="v2-db-facts"${hookAttrs(hooks)}>${rows.map(row => `<div><dt>${escapeHtml(row.label)}</dt><dd${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
+  {
+  // The count strip is a row of KPI tiles (the controller rebuilds its entries, so the tile look is in the page
+  // styles); every other fact list is label and value rows, as in a Metronic "General info" list.
+  const counts = hooks?.['data-db-counts'] !== undefined
+  return `<dl class="v2-db-facts"${hookAttrs(hooks)}>${rows.map(row => `<div><dt class="text-sm text-secondary-foreground">${escapeHtml(row.label)}</dt><dd class="${counts ? 'font-semibold text-mono' : 'text-sm text-mono'}"${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
+}
 
 export const dbCard = (key: string, title: string, bodyHtml: string, options: { flush?: boolean; description?: string; actionsHtml?: string } = {}): string =>
   card({ titleId: `v2-db-${key}-title`, title, bodyHtml, ...options })
@@ -76,7 +112,7 @@ const labelCells = (headings: readonly string[], rowsHtml: string): string => ro
 })
 
 export const dbTable = (id: string, title: string, headings: readonly string[], bodyHtml: string, bodyHooks: HookAttributes, tableHooks?: HookAttributes): string =>
-  `<div class="v2-db-table-region" role="region" tabindex="0" aria-label="${escapeHtml(title)}"><table id="${escapeHtml(id)}" class="v2-table"${hookAttrs(tableHooks)}><caption class="v2-sr">${escapeHtml(title)}</caption><thead><tr>${headings.map(heading => `<th scope="col">${escapeHtml(heading)}</th>`).join('')}</tr></thead><tbody${hookAttrs(bodyHooks)}>${labelCells(headings, bodyHtml)}</tbody></table></div>`
+  `<div class="v2-db-table-region kt-scrollable-x-auto" role="region" tabindex="0" aria-label="${escapeHtml(title)}"><table id="${escapeHtml(id)}" class="v2-table kt-table align-middle"${hookAttrs(tableHooks)}><caption class="v2-sr">${escapeHtml(title)}</caption><thead><tr>${headings.map(heading => `<th scope="col">${escapeHtml(heading)}</th>`).join('')}</tr></thead><tbody${hookAttrs(bodyHooks)}>${labelCells(headings, bodyHtml)}</tbody></table></div>`
 
 export function dbPage(t: Translate, route: DatabaseRoute, title: string, description: string, bodyHtml: string): string {
   return `<div class="v2-db-page">${pageHeader(t, {
@@ -86,6 +122,6 @@ export function dbPage(t: Translate, route: DatabaseRoute, title: string, descri
 
 export function relatedDatabasePage(t: Translate, authority: DatabasePageAuthority, route: DatabaseRoute, label: string): string {
   return authority.relatedRoutes?.has(route)
-    ? `<a class="v2-btn" href="${route}">${escapeHtml(label)}</a>`
-    : dbButton(label, undefined, { disabled: true })
+    ? `<a class="v2-btn kt-btn kt-btn-outline" href="${route}">${escapeHtml(label)}${icon('arrow', 16)}</a>`
+    : `<button type="button" class="v2-btn kt-btn kt-btn-outline" disabled>${escapeHtml(label)}${icon('arrow', 16)}</button>`
 }

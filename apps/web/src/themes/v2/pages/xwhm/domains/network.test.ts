@@ -67,7 +67,7 @@ describe('independent v2 WHM domains, DNS and certificate pages', () => {
     expect(html).toContain('Hosted domains · 2')
     expect(html).toContain('href="#v2-whm-network-domain-create-heading"')
     const unread = renderV2WhmDomainsPage({ accounts: [account] }, authority)
-    expect(unread.match(/<article class="v2-kpi" data-state="unread">/g)).toHaveLength(4)
+    expect(unread.match(/<article class="v2-kpi kt-card" data-state="unread">/g)).toHaveLength(4)
     expect(unread).not.toContain('v2-count')
     expect(unread).not.toContain('of 0 domains')
   })
@@ -210,7 +210,7 @@ describe('v2 domain row repaint and DNS record filter', () => {
 
   it('filters loaded zone records by text and record type', () => {
     const html = renderV2WhmDnsPage({ accounts: [account] }, authority)
-    expect(html).toMatch(/aria-labelledby="v2-whm-network-dns-editor-heading">.*<div class="v2-whm-network__records" data-list-filter>.*data-list-filter-search.*<select id="v2-whm-dns-record-type" data-list-filter-key="type"><option value="" selected>All<\/option><option value="A">A<\/option>/s)
+    expect(html).toMatch(/aria-labelledby="v2-whm-network-dns-editor-heading">.*<div class="v2-whm-network__records" data-list-filter>.*data-list-filter-search.*<select id="v2-whm-dns-record-type"[^>]*data-list-filter-key="type"[^>]*><option value="" selected>All<\/option><option value="A">A<\/option>/s)
     expect(html).toContain('data-list-filter-empty hidden')
     expect(html).toMatch(/<template data-xp-template="dns-record-row"><tr data-list-row>.*data-list-field="type"/s)
   })

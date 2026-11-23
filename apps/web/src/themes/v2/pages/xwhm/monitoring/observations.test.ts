@@ -172,10 +172,11 @@ describe('v2 WHM diagnostic, security and activity bodies', () => {
   })
 
   it('keeps RTL field and table alignment local to the diagnostic bodies', () => {
-    expect(WHM_OBSERVATION_CSS).toContain('gap:32px')
-    expect(WHM_OBSERVATION_CSS).toContain('gap:24px')
-    expect(WHM_OBSERVATION_CSS).toContain('gap:16px')
-    expect(WHM_OBSERVATION_CSS).toContain('gap:8px')
+    // Spacing follows the Metronic scale: 30px between columns on a desktop, 20px in stacks, 10px in groups, 8px in chips.
+    expect(WHM_OBSERVATION_CSS).toContain('gap:1.875rem')
+    expect(WHM_OBSERVATION_CSS).toContain('gap:1.25rem')
+    expect(WHM_OBSERVATION_CSS).toContain('gap:.625rem')
+    expect(WHM_OBSERVATION_CSS).toContain('gap:.5rem')
     expect(WHM_OBSERVATION_CSS).toContain('text-align:var(--v2-control-align,start)')
     expect(WHM_OBSERVATION_CSS).not.toMatch(/text-align\s*:\s*(?:left|right)|var\(--xp-/)
     for (const route of routes) {
@@ -191,10 +192,10 @@ describe('v2 WHM diagnostic, security and activity bodies', () => {
     const policy = html.slice(html.indexOf('data-sign-in-policy'), html.indexOf('id="v2-observation-security-tokens"'))
     for (const hook of ['data-sign-in-field="lockout.username.attempts"', 'data-sign-in-lockouts', 'data-sign-in-unlock-target', 'data-sign-in-save', 'data-sign-in-status']) expect(policy).toContain(hook)
     expect(html).toContain('id="v2-observation-security-locked"')
-    const jump = html.match(/<nav class="v2-observation__jump"[^>]*>(.*?)<\/nav>/)![1]!
+    const jump = html.match(/<nav class="v2-observation__jump[^"]*"[^>]*>(.*?)<\/nav>/)![1]!
     for (const id of [...jump.matchAll(/href="#([^"]+)"/g)].map(match => match[1])) expect(html).toContain(`id="${id}"`)
     expect(jump.match(/<a /g)).toHaveLength(8)
-    expect(render('/whm/security/ssh')).toMatch(/<div class="v2-observation__columns"><section class="v2-card" aria-labelledby="v2-observation-ssh-settings"/)
+    expect(render('/whm/security/ssh')).toMatch(/<div class="v2-observation__columns"><section class="v2-card[^"]*" aria-labelledby="v2-observation-ssh-settings"/)
   })
 
   it('counts and filters advisor findings from the rows the controller paints, and keeps one save bar inside the policy root', () => {
@@ -208,7 +209,7 @@ describe('v2 WHM diagnostic, security and activity bodies', () => {
     }
     expect(html).not.toContain('Problems')
     expect(WHM_OBSERVATION_CSS).toContain(':has(.v2-observation__filter [value=attention]:checked) tr[data-check-state]:not([data-check-state=attention]){visibility:collapse}')
-    const bar = html.match(/<div class="v2-observation__savebar">(.*?)<\/div><\/div>/)![1]!
+    const bar = html.match(/<div class="v2-observation__savebar[^"]*">(.*?)<\/div><\/div>/)![1]!
     expect(bar).toContain('data-sign-in-status'); expect(bar).toContain('data-sign-in-save'); expect(bar).toContain('data-sign-in-refresh')
     expect(html.match(/data-sign-in-save/g)).toHaveLength(1)
   })

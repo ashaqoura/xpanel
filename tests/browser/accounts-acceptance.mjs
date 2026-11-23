@@ -342,7 +342,7 @@ export async function runAccountsAcceptance({ output, filter } = {}) {
         await page.evaluate(() => document.fonts.ready)
         assert.equal(await page.locator('html').getAttribute('data-accounts-fixture'), 'synthetic')
         const isV2 = await page.locator('[data-ui-theme="v2"]').count() > 0
-        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans'
+        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans')
         result.fonts = await assertAppliedFont(page, 'h1', uiFamily)
         if (state.screen === 'create') {
           await createAccountGate(page, host, state, result, destination, expect)

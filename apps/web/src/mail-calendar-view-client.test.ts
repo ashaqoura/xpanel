@@ -64,15 +64,22 @@ const boot = (send?: unknown, options: { locale?: 'en' | 'ar'; canManage?: boole
   return ask
 }
 
+// The viewer zone comes from Intl's default zone. Assigning process.env.TZ does not reset ICU's default inside a
+// worker thread, so report the assigned TZ as the default zone; the tests then run the same on any host timezone.
+const resolvedOptions = Intl.DateTimeFormat.prototype.resolvedOptions
 beforeAll(() => {
   process.env.TZ = 'UTC'
+  vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockImplementation(function (this: Intl.DateTimeFormat) {
+    const options = resolvedOptions.call(this)
+    return process.env.TZ ? { ...options, timeZone: process.env.TZ } : options
+  })
   for (const locale of ['en', 'ar'] as const) for (const canManage of [true, false]) {
     const tpl = document.createElement('template')
     tpl.innerHTML = renderMailCalendarView({ locale, mailbox: MAILBOX, canManage })
     calendarViewTemplateCache.set(`${locale}:${canManage}`, tpl)
   }
 })
-afterAll(() => { if (hostZone === undefined) delete process.env.TZ; else process.env.TZ = hostZone })
+afterAll(() => { vi.restoreAllMocks(); if (hostZone === undefined) delete process.env.TZ; else process.env.TZ = hostZone })
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-11-04T12:00:00Z')); delete (window as Window & { xpanelSessionRequest?: unknown }).xpanelSessionRequest })
 afterEach(() => { vi.useRealTimers(); document.body.replaceChildren(); document.documentElement.lang = 'en'; document.documentElement.dir = 'ltr' })
 

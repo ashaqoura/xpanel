@@ -31,11 +31,11 @@ describe('V2 WHM guarded recovery tools', () => {
 
   it.each(V2_WHM_RECOVERY_TOOL_ROUTES)('puts the checked rules of %s beside its first card inside the scoped body', activeRoute => {
     const html = render(activeRoute)
-    const body = html.slice(html.indexOf('class="v2-recovery-tools v2-recovery__column"'))
-    const grid = body.slice(body.indexOf('<div class="v2-recovery__grid">'))
-    expect(grid.indexOf('<section class="v2-card"')).toBeLessThan(grid.indexOf('<aside class="v2-recovery__column">'))
+    const body = html.slice(html.indexOf('class="v2-recovery-tools v2-recovery__column'))
+    const grid = body.slice(body.indexOf('<div class="v2-recovery__grid'))
+    expect(grid.indexOf('<section class="v2-card')).toBeLessThan(grid.indexOf('<aside class="v2-recovery__column'))
     const rules = body.match(/<ul class="v2-recovery__rules">.*?<\/ul>/s)?.[0] ?? ''
-    expect(rules.match(/<li><svg\b/g)).toHaveLength(5)
+    expect(rules.match(/<li><(?:svg|i)\b/g)).toHaveLength(5)
     expect(body.match(/<ol class="v2-recovery__steps"/g)).toHaveLength(1)
   })
 

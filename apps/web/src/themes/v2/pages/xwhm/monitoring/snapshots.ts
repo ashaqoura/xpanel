@@ -1,6 +1,6 @@
 import { renderV2HostTools } from '../server/host-tools.ts'
 import { v2WhmClientTemplates } from '../../../whm-client-templates.ts'
-import { actions, button, context, facts, field, fields, help, inputControl, markerFacts, page, section, select, status, table, esc, type WhmObservationInput } from './common.ts'
+import { actions, button, context, facts, field, fields, help, inputControl, markerFacts, page, section, select, status, table, toolbarButton, esc, type WhmObservationInput } from './common.ts'
 import { renderV2WhmWebStatsEngines } from './web-stats-engines.ts'
 import { renderV2WhmLogTools } from './log-tools.ts'
 
@@ -10,10 +10,10 @@ export function renderV2WhmProcesses(input: WhmObservationInput): string {
     + field(t, 'v2-process-account', msgid('Account'), select(t, 'v2-process-account', { 'data-whm-monitoring-account': true }, [['', msgid('All processes')], ['-', msgid('Not an account')]]))
     + field(t, 'v2-process-sort', msgid('Sort'), select(t, 'v2-process-sort', { 'data-whm-monitoring-sort': true }, [['cpu', msgid('CPU, highest first')], ['memory', msgid('Memory, highest first')], ['elapsed', msgid('Running time, longest first')], ['pid', msgid('PID, ascending')]])))
   const body = section(t, 'process-list', msgid('Running processes'), help(t, msgid('Command arguments are not read, so secrets passed as arguments are never shown. Root, kernel, panel and core service processes cannot be signalled here.'))
-    + actions(button(t, msgid('Read processes'), { 'data-whm-monitoring-refresh': true }, canRead, true))
     + status(t, msgid('Processes have not been read.'), { 'data-whm-monitoring-status': true })
     + markerFacts(t, [['observed-at', msgid('Observed at (UTC)')], ['total', msgid('Processes on the host')], ['shown', msgid('Rows shown')]], 'whm-monitoring') + controls
-    + table(t, msgid('Running processes'), ['PID', msgid('User'), msgid('Account'), msgid('CPU %'), msgid('Memory %'), msgid('Resident memory'), msgid('Running time'), msgid('State'), msgid('Command'), msgid('Action')], { 'data-whm-monitoring-rows': true }, msgid('No processes have been read.'), [0, 3, 4, 5, 6]))
+    + table(t, msgid('Running processes'), ['PID', msgid('User'), msgid('Account'), msgid('CPU %'), msgid('Memory %'), msgid('Resident memory'), msgid('Running time'), msgid('State'), msgid('Command'), msgid('Action')], { 'data-whm-monitoring-rows': true }, msgid('No processes have been read.'), [0, 3, 4, 5, 6]),
+    undefined, false, undefined, toolbarButton(t, msgid('Read processes'), { 'data-whm-monitoring-refresh': true }, canRead))
     + section(t, 'process-accounts', msgid('By account'), help(t, msgid('Processes are grouped by the numeric user id of each saved account. Kill all sends KILL to one account only; root, service and panel users cannot be chosen.'))
       + table(t, msgid('Processes by account'), [msgid('Account'), msgid('Processes'), msgid('CPU %'), msgid('Resident memory'), msgid('Action')], { 'data-whm-monitoring-account-rows': true }, msgid('No account processes have been read.'), [1, 2, 3]))
   return page(input, '/whm/monitoring/processes', msgid('Processes'), msgctxt('theme:v2', 'Read a bounded process snapshot; each signal requires a fresh process identity check.'), v2WhmClientTemplates('processes') + body, { 'data-whm-monitoring': 'processes', 'data-monitoring-can-read': String(canRead), 'data-monitoring-can-signal': String(canManage) })
@@ -21,10 +21,10 @@ export function renderV2WhmProcesses(input: WhmObservationInput): string {
 
 export function renderV2WhmDisk(input: WhmObservationInput): string {
   const { t, canRead } = context(input)
-  const body = section(t, 'filesystems', msgid('Filesystems'), actions(button(t, msgid('Read disk usage'), { 'data-whm-monitoring-refresh': true }, canRead, true))
-    + status(t, msgctxt('whm-monitoring-workspace', 'Disk usage has not been read.'), { 'data-whm-monitoring-status': true })
+  const body = section(t, 'filesystems', msgid('Filesystems'), status(t, msgctxt('whm-monitoring-workspace', 'Disk usage has not been read.'), { 'data-whm-monitoring-status': true })
     + markerFacts(t, [['observed-at', msgid('Observed at (UTC)')], ['inodes', msgid('Inode counts')]], 'whm-monitoring')
-    + table(t, msgid('Filesystems'), [msgid('Mount point'), msgid('Filesystem'), msgid('Type'), msgid('Size'), msgid('Used'), msgctxt('whm-monitoring-workspace', 'Available'), msgid('Use'), msgid('Inodes used'), msgid('Inode use')], { 'data-whm-monitoring-rows': true }, msgid('No filesystems have been read.'), [3, 4, 5, 6, 7, 8]))
+    + table(t, msgid('Filesystems'), [msgid('Mount point'), msgid('Filesystem'), msgid('Type'), msgid('Size'), msgid('Used'), msgctxt('whm-monitoring-workspace', 'Available'), msgid('Use'), msgid('Inodes used'), msgid('Inode use')], { 'data-whm-monitoring-rows': true }, msgid('No filesystems have been read.'), [3, 4, 5, 6, 7, 8]),
+    undefined, false, undefined, toolbarButton(t, msgid('Read disk usage'), { 'data-whm-monitoring-refresh': true }, canRead))
     + section(t, 'account-homes', msgid('Account home usage'), help(t, msgid('Read from the user quota report of the filesystem that holds /home. Without enabled quotas, per-account usage stays unavailable; no directory scan is run.'))
       + status(t, msgid('Quota usage has not been read.'), { 'data-whm-monitoring-quota-status': true }) + markerFacts(t, [['quota-mount', msgctxt('whm-monitoring-workspace', 'Quota filesystem')]], 'whm-monitoring')
       + table(t, msgid('Account home usage'), [msgid('Account'), msgid('Used'), msgid('Quota limit'), msgid('Use')], { 'data-whm-monitoring-quota-rows': true }, msgid('No account usage has been read.'), [1, 2, 3]))
@@ -50,16 +50,15 @@ export function renderV2WhmLogs(input: WhmObservationInput): string {
     + markerFacts(t, [['observed-at', msgid('Observed at (UTC)')], ['shown', msgid('Entries returned')]], 'whm-monitoring')
     + table(t, msgid('Journal entries, newest first'), [msgid('Time (UTC)'), msgid('Priority'), msgid('Unit'), 'PID', msgid('Message')], { 'data-whm-monitoring-rows': true }, msgid('No log entries have been read.'), [1, 3]))
     + section(t, 'log-retention', msgid('Web log retention'), help(t, msgid('Each site access log is rotated once per UTC day after its traffic is counted, then kept as a gzip archive in the account ~/logs or deleted, as each account chooses on its Raw Access page or by the server default. Server error and backend logs rotate through logrotate.'))
-      + actions(button(t, msgid('Read log retention'), { 'data-whm-metering-refresh': true }, canRead))
       + status(t, canRead ? msgid('Log retention has not been read.') : msgid('Log retention requires an authorized root administrator.'), { 'data-whm-metering-status': true }, canRead ? 'unread' : 'unavailable')
       + facts(t, [['defaults', msgid('Server default')], ['panel', msgid('Server logs kept')], ['last-run', msgid('Last rotation (UTC)')], ['last-result', msgid('Last rotation result')], ['held', msgid('Undelivered archives')]], 'data-whm-metering-fact')
       + table(t, msgid('Archives waiting to be copied into ~/logs'), [msgid('Account'), msgid('Archives'), msgid('Size'), msgid('Oldest (UTC)'), msgid('Reason')], { 'data-whm-metering-rows': 'pending' }, msgid('Log retention has not been read.'), [1, 2])
       + table(t, msgid('Archive retention per account'), [msgid('Account'), msgid('Domain'), msgid('Archive retention'), msgid('Source')], { 'data-whm-metering-rows': 'retention' }, msgid('Log retention has not been read.'))
       + table(t, msgid('Rotation failures'), [msgid('Time (UTC)'), msgid('Account'), msgid('Site'), msgid('Reason')], { 'data-whm-metering-rows': 'rotation-failures' }, msgid('Log retention has not been read.')),
-      { 'data-whm-metering': 'log-retention', 'data-metering-can-read': String(canRead) })
+      { 'data-whm-metering': 'log-retention', 'data-metering-can-read': String(canRead) }, false, undefined, toolbarButton(t, msgid('Read log retention'), { 'data-whm-metering-refresh': true }, canRead))
     + section(t, 'raw-server-logs', msgid('Raw web server logs'), help(t, msgid("The web servers' own access and error logs, current and rotated, downloaded exactly as stored. Only the fixed log directories are read; files above the size bound are listed but not downloaded."))
       + fields(field(t, 'v2-raw-logs-server', msgid('Web server'), select(t, 'v2-raw-logs-server', { 'data-raw-logs-server': true }, [['nginx', 'nginx'], ['apache', 'Apache']], canRead)))
-      + actions(button(t, msgid('Read log list'), { 'data-raw-logs-refresh': true }, canRead))
+      + actions(button(t, msgid('Read log list'), { 'data-raw-logs-refresh': true }, canRead, true))
       + status(t, canRead ? msgid('The log list has not been read.') : msgid('Raw web server logs require an authorized root administrator.'), { 'data-raw-logs-status': true }, canRead ? 'unread' : 'unavailable')
       + table(t, msgid('Raw web server logs'), [msgid('File'), msgid('Size'), msgid('Modified (UTC)'), msgid('Download')], { 'data-raw-logs-rows': true }, msgid('The log list has not been read.'), [1]),
       { 'data-whm-raw-logs': true, 'data-raw-logs-can-read': String(canRead) })
@@ -71,8 +70,8 @@ export function renderV2WhmLogs(input: WhmObservationInput): string {
 
 export function renderV2WhmPerformance(input: WhmObservationInput): string {
   const { t, canRead } = context(input)
-  const metrics = [['cpuPercent', msgid('CPU %')], ['memoryMb', msgid('Memory, MiB')], ['load1', msgid('Load average, 1 minute')], ['processes', msgid('Processes')], ['diskMb', msgid('Disk used, MiB')]] as const
-  const charts = `<div class="v2-observation__charts" data-whm-monitoring-charts>${metrics.map(([key, label]) => `<figure class="v2-observation__chart" data-whm-monitoring-chart="${key}"><figcaption>${esc(t(label))}</figcaption><p data-whm-monitoring-chart-state>${esc(t(msgid('Not read')))}</p></figure>`).join('')}</div>`
+  const metrics = [['cpuPercent', msgid('CPU %'), 'ki-technology-1'], ['memoryMb', msgid('Memory, MiB'), 'ki-simcard'], ['load1', msgid('Load average, 1 minute'), 'ki-pulse'], ['processes', msgid('Processes'), 'ki-element-11'], ['diskMb', msgid('Disk used, MiB'), 'ki-external-drive']] as const
+  const charts = `<div class="v2-observation__charts grid gap-5" data-whm-monitoring-charts>${metrics.map(([key, label, glyph]) => `<figure class="v2-observation__chart flex flex-col gap-2.5 min-w-0 rounded-xl border border-border p-5" data-whm-monitoring-chart="${key}"><figcaption class="flex items-center gap-2 text-sm font-semibold text-mono"><i class="ki-filled ${glyph} text-base text-muted-foreground" aria-hidden="true"></i>${esc(t(label))}</figcaption><p class="text-xs text-secondary-foreground" data-whm-monitoring-chart-state>${esc(t(msgid('Not read')))}</p></figure>`).join('')}</div>`
   const body = section(t, 'performance', msgid('Host performance history'), help(t, msgid('Recorded host samples from the metrics history, averaged into fixed intervals. Intervals without a sample are gaps, not zero.'))
     + fields(field(t, 'v2-monitoring-window', msgid('Time window'), select(t, 'v2-monitoring-window', { 'data-whm-monitoring-window': true }, [['1h', msgid('Last hour')], ['24h', msgid('Last 24 hours')], ['7d', msgid('Last 7 days')]], canRead)))
     + actions(button(t, msgid('Read history'), { 'data-whm-monitoring-refresh': true }, canRead, true))

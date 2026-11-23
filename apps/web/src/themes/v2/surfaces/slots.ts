@@ -5,11 +5,18 @@ import type { Translate } from '../../../i18n.ts'
 import type { ActivityDrawerProps, CommandPaletteProps, DocumentBodyProps, ReconcileBannerProps, UiTheme } from '../../contract.ts'
 import { statusPill } from '../components/status-pill.ts'
 import { escapeHtml } from '../html.ts'
+import { icon } from '../icons.ts'
 import { v2Messages } from '../messages.ts'
 import { activityDrawer, commandPalette, reconcileBanner } from '../shell/overlays.ts'
 import { assembleActivityControl } from '../shell/activity-control.ts'
 import { V2_PROMPT_CSS, V2_PROMPT_TEMPLATE } from '../components/prompt.ts'
 import { renderV2IdentityCards } from '../pages/identity.ts'
+
+// Document banners above the shell: full-width Metronic alerts without side borders or rounding.
+const BANNER = 'v2-impersonation kt-alert kt-alert-light kt-alert-warning items-center rounded-none border-x-0 border-t-0'
+const BANNER_INFO = 'v2-impersonation kt-alert kt-alert-light kt-alert-primary items-center rounded-none border-x-0 border-t-0'
+const BANNER_ICON = `<span class="kt-alert-icon text-yellow-500">${icon('alert')}</span>`
+const BANNER_INFO_ICON = `<span class="kt-alert-icon text-primary">${icon('info')}</span>`
 
 export const V2_SECURITY_SLOT = '<div data-v2-account-security-slot></div>'
 type SecurityProps = Parameters<UiTheme['slots']['accountSecurity']>[0]['security']
@@ -76,10 +83,10 @@ export function renderV2DocumentBody(props: DocumentBodyProps): string {
     const sentence = escapeHtml(t('Signed in as {target} by {issuer}', { target: '\uE000', issuer: '\uE001' }))
       .replace('\uE000', `<bdi dir="ltr">${escapeHtml(props.impersonation!.target)}</bdi>`)
       .replace('\uE001', `<bdi dir="ltr">${escapeHtml(props.impersonation!.issuer)}</bdi>`)
-    return `<div class="v2-impersonation" role="region" aria-label="${escapeHtml(t('Handed-off session'))}" data-impersonation><p>${sentence}</p><button type="button" class="v2-btn" data-action="logout" data-impersonation-end>${escapeHtml(t('End session'))}</button></div>`
+    return `<div class="${BANNER}" role="region" aria-label="${escapeHtml(t('Handed-off session'))}" data-impersonation>${BANNER_ICON}<p class="kt-alert-title">${sentence}</p><div class="kt-alert-toolbar"><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-action="logout" data-impersonation-end>${escapeHtml(t('End session'))}</button></div></div>`
   })() : ''
-  const qualification = props.qualificationMode ? `<div class="v2-impersonation" role="region" aria-label="${escapeHtml(t('Qualification mode'))}" data-qualification-mode><p>${escapeHtml(t('Qualification mode is on. Unverified tools are open on this lab host and every operation is recorded in the audit log.'))}</p></div>` : ''
-  const themePreview = props.themePreviewName ? `<div class="v2-impersonation" role="status" data-theme-preview><p>${escapeHtml(t('Preview of the theme {name}. It was not chosen or saved, and the next page uses your own theme.', { name: props.themePreviewName }))}</p></div>` : ''
+  const qualification = props.qualificationMode ? `<div class="${BANNER}" role="region" aria-label="${escapeHtml(t('Qualification mode'))}" data-qualification-mode>${BANNER_ICON}<p class="kt-alert-title">${escapeHtml(t('Qualification mode is on. Unverified tools are open on this lab host and every operation is recorded in the audit log.'))}</p></div>` : ''
+  const themePreview = props.themePreviewName ? `<div class="${BANNER_INFO}" role="status" data-theme-preview>${BANNER_INFO_ICON}<p class="kt-alert-title">${escapeHtml(t('Preview of the theme {name}. It was not chosen or saved, and the next page uses your own theme.', { name: props.themePreviewName }))}</p></div>` : ''
   const body = `${qualification}${themePreview}${impersonation}${props.reconcileHtml}${props.surfaceHtml}${renderBrandingFooter(props.branding, props.locale)}${props.paletteHtml}${props.activityHtml}${V2_PROMPT_TEMPLATE}${props.clientScriptsHtml}`
   return assembleActivityControl(t, body, props.activityHtml)
 }
@@ -95,18 +102,18 @@ export const V2_SLOTS_CSS = `.v2-security{gap:var(--space-3)}
 .v2-security__tok{white-space:nowrap}
 .v2-security :is(form,.v2-security__stack)>.v2-btn{align-self:flex-start}
 .v2-security [data-auth-totp-qr]>svg{display:block;max-inline-size:100%;block-size:auto}
-.v2-impersonation{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2);padding:var(--space-2) var(--v2-panel-padding);background:var(--warn-soft);border-block-end:1px solid var(--warn-line);color:var(--text)}
+.v2-impersonation{flex:none;padding-inline:var(--space-3)}
 .v2-impersonation>p{min-inline-size:0;overflow-wrap:anywhere}
-.v2-activity-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:var(--space-2)}
+.v2-activity-list{display:flex;flex-direction:column;gap:var(--space-2)}
 .v2-activity-row{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-2);border-radius:var(--radius-notice);border:1px solid var(--line);background:var(--subtle)}
 .v2-activity-row>div:first-child{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-1)}
 .v2-activity-row dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:var(--space-2)}
 .v2-activity-row dl>div{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0}
 .v2-activity-row dt{font-size:12px;color:var(--muted)}
 .v2-activity-row dd{overflow-wrap:anywhere}
-.v2-global-reconcile{padding:var(--space-2) var(--v2-panel-padding) 0}
+.v2-global-reconcile{flex:none;padding:var(--space-2) var(--space-3) 0}
 .v2-reconcile-connection{font-size:12px;color:var(--muted);padding-block-end:var(--space-1)}
 .v2-reconcile-facts{padding:var(--space-2);font-size:12px;overflow-wrap:anywhere}
 [data-ui-theme="v2"] [data-handoff-control]{display:inline-flex;flex-direction:column;align-items:flex-start;gap:var(--space-1);min-inline-size:0}
 [data-ui-theme="v2"] [data-handoff-status]{overflow-wrap:anywhere}
-[data-ui-theme="v2"] [data-brand-footer]{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-2) var(--space-3);padding:var(--v2-panel-padding);font-size:12px;color:var(--muted)}` + '\n' + V2_PROMPT_CSS
+[data-ui-theme="v2"] [data-brand-footer]{flex:none;display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-1) var(--space-3);padding:0 var(--space-3) var(--space-2);font-size:12px;color:var(--muted)}` + '\n' + V2_PROMPT_CSS

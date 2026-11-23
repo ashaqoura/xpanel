@@ -151,7 +151,7 @@ function failureNetworkDiagnostics(page) {
 async function fontGate(page, locale) {
   const result = await page.evaluate(async locale => {
     const isV2 = document.documentElement.dataset.uiTheme === 'v2' || Boolean(document.querySelector('[data-ui-theme="v2"]'))
-    const family = locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans'
+    const family = locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans')
     const text = locale === 'ar' ? 'الحساب 0123456789' : 'Account 0123456789'
     let ready = false
     await Promise.race([document.fonts.ready.then(() => { ready = true }), new Promise(resolve => setTimeout(resolve, 10000))])

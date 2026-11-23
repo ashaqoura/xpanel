@@ -279,7 +279,7 @@ try {
         await page.locator('#v2-plan-tab-resources').click()
       }
       const isV2 = await page.locator('[data-ui-theme="v2"]').count() > 0
-      outcome.heading_font = await assertAppliedFont(page, '#main-content h1', sample.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans')
+      outcome.heading_font = await assertAppliedFont(page, '#main-content h1', sample.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans'))
       check('no-page-console-errors-or-writes', outcome.page_errors.length === 0 && outcome.console_errors.length === 0 && outcome.mutations.length === 0, { page_errors: outcome.page_errors, console_errors: outcome.console_errors, mutations: outcome.mutations })
       outcome.status = outcome.checks.every(c => c.passed) ? 'passed' : 'failed'
     } catch (error) { outcome.status = 'failed'; outcome.error = { name: error.name, message: error.message, applied_font: error.appliedFontObservation } }

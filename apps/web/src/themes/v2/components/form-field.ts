@@ -34,8 +34,15 @@ export interface FormFieldProps {
   /** Validation message; marks the control aria-invalid and is read with it. */
   error?: string
   control: FieldControl
+  /** `row` is the Metronic settings row: from the large breakpoint the label (up to 14rem) sits at the start and
+   *  the control, its hint and its error grow beside it; narrower, and by default, the label sits above. */
+  layout?: 'stacked' | 'row'
   hooks?: HookAttributes
 }
+
+const FIELD = 'v2-field kt-form-item'
+// One grid of two columns: the label keeps the first, every other child (control, error, hint, change) the second.
+const FIELD_ROW = 'v2-field v2-field--row kt-form-item lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-baseline lg:[&>:not(label)]:col-start-2'
 
 export function formField(props: FormFieldProps): string {
   const { id, control } = props
@@ -43,17 +50,20 @@ export function formField(props: FormFieldProps): string {
   const errorId = props.error ? `${id}-error` : undefined
   const changeId = props.change ? `${id}-change` : undefined
   const described = [errorId, helpId, changeId].filter(Boolean).join(' ')
-  const common = `id="${escapeHtml(id)}"${attr('name', control.name)}${control.required ? ' required' : ''}${control.disabled ? ' disabled' : ''}${control.mono ? ' class="v2-mono"' : ''}${attr('dir', control.dir)}${attr('aria-describedby', described)}${props.error ? ' aria-invalid="true"' : ''}${hookAttrs(control.hooks)}`
+  // The Metronic control class sits beside v2-mono; phones keep 16px text so focusing a control does not zoom the page.
+  const common = (kt: string): string => `id="${escapeHtml(id)}"${attr('name', control.name)}${control.required ? ' required' : ''}${control.disabled ? ' disabled' : ''} class="${control.mono ? 'v2-mono ' : ''}${kt}"${attr('dir', control.dir)}${attr('aria-describedby', described)}${props.error ? ' aria-invalid="true"' : ''}${hookAttrs(control.hooks)}`
   let field: string
   if (control.kind === 'select') {
-    field = `<span class="v2-select"><select ${common}>${control.options.map(option => `<option value="${escapeHtml(option.value)}"${option.selected ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select>${icon('chevDown', 16)}</span>`
+    // kt-select draws its own arrow. A left-to-right select inside a right-to-left page keeps it clear of the value.
+    field = `<span class="v2-select"><select ${common(control.dir === 'ltr' ? 'kt-select max-[959px]:text-base rtl:ps-6 rtl:pe-3' : 'kt-select max-[959px]:text-base')}>${control.options.map(option => `<option value="${escapeHtml(option.value)}"${option.selected ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select></span>`
   } else if (control.kind === 'textarea') {
-    field = `<textarea ${common}${attr('rows', control.rows)}${attr('placeholder', control.placeholder)}${attr('autocomplete', control.autocomplete)}${textConstraints(control)}${control.readonly ? ' readonly' : ''}>${escapeHtml(control.value ?? '')}</textarea>`
+    field = `<textarea ${common('kt-textarea max-[959px]:text-base')}${attr('rows', control.rows)}${attr('placeholder', control.placeholder)}${attr('autocomplete', control.autocomplete)}${textConstraints(control)}${control.readonly ? ' readonly' : ''}>${escapeHtml(control.value ?? '')}</textarea>`
   } else {
-    const input = `<input ${common} type="${control.type ?? 'text'}"${attr('value', control.value)}${attr('placeholder', control.placeholder)}${attr('autocomplete', control.autocomplete)}${attr('inputmode', control.inputmode)}${attr('min', control.min)}${attr('max', control.max)}${attr('step', control.step)}${textConstraints(control)}${control.readonly ? ' readonly' : ''}>`
-    field = control.unit ? `<span class="v2-field__unit">${input}<span>${escapeHtml(control.unit)}</span></span>` : input
+    const input = `<input ${common('kt-input max-[959px]:text-base')} type="${control.type ?? 'text'}"${attr('value', control.value)}${attr('placeholder', control.placeholder)}${attr('autocomplete', control.autocomplete)}${attr('inputmode', control.inputmode)}${attr('min', control.min)}${attr('max', control.max)}${attr('step', control.step)}${textConstraints(control)}${control.readonly ? ' readonly' : ''}>`
+    field = control.unit ? `<span class="v2-field__unit kt-input-group">${input}<span class="kt-input-addon">${escapeHtml(control.unit)}</span></span>` : input
   }
-  return `<div class="v2-field"${hookAttrs(props.hooks)}><label for="${escapeHtml(id)}">${escapeHtml(props.label)}</label>${field}${props.error ? `<span class="v2-field__error" id="${escapeHtml(errorId!)}">${icon('alert', 14)}${escapeHtml(props.error)}</span>` : ''}${props.help ? `<span class="v2-field__help" id="${escapeHtml(helpId!)}">${escapeHtml(props.help)}</span>` : ''}${props.change ? `<span class="v2-field__change" id="${escapeHtml(changeId!)}">${escapeHtml(props.change)}</span>` : ''}</div>`
+  const row = props.layout === 'row'
+  return `<div class="${row ? FIELD_ROW : FIELD}"${hookAttrs(props.hooks)}><label for="${escapeHtml(id)}" class="${row ? 'kt-form-label leading-tight max-w-56' : 'kt-form-label leading-tight'}">${escapeHtml(props.label)}</label>${field}${props.error ? `<span class="v2-field__error kt-form-message flex items-center gap-1.5" id="${escapeHtml(errorId!)}">${icon('alert', 14)}${escapeHtml(props.error)}</span>` : ''}${props.help ? `<span class="v2-field__help kt-form-description block" id="${escapeHtml(helpId!)}">${escapeHtml(props.help)}</span>` : ''}${props.change ? `<span class="v2-field__change text-xs font-medium text-primary" id="${escapeHtml(changeId!)}">${escapeHtml(props.change)}</span>` : ''}</div>`
 }
 
 export interface SwitchRowProps {
@@ -67,23 +77,16 @@ export interface SwitchRowProps {
   hooks?: HookAttributes
 }
 
-/** A 44px label row with a switch (checkbox role="switch"). */
+/** A Metronic notification row: the label and its description at the start, the switch (checkbox role="switch")
+ *  at the end; the whole row is the label, so it toggles the switch. */
 export const switchRow = (props: SwitchRowProps): string =>
-  `<label class="v2-switch-row" for="${escapeHtml(props.id)}"><span class="v2-switch-row__text"><span${props.change ? ' class="v2-switch-row__label"' : ''}>${escapeHtml(props.label)}${props.change ? `<span class="v2-switch-row__change" id="${escapeHtml(props.id)}-change">${escapeHtml(props.change)}</span>` : ''}</span>${props.help ? `<span id="${escapeHtml(props.id)}-help">${escapeHtml(props.help)}</span>` : ''}</span><input type="checkbox" role="switch" id="${escapeHtml(props.id)}"${attr('name', props.name)}${props.checked ? ' checked' : ''}${props.disabled ? ' disabled' : ''}${props.help || props.change ? ` aria-describedby="${[props.help ? `${escapeHtml(props.id)}-help` : '', props.change ? `${escapeHtml(props.id)}-change` : ''].filter(Boolean).join(' ')}"` : ''}${hookAttrs(props.hooks)}></label>`
+  `<label class="v2-switch-row flex items-center justify-between gap-5 cursor-pointer" for="${escapeHtml(props.id)}"><span class="v2-switch-row__text flex flex-col gap-1"><span class="${props.change ? 'v2-switch-row__label flex flex-wrap items-center gap-2 text-sm font-medium text-mono' : 'text-sm font-medium text-mono'}">${escapeHtml(props.label)}${props.change ? `<span class="v2-switch-row__change kt-badge kt-badge-sm kt-badge-outline kt-badge-primary" id="${escapeHtml(props.id)}-change">${escapeHtml(props.change)}</span>` : ''}</span>${props.help ? `<span class="text-sm font-normal text-secondary-foreground" id="${escapeHtml(props.id)}-help">${escapeHtml(props.help)}</span>` : ''}</span><input type="checkbox" role="switch" id="${escapeHtml(props.id)}"${attr('name', props.name)}${props.checked ? ' checked' : ''}${props.disabled ? ' disabled' : ''}${props.help || props.change ? ` aria-describedby="${[props.help ? `${escapeHtml(props.id)}-help` : '', props.change ? `${escapeHtml(props.id)}-change` : ''].filter(Boolean).join(' ')}"` : ''} class="kt-switch"${hookAttrs(props.hooks)}></label>`
 
-export const FORM_FIELD_CSS = `.v2-form{display:flex;flex-direction:column;gap:var(--space-2)}
-.v2-field{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
-.v2-field>label:not(:has(>input)),.v2-field>.v2-field__label{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600;text-box-trim:trim-end;text-box-edge:text}
+// A field written with the v2 classes alone (no kt-form-item, kt-form-label, kt-form-description) keeps the same look.
+export const FORM_FIELD_CSS = `.v2-form{display:flex;flex-direction:column;gap:var(--space-3)}
+.v2-field{display:flex;flex-direction:column;gap:.625rem;min-width:0}
+.v2-field>label:not(:has(>input)),.v2-field>.v2-field__label{display:flex;align-items:center;gap:.5rem;font-size:.875rem;line-height:1.25;font-weight:500;color:var(--text)}
 .v2-field :is(input,select,textarea):not([type=checkbox],[type=radio]){inline-size:100%}
-.v2-field__unit{display:flex;align-items:center;gap:var(--space-1)}
-.v2-field__unit>input{flex:1 1 auto;min-width:0}
-.v2-field__unit>span{flex:none;min-inline-size:48px;font-size:13px;color:var(--text-2)}
-.v2-field__help,.v2-switch-row__text>:nth-child(2){font-size:12px;color:var(--muted)}
-.v2-field__change{font-size:12px;color:var(--accent)}
-.v2-field__error{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--bad)}
-.v2-switch-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);min-height:var(--target);cursor:pointer}
-.v2-switch-row__text{display:flex;flex-direction:column;gap:var(--space-1)}
-.v2-switch-row__label{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1)}
-.v2-switch-row__change{padding:2px var(--space-1);border-radius:var(--radius-pill);background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:600}
-.v2-switch-row__text>:first-child{font-weight:600}
+.v2-field__help,.v2-field__error{margin-block-start:-.25rem;font-size:.75rem;line-height:1.4;font-weight:400;color:var(--text-2)}
+.v2-field__error{display:inline-flex;align-items:center;gap:.375rem;color:var(--destructive)}
 `

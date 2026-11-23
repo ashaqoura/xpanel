@@ -3,7 +3,7 @@ import type { WhmNetworkAuthority } from '../domains/common.ts'
 import { renderV2WhmTlsPage } from './index.ts'
 
 const authority: WhmNetworkAuthority = { canRead: true, canManage: true }
-const tile = (html: string, label: string): string => html.match(new RegExp(`<h2>${label}</h2></div>\\s*<p class="v2-kpi__value(?: v2-kpi__value--text)? v2-num"><span>([^<]*)</span>`))![1]!
+const tile = (html: string, label: string): string => html.match(new RegExp(`<h2>${label}</h2>(?:<span class="v2-tile[^"]*" aria-hidden="true">.*?</span>)?</div>\\s*<p class="v2-kpi__value(?: v2-kpi__value--text)? v2-num"><span>([^<]*)</span>`))![1]!
 
 describe('v2 WHM SSL/TLS summary', () => {
   it('counts the supplied stored expiry dates in the same groups as the stored-expiry filter', () => {

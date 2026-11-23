@@ -30,7 +30,7 @@ const topLevelSelectors = (list: string): string[] => {
   }
   return [...parts, list.slice(start)]
 }
-const rulesFor = (source: string): string[] => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@media[^{]+\{|@supports[^{]+\{|@keyframes[^{]+\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '').split('}').map(rule => rule.trim()).filter(Boolean)
+const rulesFor = (source: string): string[] => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@layer[^{;]+\{|@container[^{]+\{|@media[^{]+\{|@supports[^{]+\{|@keyframes[^{]+\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '').split('}').map(rule => rule.trim()).filter(Boolean)
 
 describe('v2 stylesheet asset', () => {
   it('is versioned by content hash and stays well inside the browser budget', () => {
@@ -255,9 +255,9 @@ describe('v2 stylesheet asset', () => {
   })
 
   it('defines light tokens, the dark override and the Arabic font override', () => {
-    expect(css).toMatch(/^\[data-ui-theme="v2"\]\{color-scheme:light;/)
+    expect(css).toMatch(/^@layer v2\{\n\[data-ui-theme="v2"\]\{color-scheme:light;/)
     expect(css).toContain('[data-ui-theme="v2"][data-theme="dark"]{color-scheme:dark;')
-    expect(css).toContain("[data-ui-theme=\"v2\"]:lang(ar){--font-sans:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif}")
+    expect(css).toContain("[data-ui-theme=\"v2\"]:lang(ar){--font-sans:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}")
     expect(css).toContain('@media (prefers-reduced-motion:reduce)')
   })
 })

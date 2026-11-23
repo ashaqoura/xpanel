@@ -1,8 +1,10 @@
 import { escapeHtml, hookAttrs, type HookAttributes } from '../html.ts'
-import { icon } from '../icons.ts'
+import { icon, type IconName } from '../icons.ts'
 
 export interface RowMenuItem {
   label: string
+  /** Leading icon, as the items of a Metronic menu carry one. */
+  icon?: IconName
   /** Keyboard hint shown beside the item, such as "E". */
   shortcut?: string
   danger?: boolean
@@ -24,32 +26,30 @@ export interface RowMenuProps {
   hooks?: HookAttributes
 }
 
-/** Row action menu: a 44px kebab trigger and a role="menu" list in a native popover, so it opens without
+/** Row action menu: a small ghost kebab trigger (ki-dots-vertical) and a role="menu" list in a native popover, so it opens without
  *  script, escapes the table's scroll clipping (top layer) and closes on Escape or an outside click.
  *  Arrow-key roving focus between items belongs to a core menu controller. */
 export function rowMenu(props: RowMenuProps): string {
   const label = escapeHtml(props.label)
   const items = `${props.prependItemsHtml ?? ''}${props.items.map(item => {
-    const content = `${escapeHtml(item.label)}${item.shortcut ? `<kbd aria-hidden="true">${escapeHtml(item.shortcut)}</kbd>` : ''}`
-    const cls = `v2-menu__item${item.danger ? ' v2-menu__item--danger' : ''}`
+    const content = `${item.icon ? icon(item.icon, 16) : ''}${escapeHtml(item.label)}${item.shortcut ? `<kbd class="ms-auto" aria-hidden="true">${escapeHtml(item.shortcut)}</kbd>` : ''}`
+    const cls = item.danger ? 'v2-menu__item v2-menu__item--danger kt-dropdown-menu-link text-destructive hover:text-destructive' : 'v2-menu__item kt-dropdown-menu-link'
     const control = item.href
       ? `<a role="menuitem" class="${cls}" href="${escapeHtml(item.href)}"${hookAttrs(item.hooks)}>${content}</a>`
       : `<button type="button" role="menuitem" class="${cls}"${hookAttrs(item.hooks)}>${content}</button>`
     return `${item.separatorBefore ? '<li role="separator"></li>' : ''}<li role="none">${control}</li>`
   }).join('')}`
   const id = escapeHtml(props.id)
-  return `<span class="v2-menu"${hookAttrs(props.hooks)}><button type="button" class="v2-btn v2-btn--icon" popovertarget="${id}" aria-haspopup="menu" aria-controls="${id}" aria-label="${label}"${hookAttrs(props.triggerHooks)}>${icon('more')}</button><ul class="v2-menu__list" id="${id}" role="menu" aria-label="${label}" popover>${items}</ul></span>`
+  return `<span class="v2-menu"${hookAttrs(props.hooks)}><button type="button" class="v2-btn v2-btn--icon kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost [&:has(+:popover-open)]:bg-accent" popovertarget="${id}" aria-haspopup="menu" aria-controls="${id}" aria-label="${label}"${hookAttrs(props.triggerHooks)}><i class="v2-icon ki-filled ki-dots-vertical text-lg leading-none" aria-hidden="true"></i></button><ul class="v2-menu__list" id="${id}" role="menu" aria-label="${label}" popover>${items}</ul></span>`
 }
 
-// Without CSS anchor positioning the popover keeps the browser's centered placement.
+/// Without CSS anchor positioning the popover keeps the browser's centered placement (margin:auto, which the
+// stylesheet reset would otherwise clear). The list carries the Metronic dropdown-menu values: the kt-dropdown-menu
+// root itself only shows with its script. Items are kt-dropdown-menu-link.
 export const ROW_MENU_CSS = `.v2-menu{display:inline-flex}
-.v2-menu>.v2-btn:has(+:popover-open){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.v2-menu__list{min-inline-size:220px;max-block-size:calc(100dvh - 16px);overflow-y:auto;list-style:none;padding:4px;border-radius:var(--radius-notice);background:var(--surface);color:var(--text);border:1px solid var(--line-strong);box-shadow:var(--v2-elev);text-align:start}
-.v2-menu__list:popover-open{display:flex;flex-direction:column;gap:2px}
+.v2-menu__list{min-inline-size:175px;max-block-size:calc(100dvh - 16px);margin:auto;overflow-y:auto;padding:.5rem;border-radius:var(--radius-control);background:var(--popover,var(--surface));color:var(--popover-foreground,var(--text));border:1px solid var(--line);box-shadow:var(--v2-elev);text-align:start}
+.v2-menu__list:popover-open{display:flex;flex-direction:column;gap:.25rem}
 @supports (position-area:block-end){.v2-menu__list{inset:auto;margin:4px 0 0;position-area:block-end span-inline-start;position-try-fallbacks:flip-block,flip-inline,flip-block flip-inline}}
-.v2-menu__list [role=separator]{height:1px;margin:4px;background:var(--line)}
-.v2-menu__item{display:flex;align-items:center;justify-content:space-between;gap:12px;inline-size:100%;min-height:var(--target);padding:0 12px;border:0;border-radius:var(--radius-chip);background:transparent;color:var(--text);font-size:14px;font-weight:500;text-align:start;text-decoration:none;cursor:pointer}
-.v2-menu__item:hover,.v2-menu__item:focus-visible{background:var(--subtle);color:var(--text)}
-.v2-menu__item--danger{color:var(--bad);font-weight:600}
-.v2-menu__item--danger:hover,.v2-menu__item--danger:focus-visible{background:var(--bad-soft);color:var(--bad)}
+.v2-menu__list [role=separator]{flex:none;height:1px;margin:.375rem -.5rem;background:var(--line)}
+.v2-menu__item:focus-visible{outline:0;background:var(--kt-accent)}
 `

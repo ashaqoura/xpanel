@@ -91,8 +91,11 @@ describe('v2 account files pages', () => {
     const html = renderV2FilesPage(v2Messages.translator('ar'), { surface: { account, files: [] }, canManage: true })
     expect(html).toContain('<bdi dir="ltr" class="v2-mono" data-file-home-path>/home/alice</bdi>')
     expect(V2_FILES_CSS).toContain('text-align:start')
-    expect(V2_FILES_CSS).toContain('gap:var(--space-2)')
-    expect(V2_FILES_CSS).toContain('gap:var(--space-3)')
+    // Spacing follows the Metronic scale: 1.25rem between cards (1.875rem from the large breakpoint), no pixel gaps.
+    expect(V2_FILES_CSS).toContain('--v2-files-gap:1.25rem')
+    expect(V2_FILES_CSS).toContain('--v2-files-gap:1.875rem')
+    expect(V2_FILES_CSS).toContain('gap:.625rem')
+    expect(V2_FILES_CSS).not.toMatch(/gap:[0-9.]+px/)
     expect(html).not.toMatch(/[\u0660-\u0669\u06f0-\u06f9]/)
   })
 })

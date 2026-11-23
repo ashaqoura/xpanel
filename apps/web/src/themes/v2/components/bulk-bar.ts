@@ -12,23 +12,18 @@ export interface BulkBarProps {
   hooks?: HookAttributes
 }
 
+// The Metronic selection toolbar: a primary-tinted band with the count at the start and small outline actions at
+// the end; a risky action is the soft destructive button.
 export function bulkBar(t: Translate, props: BulkBarProps): string {
   const actions = props.actions.map(action => {
-    const cls = `v2-btn${action.tone ? ` v2-bulk__${action.tone}` : ''}`
+    const cls = action.tone === 'bad' ? 'v2-btn v2-bulk__bad kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive'
+      : action.tone === 'warn' ? 'v2-btn v2-bulk__warn kt-btn kt-btn-sm kt-btn-outline border-yellow-200 text-yellow-700 dark:border-yellow-950 dark:text-yellow-600'
+      : 'v2-btn kt-btn kt-btn-sm kt-btn-outline'
     return action.href
       ? `<a class="${cls}" href="${escapeHtml(action.href)}"${hookAttrs(action.hooks)}>${escapeHtml(action.label)}</a>`
       : `<button type="button" class="${cls}"${hookAttrs(action.hooks)}>${escapeHtml(action.label)}</button>`
   }).join('')
-  const clear = props.clear ? `<button type="button" class="v2-btn v2-btn--ghost"${hookAttrs(props.clear)}>${escapeHtml(t('Clear'))}</button>` : ''
-  return `<div class="v2-bulk" role="region" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Bulk actions')))}"${props.hidden ? ' hidden' : ''}${hookAttrs(props.hooks)}><span class="v2-bulk__count v2-num" role="status">${escapeHtml(props.countLabel)}</span><span class="v2-bulk__actions">${actions}${clear}</span></div>`
+  const clear = props.clear ? `<button type="button" class="v2-btn v2-btn--ghost kt-btn kt-btn-sm kt-btn-ghost"${hookAttrs(props.clear)}>${escapeHtml(t('Clear'))}</button>` : ''
+  return `<div class="v2-bulk flex flex-wrap items-center justify-between gap-2.5 px-5 py-2.5 border-y border-primary/10 bg-primary/5" role="region" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Bulk actions')))}"${props.hidden ? ' hidden' : ''}${hookAttrs(props.hooks)}><span class="v2-bulk__count v2-num text-sm font-medium text-primary" role="status">${escapeHtml(props.countLabel)}</span><span class="v2-bulk__actions flex flex-wrap items-center gap-2.5 ms-auto">${actions}${clear}</span></div>`
 }
 
-export const BULK_BAR_CSS = `.v2-bulk{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-1) var(--space-2);padding:10px var(--v2-panel-padding);background:var(--accent-soft);border-block:1px solid var(--accent-line)}
-.v2-bulk__count{font-size:13px;font-weight:600;color:var(--accent)}
-.v2-bulk__actions{display:inline-flex;flex-wrap:wrap;gap:var(--space-1);margin-inline-start:auto}
-.v2-bulk .v2-btn{font-size:13px;padding:0 14px}
-.v2-bulk .v2-bulk__warn{border-color:var(--warn-line);color:var(--warn)}
-.v2-bulk .v2-bulk__warn:hover{border-color:var(--warn);background:var(--warn-soft);color:var(--warn)}
-.v2-bulk .v2-bulk__bad{border-color:var(--bad-line);color:var(--bad)}
-.v2-bulk .v2-bulk__bad:hover{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
-`

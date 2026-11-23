@@ -86,7 +86,8 @@ describe('v2 account resources', () => {
 
   it('keeps detailed unavailable chart, unit, event, process and folder composition without fabricating observations', () => {
     const html = renderV2PanelResources(props())
-    expect(html).toContain('<details class="v2-resource-unit"><summary>Service unit details</summary>')
+    // The disclosure keeps its native details/summary; the marker is a Keenicon instead of the browser glyph.
+    expect(html).toMatch(/<details class="v2-resource-unit group"><summary class="[^"]*list-none[^"]*"><i class="ki-filled ki-right [^"]*" aria-hidden="true"><\/i>Service unit details<\/summary>/)
     expect(html).toContain('xpanel-20031.slice')
     expect(html).toContain('Unit file has not been read.')
     expect(html).toContain('aria-label="IO direction"')

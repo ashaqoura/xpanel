@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 
-const proportionalFamilies = new Set(['IBM Plex Sans', 'IBM Plex Sans Arabic', 'sans-serif'])
+const proportionalFamilies = new Set(['Inter', 'IBM Plex Sans', 'IBM Plex Sans Arabic', 'sans-serif'])
 const wordmarkSelectors = {
   'login-wordmark': new Set(['.xp-brand__name', '[data-login-product]']),
   'mail-wordmark': new Set(['[data-mail-layout="reference"] > header > a:first-of-type > span:last-child', '.v2-side .v2-brand__name', '.v2-top__brand']),
@@ -13,7 +13,7 @@ const reportedFamily = name => {
   // IBM's release files name some styles in the abbreviated legacy form (Medm, SmBld).
   const match = /^(IBM Plex Sans Arabic|IBM Plex Sans|IBM Plex Mono|Noto Sans Arabic)(?: (?:Thin|Extra ?Light|Light|Regular|Text|Medium|Medm|Semi ?Bold|SmBld|Bold|Extra ?Bold)(?: Italic)?| Italic)?$/i.exec(normalized)
   if (!match) return normalized
-  return ['IBM Plex Sans Arabic', 'IBM Plex Sans', 'IBM Plex Mono', 'Noto Sans Arabic'].find(family => family.toLowerCase() === match[1].toLowerCase())
+  return ['IBM Plex Sans Arabic', 'IBM Plex Sans', 'IBM Plex Mono', 'Inter', 'Noto Sans Arabic'].find(family => family.toLowerCase() === match[1].toLowerCase())
 }
 
 /**

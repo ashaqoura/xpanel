@@ -2,6 +2,7 @@ import type { Translate } from '../../../i18n.ts'
 import { card } from '../components/card.ts'
 import { v2SecClientTemplates } from '../components/sec-client-templates.ts'
 import { escapeHtml as esc, hookAttrs, type HookAttributes } from '../html.ts'
+import { icon, type IconName } from '../icons.ts'
 import { v2Messages } from '../messages.ts'
 
 /**
@@ -12,36 +13,49 @@ import { v2Messages } from '../messages.ts'
 type Family = 'v2-observation' | 'v2-panel-settings'
 /** On a phone a row stays two columns: its name and details, opposite its action. */
 export const IDENTITY_ROWS_CSS = `.v2-card[data-sec-workspace] :is(dd,td){font-variant-numeric:tabular-nums}
-.v2-card[data-sec-workspace] .v2-btn{min-inline-size:var(--target);min-block-size:var(--target)}
-.v2-card[data-sec-workspace] .v2-identity-pair{grid-template-columns:repeat(2,minmax(0,1fr))}
-.v2-card[data-sec-workspace] [data-sec-status]{font-size:13px;color:var(--muted)}
-.v2-card[data-sec-workspace] [data-sec-result]:not([hidden]){padding:12px 16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--subtle);font-size:13px}
 .v2-card[data-sec-workspace] :is(.v2-observation__scroll,.v2-panel-settings__table){border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--surface);overflow:auto}
-.v2-card[data-sec-workspace] :is(.v2-observation__scroll,.v2-panel-settings__table) tbody tr:last-child>:is(th,td){border-block-end:0}
 .v2-identity-rows table th,.v2-identity-rows table td:last-child:not(:first-child){overflow-wrap:normal;white-space:nowrap}
-@media(max-width:640px){.v2-card[data-sec-workspace] .v2-identity-pair{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){.v2-identity-rows thead{display:block;block-size:0;overflow:hidden}.v2-identity-rows table,.v2-identity-rows tbody{display:block}.v2-identity-rows tbody tr{display:grid;grid-template-columns:minmax(0,1fr) fit-content(40%);gap:8px 16px;padding:12px 16px}.v2-identity-rows tbody tr:has(>td[colspan]){grid-template-columns:minmax(0,1fr)}.v2-identity-rows tbody tr+tr{border-block-start:1px solid var(--line)}.v2-identity-rows table tbody td{display:block;grid-column:1;padding:0;border:0}.v2-identity-rows table tbody td:last-child:not(:first-child){grid-column:2;grid-row:1}}`
+@media(max-width:600px){.v2-identity-rows thead{display:block;block-size:0;overflow:hidden}.v2-identity-rows table,.v2-identity-rows tbody{display:block}.v2-identity-rows tbody tr{display:grid;grid-template-columns:minmax(0,1fr) fit-content(40%);gap:.5rem 1rem;padding:.75rem 1rem}.v2-identity-rows tbody tr:has(>td[colspan]){grid-template-columns:minmax(0,1fr)}.v2-identity-rows table tbody td{display:block;grid-column:1;padding:0!important;border:0!important}.v2-identity-rows table tbody td:last-child:not(:first-child){grid-column:2;grid-row:1}}`
 interface Ui { readonly t: Translate; readonly p: Family; readonly read: boolean; readonly manage: boolean }
 const LTR_FACTS = new Set(['host', 'group', 'observed-at', 'updated', 'count', 'client', 'redirect-uris'])
 
-const control = (id: string, key: string, type = 'text', extra = ''): string => `<input id="${esc(id)}" type="${esc(type)}" data-sec-input="${esc(key)}"${extra} disabled>`
-const field = (ui: Ui, id: string, label: string, body: string, help?: string): string => `<div class="v2-field"><label for="${esc(id)}">${esc(ui.t(label))}</label>${body}${help ? `<p class="v2-muted">${esc(ui.t(help))}</p>` : ''}</div>`
-const fields = (ui: Ui, body: string, extra = ''): string => `<div class="${ui.p}__fields${extra ? ` ${extra}` : ''}">${body}</div>`
-const actions = (ui: Ui, body: string): string => `<div class="${ui.p}__actions">${body}</div>`
-const button = (ui: Ui, label: string, action: string, primary = false, enabled = false): string =>
-  `<button type="button" class="v2-btn${primary ? ' v2-btn--primary' : ''}" data-sec-action="${esc(action)}"${enabled ? '' : ' disabled'}>${esc(ui.t(label))}</button>`
-const help = (ui: Ui, text: string, hooks?: HookAttributes): string => `<p class="v2-muted"${hookAttrs(hooks)}>${esc(ui.t(text))}</p>`
-const check = (ui: Ui, label: string, key: string): string => `<label class="${ui.p}__check"><input type="checkbox" data-sec-input="${esc(key)}" disabled><span>${esc(ui.t(label))}</span></label>`
-const facts = (ui: Ui, items: readonly (readonly [string, string])[]): string =>
-  `<dl class="${ui.p}__facts">${items.map(([key, label]) => `<div><dt>${esc(ui.t(label))}</dt><dd><bdi${LTR_FACTS.has(key) ? ' dir="ltr"' : ''} data-sec-field="${esc(key)}">${esc(ui.t(msgid('Not read')))}</bdi></dd></div>`).join('')}</dl>`
-const select = (ui: Ui, id: string, key: string, placeholder: string): string => `<span class="v2-select"><select id="${esc(id)}" data-sec-input="${esc(key)}" disabled><option value="">${esc(ui.t(placeholder))}</option></select></span>`
+// Metronic settings card (account/home/settings-plain.html): a row is its label beside the control, hints under the
+// control, facts as label and value rows, an on/off choice as a switch row and the actions at the end of the card.
+const ROW = 'flex flex-wrap lg:flex-nowrap items-baseline gap-2.5 min-w-0'
+const ROW_LABEL = 'kt-form-label max-w-56'
+const ROW_BODY = 'v2-field flex flex-col gap-1.5 w-full min-w-0'
+const HINT = 'v2-muted text-xs font-normal leading-relaxed text-muted-foreground'
+const FACT = 'grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:grid-cols-[minmax(9rem,14rem)_minmax(0,1fr)] items-baseline gap-2.5 min-w-0 p-0 border-0 rounded-none text-start'
+const FACT_LABEL = 'order-none text-sm font-normal text-secondary-foreground'
+const FACT_VALUE = 'order-none min-w-0 text-sm font-normal text-mono break-words'
+// full literal class lists of the family's own containers with the settings-card layout on them
+const FIELDS = { 'v2-observation': 'v2-observation__fields grid grid-cols-1 gap-5 min-w-0', 'v2-panel-settings': 'v2-panel-settings__fields grid grid-cols-1 gap-5 min-w-0' } as const
+const FACTS = { 'v2-observation': 'v2-observation__facts flex flex-col gap-3.5 min-w-0', 'v2-panel-settings': 'v2-panel-settings__facts flex flex-col gap-3.5 min-w-0' } as const
+const ACTIONS = { 'v2-observation': 'v2-observation__actions flex flex-row flex-wrap items-center justify-end gap-2.5', 'v2-panel-settings': 'v2-panel-settings__actions flex flex-row flex-wrap items-center justify-end gap-2.5' } as const
+const SWITCH = { 'v2-observation': 'v2-observation__check flex flex-row items-center justify-between gap-5 min-w-0 px-4 py-3 rounded-lg border border-border cursor-pointer', 'v2-panel-settings': 'v2-panel-settings__check flex flex-row items-center justify-between gap-5 min-w-0 px-4 py-3 rounded-lg border border-border cursor-pointer' } as const
+const SCROLL = { 'v2-observation': 'v2-observation__scroll kt-scrollable-x-auto', 'v2-panel-settings': 'v2-panel-settings__table kt-scrollable-x-auto' } as const
+const BUTTON = { primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-outline', ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive' } as const
+// the leading glyph Metronic shows on an action of that kind
+const GLYPHS: Readonly<Record<string, IconName>> = { add: 'plus', 'add-address': 'plus', 'add-current': 'plus', 'new-provider': 'plus', link: 'link', generate: 'refresh' }
+
+const control = (id: string, key: string, type = 'text', extra = ''): string => `<input class="kt-input" id="${esc(id)}" type="${esc(type)}" data-sec-input="${esc(key)}"${extra} disabled>`
+const field = (ui: Ui, id: string, label: string, body: string, help?: string): string => `<div class="${ROW}"><label class="${ROW_LABEL}" for="${esc(id)}">${esc(ui.t(label))}</label><div class="${ROW_BODY}">${body}${help ? `<p class="${HINT}">${esc(ui.t(help))}</p>` : ''}</div></div>`
+const fields = (ui: Ui, body: string): string => `<div class="${FIELDS[ui.p]}">${body}</div>`
+const actions = (ui: Ui, body: string): string => `<div class="${ACTIONS[ui.p]}">${body}</div>`
+const button = (ui: Ui, label: string, action: string, primary = false, enabled = false, tone?: keyof typeof BUTTON): string =>
+  `<button type="button" class="${BUTTON[tone ?? (primary ? 'primary' : 'outline')]}" data-sec-action="${esc(action)}"${enabled ? '' : ' disabled'}>${GLYPHS[action] ? icon(GLYPHS[action]!, 16) : ''}${esc(ui.t(label))}</button>`
+const help = (ui: Ui, text: string, hooks?: HookAttributes): string => `<p class="v2-muted text-sm font-normal leading-relaxed text-secondary-foreground"${hookAttrs(hooks)}>${esc(ui.t(text))}</p>`
+const check = (ui: Ui, label: string, key: string): string => `<label class="${SWITCH[ui.p]}"><span class="text-sm font-medium leading-snug text-mono">${esc(ui.t(label))}</span><input class="kt-switch kt-switch-sm" type="checkbox" data-sec-input="${esc(key)}" disabled></label>`
+const fact = (ui: Ui, key: string, label: string, extra = ''): string => `<div class="${FACT}"><dt class="${FACT_LABEL}">${esc(ui.t(label))}</dt><dd class="${FACT_VALUE}"><bdi${LTR_FACTS.has(key) ? ' dir="ltr"' : ''}${extra} data-sec-field="${esc(key)}">${esc(ui.t(msgid('Not read')))}</bdi></dd></div>`
+const facts = (ui: Ui, items: readonly (readonly [string, string])[]): string => `<dl class="${FACTS[ui.p]}">${items.map(([key, label]) => fact(ui, key, label)).join('')}</dl>`
+const select = (ui: Ui, id: string, key: string, placeholder: string): string => `<span class="v2-select"><select class="kt-select" id="${esc(id)}" data-sec-input="${esc(key)}" disabled><option value="">${esc(ui.t(placeholder))}</option></select></span>`
 const table = (ui: Ui, title: string, columns: readonly string[], rows: string): string =>
-  `<div class="${ui.p === 'v2-observation' ? 'v2-observation__scroll' : 'v2-panel-settings__table'}${columns.length > 2 ? ' v2-identity-rows' : ''}" role="region" tabindex="0" aria-label="${esc(ui.t(title))}"><table><caption class="v2-sr">${esc(ui.t(title))}</caption><thead><tr>${columns.map(label => `<th scope="col">${esc(ui.t(label))}</th>`).join('')}</tr></thead><tbody data-sec-rows="${esc(rows)}"><tr><td colspan="${columns.length}">${esc(ui.t(msgid('Not read')))}</td></tr></tbody></table></div>`
+  `<div class="${columns.length > 2 ? `${SCROLL[ui.p]} v2-identity-rows` : SCROLL[ui.p]}" role="region" tabindex="0" aria-label="${esc(ui.t(title))}"><table class="kt-table text-start"><caption class="v2-sr">${esc(ui.t(title))}</caption><thead><tr>${columns.map(label => `<th class="text-start font-medium" scope="col">${esc(ui.t(label))}</th>`).join('')}</tr></thead><tbody data-sec-rows="${esc(rows)}"><tr><td class="text-sm font-normal text-secondary-foreground" colspan="${columns.length}">${esc(ui.t(msgid('Not read')))}</td></tr></tbody></table></div>`
 const workspace = (ui: Ui, page: string, title: string, body: string): string => card({
   title: ui.t(title), titleId: `v2-identity-${page}`,
-  actionsHtml: button(ui, msgid('Refresh'), 'refresh', false, ui.read),
-  bodyHtml: body
-    + `<p role="status" data-state="${ui.read ? 'unread' : 'unavailable'}" data-sec-status>${esc(ui.t(ui.read ? msgid('Nothing has been read yet.') : msgid('This page requires an authorized administrator. Nothing was read or changed.')))}</p><p role="status" data-sec-result hidden></p>` + v2SecClientTemplates(ui.p === 'v2-panel-settings' ? 'identity-panel' : 'identity-whm'),
+  actionsHtml: `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-sec-action="refresh"${ui.read ? '' : ' disabled'}>${icon('refresh', 14)}${esc(ui.t(msgid('Refresh')))}</button>`,
+  bodyHtml: `<div class="flex flex-col gap-5 min-w-0">${body}`
+    + `<p class="text-sm font-normal text-secondary-foreground" role="status" data-state="${ui.read ? 'unread' : 'unavailable'}" data-sec-status>${esc(ui.t(ui.read ? msgid('Nothing has been read yet.') : msgid('This page requires an authorized administrator. Nothing was read or changed.')))}</p><p class="kt-alert kt-alert-light block" role="status" data-sec-result hidden></p></div>` + v2SecClientTemplates(ui.p === 'v2-panel-settings' ? 'identity-panel' : 'identity-whm'),
   hooks: { 'data-sec-workspace': true, 'data-sec-page': page, 'data-sec-can-read': String(ui.read), 'data-sec-can-manage': String(ui.read && ui.manage) },
 })
 const password = (id: string, key: string, autocomplete: string): string => control(id, key, 'password', ` dir="ltr" maxlength="1024" autocomplete="${autocomplete}" spellcheck="false"`)
@@ -58,7 +72,7 @@ export function renderV2RootIdentityCards(t: Translate, canRead: boolean, canMan
     + fields(ui, field(ui, 'v2-root-password-new', msgid('New root password'), password('v2-root-password-new', 'password', 'new-password'), msgid('The server password strength rule applies.'))
       + field(ui, 'v2-root-password-confirm', msgid('Confirm new root password'), password('v2-root-password-confirm', 'confirmation', 'new-password'))
       + field(ui, 'v2-root-password-current', msgid('Your current xWHM password'), password('v2-root-password-current', 'current-password', 'current-password'))
-      + `<div class="v2-field" data-identity-totp hidden><label for="v2-root-password-totp">${esc(t(msgid('Authenticator code')))}</label>${control('v2-root-password-totp', 'totp', 'text', ' dir="ltr" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"')}</div>`)
+      + `<div class="${ROW}" data-identity-totp hidden><label class="${ROW_LABEL}" for="v2-root-password-totp">${esc(t(msgid('Authenticator code')))}</label><div class="${ROW_BODY}">${control('v2-root-password-totp', 'totp', 'text', ' dir="ltr" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"')}</div></div>`)
     + actions(ui, button(ui, msgid('Generate password'), 'generate') + button(ui, msgid('Change root password'), 'change', true)))
     + workspace(ui, 'admin-group', msgid('Administrator group'),
       help(ui, msgid('Members of wheel (AlmaLinux, Rocky Linux) or sudo (Debian, Ubuntu) can become root. Only hosting accounts are added or removed here; other members stay as they are.'))
@@ -86,27 +100,27 @@ export function renderV2IdentityCards(props: IdentityCardsProps): string {
   const ui: Ui = { t, p: props.surface === 'xpanel' ? 'v2-panel-settings' : 'v2-observation', read: true, manage: open && props.readOnly !== true }
   if (props.readOnly) return card({ title: t(msgid('Security questions and external sign-in')), titleId: 'v2-identity-readonly', bodyHtml: help(ui, msgid('These sign-in factors cannot be changed from a handed-off session.')) })
   const root = props.principalKind === 'root' && props.surface === 'xwhm'
-  // One row per pair: a shared grid would split a question from its answer.
+  // One block per pair: a question row directly over its answer row.
   const questions = [1, 2, 3].map(n => fields(ui, field(ui, `v2-identity-question-${n}`, msgid('Question'), control(`v2-identity-question-${n}`, `question-${n}`, 'text', ' dir="auto" maxlength="200" list="v2-identity-question-suggestions"'))
-    + field(ui, `v2-identity-answer-${n}`, msgid('Answer'), control(`v2-identity-answer-${n}`, `answer-${n}`, 'password', ' dir="auto" maxlength="200" autocomplete="off"')), 'v2-identity-pair')).join('')
+    + field(ui, `v2-identity-answer-${n}`, msgid('Answer'), control(`v2-identity-answer-${n}`, `answer-${n}`, 'password', ' dir="auto" maxlength="200" autocomplete="off"')))).join('')
   const policy = root ? workspace(ui, 'security-policy', msgid('Verified-address sign-in'),
     help(ui, msgid('When this is on, a user who set security questions and signs in from an address they have not verified must answer them. Users with two-factor authentication are not asked.'))
     + facts(ui, [['policy-state', msgid('Policy')], ['updated', msgid('Last saved (UTC)')]])
     + check(ui, msgid('Ask security questions from unverified addresses'), 'verified-ip') + actions(ui, button(ui, msgid('Save policy'), 'save', true))
     + fields(ui, field(ui, 'v2-identity-reset-user', msgid('User to reset'), control('v2-identity-reset-user', 'reset-username', 'text', ' dir="ltr" maxlength="320" spellcheck="false"'), msgid('Removes the saved questions of a user who lost the answers, so they can sign in and set new ones. Answers are never shown.')))
-    + actions(ui, button(ui, msgid('Reset questions'), 'reset-user'))) : ''
+    + actions(ui, button(ui, msgid('Reset questions'), 'reset-user', false, false, 'danger'))) : ''
   const own = workspace(ui, 'security-questions', msgid('Security questions'),
     help(ui, msgid('Choose a suggested question or write your own, and set two or three only you can answer. Answers are stored as hashes and compared without regard to case or extra spaces.'))
     + facts(ui, [['policy', msgid('Verified-address sign-in')], ['count', msgid('Your questions')], ['client', msgid('This address')]])
     + table(ui, msgid('Your security questions'), [msgid('Number'), msgid('Question')], 'questions')
     + suggestions(ui, 'v2-identity-question-suggestions') + questions + fields(ui, field(ui, 'v2-identity-questions-password', msgid('Current password'), password('v2-identity-questions-password', 'current-password', 'current-password')))
-    + actions(ui, button(ui, msgid('Save questions'), 'save', true) + button(ui, msgid('Remove questions'), 'clear'))
+    + actions(ui, button(ui, msgid('Remove questions'), 'clear', false, false, 'danger') + button(ui, msgid('Save questions'), 'save', true))
     + table(ui, msgid('Verified addresses'), [msgid('Address'), msgid('Source'), msgid('Added (UTC)'), msgid('Action')], 'addresses')
     + fields(ui, field(ui, 'v2-identity-address', msgid('Address'), control('v2-identity-address', 'address', 'text', ' dir="ltr" maxlength="45" spellcheck="false"'), msgid('An IPv4 address may end in * to cover its last part.')))
     + actions(ui, button(ui, msgid('Add address'), 'add-address') + button(ui, msgid('Add this address'), 'add-current')))
   const providers = root ? workspace(ui, 'external-providers', msgid('Identity providers'),
     help(ui, msgid('OpenID Connect providers for sign-in to xPanel and xWHM. A provider is saved only after its discovery document passes; register the redirect addresses below with it. The client secret is never shown again.'))
-    + `<dl class="${ui.p}__facts"><div><dt>${esc(t(msgid('Redirect addresses')))}</dt><dd><bdi dir="ltr" style="white-space:pre-line" data-sec-field="redirect-uris">${esc(t(msgid('Not read')))}</bdi></dd></div></dl>`
+    + `<dl class="${FACTS[ui.p]}">${fact(ui, 'redirect-uris', msgid('Redirect addresses'), ' class="whitespace-pre-line"')}</dl>`
     + table(ui, msgid('Identity providers'), [msgid('Name'), msgid('Issuer'), msgid('Client ID'), msgid('Panels'), msgid('Action')], 'providers')
     + fields(ui, field(ui, 'v2-identity-provider-id', msgid('Provider ID'), control('v2-identity-provider-id', 'provider-id', 'text', ' dir="ltr" maxlength="32" spellcheck="false"'))
       + field(ui, 'v2-identity-provider-label', msgid('Button name'), control('v2-identity-provider-label', 'provider-label', 'text', ' dir="auto" maxlength="64"'))
@@ -114,7 +128,7 @@ export function renderV2IdentityCards(props: IdentityCardsProps): string {
       + field(ui, 'v2-identity-provider-client-id', msgid('Client ID'), control('v2-identity-provider-client-id', 'provider-client-id', 'text', ' dir="ltr" maxlength="512" spellcheck="false"'))
       + field(ui, 'v2-identity-provider-client-secret', msgid('Client secret'), control('v2-identity-provider-client-secret', 'provider-client-secret', 'password', ' dir="ltr" maxlength="512" autocomplete="off"'), msgid('Leave empty to keep the saved secret.')))
     + check(ui, msgid('Offer on the xPanel sign-in page'), 'provider-xpanel') + check(ui, msgid('Offer on the xWHM sign-in page'), 'provider-xwhm')
-    + actions(ui, button(ui, msgid('Save provider'), 'save-provider', true) + button(ui, msgid('New provider'), 'new-provider'))
+    + actions(ui, button(ui, msgid('New provider'), 'new-provider') + button(ui, msgid('Save provider'), 'save-provider', true))
     + table(ui, msgid('Linked identities'), [msgid('User'), msgid('Provider'), msgid('Identity'), msgid('Linked (UTC)'), msgid('Last used (UTC)'), msgid('Action')], 'links')) : ''
   const linked = workspace(ui, 'external-identities', msgid('Linked external identities'),
     help(ui, msgid('Sign in with an identity provider the administrator configured. Linking asks for your password first; your password and two-factor sign-in keep working.'))
@@ -124,5 +138,5 @@ export function renderV2IdentityCards(props: IdentityCardsProps): string {
       + field(ui, 'v2-identity-link-password', msgid('Current password'), password('v2-identity-link-password', 'current-password', 'current-password')))
     + actions(ui, button(ui, msgid('Link identity'), 'link', true)))
   const cards = policy + (props.securityPolicyDisabled ? '' : own) + providers + linked
-  return open ? cards : '<div data-readonly="true" style="display:contents">' + cards + '</div>'
+  return open ? cards : '<div class="contents" data-readonly="true">' + cards + '</div>'
 }

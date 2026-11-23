@@ -102,7 +102,7 @@ describe.each(['classic', 'v2'] as const)('%s emitted software operation binding
     const select = document.querySelector<HTMLSelectElement>('[data-sw-dep-account]')!; select.value = 'alice'; select.dispatchEvent(new Event('change')); await settle()
     const row = document.querySelector('[data-sw-dep-repositories] tr')!
     expect(row.textContent).toContain('site'); expect(row.querySelectorAll('td')).toHaveLength(2)
-    expect(row.querySelector('button')?.className).toBe(theme === 'v2' ? 'v2-btn' : 'xp-btn')
+    expect(row.querySelector('button')?.className).toBe(theme === 'v2' ? 'v2-btn kt-btn kt-btn-outline kt-btn-sm' : 'xp-btn')
     expect(send.mock.calls.every(call => call[0] === 'GET')).toBe(true)
   })
   it('keeps conversion unavailable after a real preview while rendering selected-theme rows', async () => {

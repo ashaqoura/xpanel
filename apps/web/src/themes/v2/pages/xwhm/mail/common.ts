@@ -4,6 +4,7 @@ import { v2Messages } from '../../../messages.ts'
 import { escapeHtml, hookAttrs, type HookAttributes } from '../../../html.ts'
 import { card } from '../../../components/card.ts'
 import { pageHeader } from '../../../components/page-header.ts'
+import { icon } from '../../../icons.ts'
 import { mailCardsFor } from '../../../../../mail-cards.ts'
 import { renderV2MailCards } from '../../mail-cards.ts'
 import type { WhmStoredFactAuthority } from '../stored-facts.ts'
@@ -19,24 +20,83 @@ export function mailContext(input: WhmMailPageInput) {
     canManage: canRead && input.mailAuthority?.canManage === true }
 }
 
-export const technical = (value: string | number): string => `<bdi class="v2-mono" dir="ltr">${escapeHtml(value)}</bdi>`
-export const button = (label: string, hooks: HookAttributes, disabled = true, tone: 'default' | 'primary' | 'danger' = 'default'): string =>
-  `<button type="button" class="v2-btn${tone === 'default' ? '' : ` v2-btn--${tone}`}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${escapeHtml(label)}</button>`
-export const status = (message: string, hooks: HookAttributes, hidden = false): string =>
-  `<p class="v2-whm-mail__status" role="status" data-state="unread"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${escapeHtml(message)}</p>`
-export const group = (key: string, title: string, bodyHtml: string, actionsHtml?: string): string =>
-  card({ title, titleId: `v2-whm-mail-${key}`, bodyHtml, ...(actionsHtml ? { actionsHtml } : {}) })
+/** Keenicons the shared v2 icon set has no name for; complete literal class names. */
+const GLYPHS = {
+  eye: 'ki-eye', trash: 'ki-trash', lock: 'ki-lock', key: 'ki-key', calculator: 'ki-calculator', loop: 'ki-arrows-loop',
+  searchList: 'ki-search-list', shieldSearch: 'ki-shield-search', shieldCross: 'ki-shield-cross', timer: 'ki-timer',
+  message: 'ki-message-text-2', send: 'ki-paper-plane',
+} as const
+export type MailGlyph = keyof typeof GLYPHS
+const GLYPH_SIZE = { base: 'text-base', lg: 'text-lg', xl: 'text-xl' } as const
+/** A decorative Keenicon; its meaning is carried by the text beside it. */
+export const glyph = (name: MailGlyph, size: keyof typeof GLYPH_SIZE = 'base'): string =>
+  `<i class="v2-icon ki-filled ${GLYPHS[name]} ${GLYPH_SIZE[size]} leading-none" aria-hidden="true"></i>`
 
+export const technical = (value: string | number): string => `<bdi class="v2-mono" dir="ltr">${escapeHtml(value)}</bdi>`
+/** Complete class names per tone, so the stylesheet build finds them. */
+const BUTTON_CLASS = { default: 'v2-btn kt-btn kt-btn-outline', primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', danger: 'v2-btn v2-btn--danger kt-btn kt-btn-outline kt-btn-destructive' } as const
+/** `iconHtml` is a leading icon built with `icon()` or `glyph()`. */
+export const button = (label: string, hooks: HookAttributes, disabled = true, tone: 'default' | 'primary' | 'danger' = 'default', iconHtml = ''): string =>
+  `<button type="button" class="${BUTTON_CLASS[tone]}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${iconHtml}${escapeHtml(label)}</button>`
+/** A state line: quiet while nothing needs attention, a light alert once its controller reports a state that does. */
+export const status = (message: string, hooks: HookAttributes, hidden = false): string =>
+  `<div class="v2-whm-mail__note"><span aria-hidden="true"><span>${icon('info', 18)}</span><span>${icon('okCircle', 18)}</span><span>${icon('alert', 18)}</span></span><p class="v2-whm-mail__status" role="status" data-state="unread"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${escapeHtml(message)}</p></div>`
+/** Secondary copy inside a card. */
+export const note = (text: string, hooks: HookAttributes = {}, hidden = false): string =>
+  `<p class="text-sm text-secondary-foreground"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${escapeHtml(text)}</p>`
+
+/** A warning that appears when its controller unhides it (a truncated or incomplete read). */
+export const caution = (text: string, hooks: HookAttributes, role = ''): string =>
+  `<p class="kt-alert kt-alert-light kt-alert-warning"${hookAttrs(hooks)}${role ? ` role="${role}"` : ''} hidden><span class="kt-alert-icon text-yellow-500">${icon('alert', 18)}</span><span class="kt-alert-title">${escapeHtml(text)}</span></p>`
+
+export interface GroupParts {
+  /** A table region that runs edge to edge under the card content. */
+  tableHtml?: string
+  /** Footer actions, laid out at the end of the card. */
+  footerHtml?: string
+}
+const CONTENT = 'v2-whm-mail__content kt-card-content flex flex-col gap-5 min-w-0'
+const FOOTER = 'flex flex-wrap items-center justify-end gap-2.5 w-full'
+export const group = (key: string, title: string, bodyHtml: string, actionsHtml?: string, parts: GroupParts = {}): string =>
+  card({ title, titleId: `v2-whm-mail-${key}`, flush: true,
+    bodyHtml: `${bodyHtml ? `<div class="${CONTENT}">${bodyHtml}</div>` : ''}${parts.tableHtml ?? ''}`,
+    ...(actionsHtml ? { actionsHtml } : {}), ...(parts.footerHtml ? { footerHtml: `<div class="${FOOTER}">${parts.footerHtml}</div>` } : {}) })
+/** A settings card whose form (or its read-only stand-in) wraps both the rows and the footer actions. */
+export const formGroup = (key: string, title: string, open: string, close: string, bodyHtml: string, footerHtml: string): string =>
+  card({ title, titleId: `v2-whm-mail-${key}`, flush: true,
+    bodyHtml: `${open}<div class="${CONTENT}">${bodyHtml}</div><div class="v2-whm-mail__foot kt-card-footer flex-wrap justify-end gap-2.5">${footerHtml}</div>${close}` })
+
+/** Settings rows as in Metronic's settings pages: the label on the start, the control and its hint growing beside it;
+ *  below the desktop width each label sits above its control. */
+const ROWS = {
+  normal: 'v2-whm-mail__rows grid gap-5 min-w-0 lg:[&>.kt-form-item]:grid lg:[&>.kt-form-item]:grid-cols-[14rem_minmax(0,1fr)] lg:[&>.kt-form-item]:items-start lg:[&>.kt-form-item]:gap-x-2.5 lg:[&>.kt-form-item>:first-child]:pt-2 lg:[&>.kt-form-item>:not(:first-child)]:col-start-2',
+  // Long setting keys (Postfix parameter names) get a wider label column.
+  wide: 'v2-whm-mail__rows grid gap-5 min-w-0 lg:[&>.kt-form-item]:grid lg:[&>.kt-form-item]:grid-cols-[17.5rem_minmax(0,1fr)] lg:[&>.kt-form-item]:items-start lg:[&>.kt-form-item]:gap-x-2.5 lg:[&>.kt-form-item>:first-child]:pt-2 lg:[&>.kt-form-item>:not(:first-child)]:col-start-2',
+} as const
+export const rows = (fieldsHtml: string, labels: keyof typeof ROWS = 'normal'): string => `<div class="${ROWS[labels]}">${fieldsHtml}</div>`
+/** A switch row: label and description on the start, the switch on the end. */
+export const switchRow = (id: string, label: string, hooks: HookAttributes, help?: string): string =>
+  `<div class="v2-whm-mail__switch flex items-center justify-between gap-5 pb-5 border-b border-border"><div class="flex flex-col gap-1 min-w-0"><label for="${id}" class="text-sm font-medium text-mono">${escapeHtml(label)}</label>${help ? `<p id="${id}-help" class="text-xs text-secondary-foreground">${escapeHtml(help)}</p>` : ''}</div><input id="${id}" class="kt-switch shrink-0" type="checkbox" role="switch"${hookAttrs(hooks)}${help ? ` aria-describedby="${id}-help"` : ''} disabled></div>`
+
+/** A fact table: one label and value per row, two rows side by side on wide screens. */
 export function facts(t: Translate, rows: readonly (readonly [string, string])[], attribute: string): string {
   return `<dl class="v2-whm-mail__facts">${rows.map(([key, label]) => `<div><dt>${escapeHtml(t(label))}</dt><dd><bdi dir="ltr" ${attribute}="${escapeHtml(key)}">${escapeHtml(t(msgid('Not read')))}</bdi></dd></div>`).join('')}</dl>`
 }
+const TILE_TONE = { neutral: 'text-muted-foreground', ok: 'text-green-500', warn: 'text-yellow-500', bad: 'text-destructive', info: 'text-primary' } as const
+export interface MailTile { label: string; iconHtml: string; tone?: keyof typeof TILE_TONE; valueHtml: string }
+/** Counter tiles: the value large on top, its label and icon below. */
+export const tiles = (items: readonly MailTile[]): string =>
+  `<dl class="v2-whm-mail__tiles grid grid-cols-2 md:grid-cols-3 min-[1600px]:grid-cols-6 gap-2.5 lg:gap-5 min-w-0">${items.map(item => `<div class="flex flex-col-reverse justify-end gap-1.5 min-w-0 rounded-md border border-dashed border-input px-3.5 py-2.5"><dt class="flex items-center gap-1.5 text-sm text-secondary-foreground"><span class="inline-flex ${TILE_TONE[item.tone ?? 'neutral']}">${item.iconHtml}</span>${escapeHtml(item.label)}</dt>${item.valueHtml}</div>`).join('')}</dl>`
+export const TILE_VALUE = 'text-lg sm:text-2xl font-semibold text-mono leading-8'
 
 /** Phone rows name each stacked value: the translated headers travel to CSS as custom properties on the table. */
 export const columnLabels = (headers: readonly string[], offset = 0): string =>
   ` style="${escapeHtml(headers.map((label, index) => `--v2-col-${index + 1 + offset}:'${label.replace(/[\\']/g, '\\$&')}'`).join(';'))}"`
 
-export function table(t: Translate, title: string, headers: readonly string[], hooks: HookAttributes, empty = t(msgid('Nothing has been read.'))): string {
-  return `<div class="v2-whm-mail__scroll" role="region" tabindex="0" aria-label="${escapeHtml(title)}"><table class="v2-whm-mail__table"${columnLabels(headers)}><caption class="v2-sr">${escapeHtml(title)}</caption><thead><tr>${headers.map(label => `<th scope="col">${escapeHtml(label)}</th>`).join('')}</tr></thead><tbody${hookAttrs(hooks)}><tr><td colspan="${headers.length}">${escapeHtml(empty)}</td></tr></tbody></table></div>`
+/** Complete class lists of a table region: flush under card content, or boxed inside it. */
+export const SCROLL_CLASS = { flush: 'v2-whm-mail__scroll kt-scrollable-x-auto', boxed: 'v2-whm-mail__scroll kt-scrollable-x-auto rounded-lg border border-border' } as const
+export function table(t: Translate, title: string, headers: readonly string[], hooks: HookAttributes, empty = t(msgid('Nothing has been read.')), flush = false): string {
+  return `<div class="${SCROLL_CLASS[flush ? 'flush' : 'boxed']}" role="region" tabindex="0" aria-label="${escapeHtml(title)}"><table class="v2-whm-mail__table kt-table"${columnLabels(headers)}><caption class="v2-sr">${escapeHtml(title)}</caption><thead><tr>${headers.map(label => `<th scope="col">${escapeHtml(label)}</th>`).join('')}</tr></thead><tbody${hookAttrs(hooks)}><tr><td colspan="${headers.length}">${escapeHtml(empty)}</td></tr></tbody></table></div>`
 }
 
 export function page(input: WhmMailPageInput, route: string, title: string, description: string, body: string): string {
@@ -48,91 +108,86 @@ export function page(input: WhmMailPageInput, route: string, title: string, desc
   return `<section class="v2-whm-mail" data-whm-detail-route="${escapeHtml(route)}" data-capability-state="${canRead ? 'authorized' : 'unavailable'}">${head}${body}${cards}</section>`
 }
 
-export const WHM_MAIL_CSS = `.v2-whm-mail,.v2-whm-mail__stack{display:flex;flex-direction:column;gap:var(--space-4);min-inline-size:0}
-.v2-whm-mail__fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:var(--space-2);min-inline-size:0}
-.v2-whm-mail__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:var(--space-2);margin:0;min-inline-size:0}
-.v2-whm-mail .v2-card__body p:not([role=alert],[data-state=failed],[data-state=error]){font-size:13px;line-height:1.6;color:var(--text-2)}
-.v2-whm-mail .v2-card__body p[role=status]{color:var(--muted)}
-.v2-card .v2-whm-mail__stack{gap:var(--space-2)}
-.v2-whm-mail__facts>div,.v2-whm-mail__field{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0;text-align:start}
-.v2-whm-mail__field>label{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600}
-.v2-whm-mail__facts dt{font-size:12px;color:var(--muted)}
-.v2-whm-mail__facts dd{margin:0;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;unicode-bidi:plaintext;text-align:var(--v2-control-align,match-parent);overflow-wrap:break-word}
-.v2-whm-mail__field>label,.v2-whm-mail__field>span[id],.v2-whm-mail .v2-field>label,.v2-whm-mail__facts dt{text-box-trim:trim-end;text-box-edge:text}
-.v2-whm-mail__facts dd{text-box-trim:trim-start;text-box-edge:text}
-.v2-whm-mail__field :is(input:not([type=checkbox],[type=radio]),select,textarea){inline-size:100%;min-inline-size:0}
+// State selectors carry the colours of the matching Metronic variants: the light kt-alert for state lines and
+// results, the outline kt-badge for check results. The glyph in the timeline marker is Keenicons "time".
+const ALERT = ':is([data-state=failed],[data-state=error],[role=alert],[data-outcome=failed],[data-outcome=denied],[data-outcome=unknown],[data-outcome=refused],[data-outcome=conflict])'
+const CAUTION = ':is([data-state=unavailable],[data-state=partial],[data-state=drift],[data-state=stale],[data-state=uncertain],[data-state=not-saved],[data-outcome=partial],[data-outcome=skipped])'
+const DONE = ':is([data-state=saved],[data-state=applied],[data-outcome=confirmed],[data-outcome=attempted],[data-outcome=submitted],[data-outcome=applied],[data-outcome=ok])'
+const NOTE = '.v2-whm-mail__note'
+const STACKED = ':is(.v2-whm-mail__scroll tr:not(:has(>td>[type=checkbox]))>td:nth-child(n+3):not([colspan],:empty),.v2-whm-mail__scroll tr:has(>td>[type=checkbox])>td:nth-child(n+4):not(:empty))'
+export const WHM_MAIL_CSS = `.v2-whm-mail,.v2-whm-mail__stack{display:flex;flex-direction:column;gap:1.25rem;min-inline-size:0}
+@media(min-width:1024px){.v2-whm-mail,.v2-whm-mail__stack{gap:1.875rem}}
 .v2-whm-mail [dir=ltr]:is(input,select,textarea,pre){text-align:var(--v2-control-align,start)}
-.v2-whm-mail :is(fieldset,form){margin:0;min-inline-size:0;display:flex;flex-direction:column;gap:var(--space-3)}
-.v2-whm-mail fieldset{border:0;padding:0}
-.v2-whm-mail legend{float:inline-start;inline-size:100%;padding:0;font-size:14px;font-weight:600}
-.v2-whm-mail__actions,.v2-whm-mail__check{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
-.v2-whm-mail .v2-btn{min-inline-size:var(--target);min-block-size:var(--target)}
-.v2-whm-mail__check{gap:10px;min-block-size:var(--target);cursor:pointer}
-.v2-whm-mail__check-cell{display:inline-flex;align-items:center;justify-content:center;min-inline-size:var(--target);min-block-size:var(--target);cursor:pointer}
-.v2-whm-mail__check>input,.v2-whm-mail__check-cell>input{margin:0}
-.v2-whm-mail [data-whm-mail-queue-bulk-bar]{padding:12px var(--space-2);border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--subtle)}
-.v2-whm-mail :is([data-whm-mail-queue-selected],[data-whm-mail-quality-selected],[data-whm-mailbox-maintenance-selected],[data-mail-log-page-label]){font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.v2-whm-mail .v2-card__body ul:not([class]){margin:0;padding-inline-start:var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);font-size:13px;line-height:1.6;color:var(--text-2)}
-.v2-whm-mail [data-whm-mail-settings-preview]:not([hidden]){padding:var(--space-2);border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--subtle)}
-.v2-whm-mail__scroll{min-inline-size:0;overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--surface)}
-.v2-whm-mail__table{inline-size:100%}
-.v2-whm-mail__table td[colspan]{color:var(--muted)}
-.v2-whm-mail__table{min-inline-size:720px}
-.v2-whm-mail__table :is(th,td){text-align:start;vertical-align:top}
-.v2-whm-mail__split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:var(--space-3);align-items:start}
-.v2-whm-mail__split>.v2-whm-mail__stack{gap:var(--space-3)}
-.v2-whm-mail__split>:last-child :is(.v2-whm-mail__fields,.v2-whm-mail__facts){grid-template-columns:repeat(2,minmax(0,1fr))}
-.v2-whm-mail__split>:last-child .v2-whm-mail__fields{grid-template-columns:minmax(0,1fr)}
-.v2-whm-mail__timeline{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-2)}
-.v2-whm-mail__timeline>li{display:flex;flex-direction:column;gap:var(--space-1);padding-inline-start:var(--space-2);border-inline-start:2px solid var(--line)}
-.v2-whm-mail__status{overflow-wrap:anywhere}
-.v2-whm-mail pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
-.v2-whm-mail__field>pre{padding:12px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--subtle);font-size:13px;line-height:1.6;font-variant-numeric:tabular-nums}
-.v2-whm-mail [hidden]{display:none!important}
-.v2-whm-mail form>.v2-btn{align-self:flex-start}
-.v2-whm-mail__split .v2-whm-mail__table{min-inline-size:0}
-.v2-whm-mail__split .v2-whm-mail__table :is(th,td){white-space:normal;padding-inline:12px}
-.v2-whm-mail__table :is(th,td){padding-inline:12px}
-.v2-whm-mail__table th:has(>[type=checkbox]){vertical-align:middle}
-.v2-whm-mail__table td{overflow-wrap:break-word;font-variant-numeric:tabular-nums}
-@media(min-width:601px){.v2-whm-mail__table tbody tr:last-child>:is(th,td){border-block-end:0}}
-.v2-whm-mail [data-whm-mail-quality-rows] td[data-check] strong[data-state=unchecked]{font-weight:400;color:var(--muted)}
-.v2-whm-mail__table tr:has(button)>:is(th,td){vertical-align:middle}
-.v2-whm-mail [data-list-reset] .v2-card__title{display:flex;flex-direction:column;gap:8px}
-.v2-whm-mail [data-list-reset] .v2-actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
-.v2-whm-mail td[data-xp-slot=actions]>.v2-btn+.v2-btn{margin-inline-start:8px}
 .v2-whm-mail :is(input.v2-mono:placeholder-shown,select.v2-mono:has(>option[value=""]:checked)){font-family:inherit}
-.v2-whm-mail__table tr:has(>td:nth-child(10))>td:is(:nth-child(7),:nth-child(8)){overflow-wrap:anywhere}
-.v2-whm-mail__table td>select{inline-size:100%;min-inline-size:200px;max-inline-size:260px}
-@media(min-width:601px){.v2-whm-mail__table tr:has(>td:nth-child(10))>td:is(:nth-child(2),:nth-child(3),:nth-child(5),:nth-child(6)){overflow-wrap:normal;white-space:nowrap}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows]){min-inline-size:1080px}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows]) tr>:last-child:not([colspan]){position:sticky;inset-inline-end:0;background:var(--surface);border-inline-start:1px solid var(--line)}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows]) thead tr>:last-child{background:var(--subtle)}}
-@media(min-width:901px){.v2-whm-mail__fields:has(>:nth-child(3):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}}
-.v2-whm-mail__table td>.v2-whm-mail__actions{display:grid;grid-template-columns:repeat(2,max-content);gap:6px}
-.v2-whm-mail__table td>.v2-whm-mail__actions>.v2-btn{padding-inline:10px;font-size:13px}
-.v2-whm-mail .v2-card__body p.v2-whm-mail__status:is([data-state=uncertain],[data-state=stale]){padding:12px var(--space-2);border:1px solid var(--bad-line);border-radius:var(--radius-notice);background:var(--bad-soft);color:var(--text)}
-.v2-whm-mail input[type=file]{inline-size:100%;max-inline-size:480px;min-block-size:var(--target);padding:6px;border:1px dashed var(--line-strong);border-radius:var(--radius-control);background:var(--subtle);color:var(--text-2);font-size:13px}
-.v2-whm-mail input[type=file]::file-selector-button{min-block-size:var(--target);margin-inline-end:12px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius-chip);background:var(--surface);color:var(--text);font:inherit;font-weight:600;cursor:pointer}
+.v2-whm-mail__form{display:flex;flex-direction:column;min-inline-size:0;margin:0}
+.v2-whm-mail__rows>.kt-form-item>:first-child{overflow-wrap:anywhere}
+.v2-whm-mail__content a:not([class]){font-weight:500;text-underline-offset:4px}
+.v2-whm-mail__content a:not([class]):hover{text-decoration:underline}
 .v2-whm-mail dd:empty::before{content:"—";color:var(--muted)}
-.v2-whm-mail__field>span[id]{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600}
-.v2-whm-mail form>fieldset+fieldset{padding-block-start:var(--space-3);border-block-start:1px solid var(--line)}
-.v2-whm-mail form>fieldset{gap:var(--space-2)}
-.v2-whm-mail [data-whm-mail-log=monitor] [data-mail-log-form]{flex-direction:row;flex-wrap:wrap;align-items:flex-end}
-.v2-whm-mail [data-whm-mail-log=monitor] [data-mail-log-form]>.v2-whm-mail__fields{flex:0 1 360px;grid-template-columns:minmax(0,1fr)}
-.v2-whm-mail [data-whm-mail-queue-bulk=delete]{margin-inline-start:auto}
-.v2-whm-mail .v2-card__body a[href]{display:inline-flex;align-items:center;min-block-size:var(--target)}
-.v2-whm-mail tbody th{background:none;color:var(--text);font-size:14px;font-weight:500;white-space:normal}
-.v2-whm-mail [data-mailx-form]>.v2-whm-mail__status:empty{margin-block-start:calc(-1 * var(--space-3))}
-.v2-whm-mail__facts:has(>div>[data-mail-monitor-count]){grid-template-columns:repeat(3,minmax(0,1fr))}
-@media(min-width:901px){.v2-whm-mail__facts:has(>:nth-child(6):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}.v2-whm-mail__facts:has(>:nth-child(7)){grid-template-columns:repeat(4,minmax(0,1fr))}
-.v2-whm-mail [data-mailx-form]>.v2-whm-mail__fields{grid-template-columns:repeat(6,minmax(0,1fr))}.v2-whm-mail [data-mailx-form]>.v2-whm-mail__fields>*{grid-column:span 3}
-.v2-whm-mail [data-mailx-page=spam] [data-mailx-form]>.v2-whm-mail__fields>.v2-field:has(>[type=number]),.v2-whm-mail [data-mailx-page=marketing] [data-mailx-form]>.v2-whm-mail__fields>*{grid-column:span 2}
-.v2-whm-mail [data-mailx-form]>.v2-whm-mail__fields>:is([data-mailx-page=spam] .v2-field:has(>textarea),[data-mailx-page=relay] .v2-whm-mail__field,[data-mailx-page=bcc] .v2-field:has(>[type=email])){grid-column:1/-1}}
-@media(min-width:1101px){.v2-whm-mail__facts:has(>div>[data-mail-monitor-count]){grid-template-columns:repeat(6,minmax(0,1fr))}}
-@media(min-width:901px){.v2-whm-mail__facts:has([data-mail-log-fact=window]){grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)}}
-@media(prefers-reduced-motion:no-preference){.v2-whm-mail .v2-btn{transition:background-color 140ms ease-out,border-color 140ms ease-out,color 140ms ease-out,box-shadow 140ms ease-out,opacity 140ms ease-out,transform 140ms ease-out}}
-@media(max-width:1100px){.v2-whm-mail__split{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:640px){.v2-whm-mail__fields{grid-template-columns:minmax(0,1fr)}.v2-whm-mail__facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.v2-whm-mail :is(.v2-whm-mail__scroll tr:not(:has(>td>[type=checkbox]))>td:nth-child(n+3):not([colspan],:empty),.v2-whm-mail__scroll tr:has(>td>[type=checkbox])>td:nth-child(n+4):not(:empty)){grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:16px;text-align:end}
-.v2-whm-mail :is(.v2-whm-mail__scroll tr:not(:has(>td>[type=checkbox]))>td:nth-child(n+3):not([colspan],:empty),.v2-whm-mail__scroll tr:has(>td>[type=checkbox])>td:nth-child(n+4):not(:empty))::before{flex:none;font-size:13px;color:var(--muted);text-align:start}
-.v2-whm-mail__scroll td:nth-child(3):not([colspan])::before{content:var(--v2-col-3)}.v2-whm-mail__scroll tr:has(>td>[type=checkbox])>td:nth-child(3)::before{content:none}.v2-whm-mail__scroll td:nth-child(4):not([colspan])::before{content:var(--v2-col-4)}.v2-whm-mail__scroll td:nth-child(5):not([colspan])::before{content:var(--v2-col-5)}.v2-whm-mail__scroll td:nth-child(6):not([colspan])::before{content:var(--v2-col-6)}.v2-whm-mail__scroll td:nth-child(7):not([colspan])::before{content:var(--v2-col-7)}.v2-whm-mail__scroll td:nth-child(8):not([colspan])::before{content:var(--v2-col-8)}.v2-whm-mail__scroll td:nth-child(9):not([colspan])::before{content:var(--v2-col-9)}.v2-whm-mail__scroll td:nth-child(10):not([colspan])::before{content:var(--v2-col-10)}}
-@media(max-width:600px){.v2-whm-mail__table td>.v2-whm-mail__actions>.v2-btn{min-block-size:var(--target)}.v2-whm-mail table.v2-whm-mail__table tr>td:first-child:has(>[type=checkbox]){grid-column:auto;grid-row:auto;line-height:0}.v2-whm-mail__fields{grid-template-columns:minmax(0,1fr)}.v2-whm-mail__facts{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-whm-mail__table{min-inline-size:560px}}
+.v2-whm-mail__fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:1.25rem;min-inline-size:0}
+.v2-whm-mail [data-list-reset] .v2-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem}
+${NOTE}{display:flex;align-items:flex-start;gap:.625rem;min-inline-size:0;font-size:.875rem;line-height:1.25rem;color:var(--text-2)}
+${NOTE}:has(>.v2-whm-mail__status:is([hidden],:empty)){display:none}
+${NOTE}>span{flex:none;display:inline-flex;color:var(--muted)}
+${NOTE}>span>span{display:none}
+${NOTE}>span>span:first-child{display:inline-flex}
+.v2-whm-mail__status{flex:1 1 0;min-inline-size:0;padding:0;border:0;border-radius:0;background:none;color:inherit;font-size:inherit;overflow-wrap:anywhere}
+${NOTE}:has(>${ALERT},>${CAUTION},>${DONE}){padding:.875rem;border:1px solid var(--line);border-radius:.5rem;color:var(--text)}
+${NOTE}:has(>${ALERT}){border-color:color-mix(in oklab,var(--destructive) 10%,transparent);background:color-mix(in oklab,var(--destructive) 5%,transparent)}
+${NOTE}:has(>${CAUTION}){border-color:var(--warn-line);background:var(--warn-soft)}
+${NOTE}:has(>${DONE}){border-color:var(--ok-line);background:var(--ok-soft)}
+${NOTE}:has(>${ALERT})>span{color:var(--destructive)}
+${NOTE}:has(>${CAUTION})>span{color:var(--color-yellow-500)}
+${NOTE}:has(>${DONE})>span{color:var(--color-green-500)}
+${NOTE}:has(>${ALERT},>${CAUTION},>${DONE})>span>span:first-child{display:none}
+${NOTE}:has(>${ALERT},>${CAUTION})>span>span:last-child,${NOTE}:has(>${DONE})>span>span:nth-child(2){display:inline-flex}
+.v2-whm-mail__facts{display:grid;grid-template-columns:minmax(0,1fr);column-gap:1.875rem;min-inline-size:0;overflow:hidden}
+@media(min-width:1024px){.v2-whm-mail__facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.v2-whm-mail__facts>div{display:flex;align-items:baseline;gap:.625rem;min-inline-size:0;margin-block-start:-1px;padding-block:.625rem;border-block-start:1px solid var(--line)}
+.v2-whm-mail__facts dt{flex:0 1 11rem;min-inline-size:7rem;font-size:.875rem;line-height:1.25rem;color:var(--text-2)}
+.v2-whm-mail__facts dd{flex:1 1 0;min-inline-size:0;font-size:.875rem;line-height:1.25rem;font-weight:500;color:var(--mono,var(--text));font-variant-numeric:tabular-nums;unicode-bidi:plaintext;text-align:var(--v2-control-align,match-parent);overflow-wrap:anywhere}
+.v2-whm-mail__tiles dd{font-variant-numeric:tabular-nums;unicode-bidi:plaintext;text-align:var(--v2-control-align,match-parent);overflow-wrap:break-word}
+.v2-whm-mail__timeline{display:flex;flex-direction:column}
+.v2-whm-mail__timeline>li{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.125rem;min-block-size:2.25rem;padding-inline-start:2.875rem;padding-block-end:1.75rem;font-size:.75rem;line-height:1rem;color:var(--text-2);overflow-wrap:anywhere}
+.v2-whm-mail__timeline>li:last-child{padding-block-end:0}
+.v2-whm-mail__timeline>li>strong{font-size:.875rem;line-height:1.25rem;font-weight:500;color:var(--text)}
+.v2-whm-mail__timeline>li::before{content:"\\ecd5";position:absolute;inset-block-start:0;inset-inline-start:0;display:flex;align-items:center;justify-content:center;inline-size:2.25rem;block-size:2.25rem;border:1px solid var(--line-strong);border-radius:50%;background:color-mix(in oklab,var(--kt-accent) 60%,transparent);font-family:"keenicons-filled";font-size:1rem;line-height:1;color:var(--text-2)}
+.v2-whm-mail__timeline>li:not(:last-child)::after{content:"";position:absolute;inset-block:2.25rem 0;inset-inline-start:1.125rem;border-inline-start:1px solid var(--line-strong)}
+.v2-whm-mail__results{display:flex;flex-direction:column;gap:.375rem;font-size:.8125rem;line-height:1.25rem;color:var(--text)}
+.v2-whm-mail__results>li{position:relative;padding-inline-start:1rem;overflow-wrap:anywhere}
+.v2-whm-mail__results>li::before{content:"";position:absolute;inset-block-start:.4375rem;inset-inline-start:0;inline-size:.375rem;block-size:.375rem;border-radius:50%;background:var(--muted);opacity:.75}
+.v2-whm-mail__results>li${ALERT}::before{background:var(--destructive)}
+.v2-whm-mail__results>li${CAUTION}::before{background:var(--color-yellow-500)}
+.v2-whm-mail__results>li${DONE}::before{background:var(--color-green-500)}
+.v2-whm-mail__scroll{min-inline-size:0;overflow-x:auto}
+.v2-whm-mail__content+.v2-whm-mail__scroll{border-block-start:1px solid var(--line)}
+.v2-whm-mail__table :is(th,td){text-align:start}
+.v2-whm-mail__table thead th{white-space:nowrap}
+.v2-whm-mail__table:where(:has(thead th:nth-child(5))){min-inline-size:45rem}
+.v2-whm-mail__table td{overflow-wrap:break-word;font-variant-numeric:tabular-nums}
+.v2-whm-mail__table td[colspan]{padding-block:1.875rem;text-align:center;color:var(--muted)}
+.v2-whm-mail__table tbody tr:not(:has([type=checkbox]))>td:first-child:not([colspan]),.v2-whm-mail__table tbody tr:has(>td:first-child [type=checkbox])>td:nth-child(2){font-weight:500;color:var(--mono,var(--text))}
+.v2-whm-mail__table td[data-state]{font-size:.75rem;font-weight:500;white-space:nowrap;color:var(--text-2)}
+.v2-whm-mail [data-check] strong::before{content:"";flex:none;inline-size:.375rem;block-size:.375rem;margin-inline-end:.375rem;border-radius:50%;background:currentColor;opacity:.75}
+@media(min-width:601px){.v2-whm-mail__table td[data-state]::before{content:"";display:inline-block;inline-size:.375rem;block-size:.375rem;margin-inline-end:.375rem;border-radius:50%;background:currentColor;opacity:.75;vertical-align:middle}}
+.v2-whm-mail__table td[data-state=match]{color:var(--ok)}
+.v2-whm-mail__table td[data-state=drift]{color:var(--warn)}
+.v2-whm-mail [data-check]>.v2-field{align-items:flex-start;gap:.375rem;font-size:.75rem;line-height:1rem;color:var(--text-2)}
+.v2-whm-mail [data-check] strong{display:inline-flex;align-items:center;block-size:1.5rem;padding-inline:.45rem;border:1px solid var(--line);border-radius:.375rem;background:var(--sunken);color:var(--text-2);font-size:.75rem;font-weight:500;white-space:nowrap}
+.v2-whm-mail [data-check] strong[data-state=ok]{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}
+.v2-whm-mail [data-check] strong[data-state=problem]{border-color:var(--bad-line);background:var(--bad-soft);color:var(--bad)}
+.v2-whm-mail [data-check] strong[data-state=unavailable]{border-color:var(--warn-line);background:var(--warn-soft);color:var(--warn)}
+.v2-whm-mail__check-cell{display:inline-flex;align-items:center;justify-content:center;min-inline-size:var(--target);min-block-size:var(--target);cursor:pointer}
+.v2-whm-mail__table th:has(>.v2-whm-mail__check-cell){inline-size:3.75rem}
+.v2-whm-mail__table td>select{inline-size:100%;min-inline-size:12.5rem;max-inline-size:16.25rem}
+.v2-whm-mail__table td .v2-btn{min-height:1.75rem}
+.v2-whm-mail__table tr:has(>td:nth-child(10))>td:is(:nth-child(7),:nth-child(8)){overflow-wrap:anywhere}
+@media(min-width:601px){.v2-whm-mail__table tr:has(>td:nth-child(10))>td:is(:nth-child(2),:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(6)){overflow-wrap:normal;white-space:nowrap}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows] td:nth-child(10)) th:is(:nth-child(7),:nth-child(8),:nth-child(9)){min-inline-size:15rem}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows] td:nth-child(10)) th:last-child{min-inline-size:14rem}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows]) tr>:last-child:not([colspan]){position:sticky;inset-inline-end:0;background:var(--surface);border-inline-start:1px solid var(--line)}.v2-whm-mail__table:has(>[data-whm-mail-queue-rows]) thead tr>:last-child:not([colspan]){background-image:linear-gradient(var(--subtle),var(--subtle))}}
+@media(max-width:640px){.v2-whm-mail__fields{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.v2-whm-mail ${STACKED}{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;text-align:end;overflow-wrap:anywhere}
+.v2-whm-mail ${STACKED}>*{min-inline-size:0}
+.v2-whm-mail__table td>.v2-whm-mail__actions{justify-content:flex-end}
+.v2-whm-mail ${STACKED}::before{flex:none;font-size:.8125rem;color:var(--muted);text-align:start}
+.v2-whm-mail__scroll td:nth-child(3):not([colspan])::before{content:var(--v2-col-3)}.v2-whm-mail__scroll tr:has(>td>[type=checkbox])>td:nth-child(3)::before{content:none}.v2-whm-mail__scroll td:nth-child(4):not([colspan])::before{content:var(--v2-col-4)}.v2-whm-mail__scroll td:nth-child(5):not([colspan])::before{content:var(--v2-col-5)}.v2-whm-mail__scroll td:nth-child(6):not([colspan])::before{content:var(--v2-col-6)}.v2-whm-mail__scroll td:nth-child(7):not([colspan])::before{content:var(--v2-col-7)}.v2-whm-mail__scroll td:nth-child(8):not([colspan])::before{content:var(--v2-col-8)}.v2-whm-mail__scroll td:nth-child(9):not([colspan])::before{content:var(--v2-col-9)}.v2-whm-mail__scroll td:nth-child(10):not([colspan])::before{content:var(--v2-col-10)}
+.v2-whm-mail__table td .v2-btn{min-height:var(--target)}.v2-whm-mail table.v2-whm-mail__table tr>td:first-child:has(>[type=checkbox]){grid-column:auto;grid-row:auto;line-height:0}.v2-whm-mail__table:where(:has(thead th:nth-child(5))){min-inline-size:35rem}}
 `

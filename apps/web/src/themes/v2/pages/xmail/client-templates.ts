@@ -1,27 +1,51 @@
+import { icon } from '../../icons.ts'
+
+// Shared class lists of the client fragments (complete literal tokens for the stylesheet build).
+const ROW_BUTTON = 'v2-btn kt-btn kt-btn-outline kt-btn-sm'
+const ROW_REMOVE = 'v2-btn kt-btn kt-btn-ghost kt-btn-destructive kt-btn-sm'
+const NAME = 'text-sm font-medium text-mono'
+const META = 'text-xs font-normal text-muted-foreground'
+const FILE = 'v2-btn kt-btn kt-btn-outline h-auto min-h-14 w-full justify-start gap-3 px-3.5 py-2.5 whitespace-normal text-start'
+const FILE_BADGE = 'flex items-center justify-center shrink-0 size-9 rounded-md border border-border bg-muted text-[0.6875rem] font-semibold leading-none uppercase text-secondary-foreground'
+const FILE_TEXT = 'flex flex-col gap-0.5 grow min-w-0 break-words'
+const SHARE = 'flex flex-wrap items-center justify-between gap-2.5 py-2.5 border-b border-border last:border-b-0'
+
 /** Hidden fragments owned by the V2 mailbox presentation. */
 export function v2MailClientTemplates(kind: string): string {
   const template = (name: string, body: string): string => `<template data-xp-template="${name}">${body}</template>`
-  const button = (name: string): string => template(name, '<button type="button" class="v2-btn" data-xp-slot="label"></button>')
+  const button = (name: string): string => template(name, `<button type="button" class="${ROW_BUTTON}" data-xp-slot="label"></button>`)
   const empty = (name: string, columns: number): string => template(name, `<tr><td colspan="${columns}" data-xp-slot="message"></td></tr>`)
+  const share = (name: string): string => template(name, `<li class="${SHARE}"><span class="flex flex-col gap-0.5 min-w-0"><bdi dir="ltr" class="v2-mono ${NAME}" data-xp-slot="address"></bdi><span class="${META}" data-xp-slot="permission"></span></span><button type="button" class="${ROW_REMOVE}" data-xp-slot="remove"></button></li>`) + template(`${name}-empty`, '<li class="text-sm text-muted-foreground" data-xp-slot="message"></li>')
   switch (kind) {
-    case 'attachments': return template('mail-attachment-row', '<li><a class="v2-btn v2-mail-attachments__download" data-xp-slot="link" target="_blank" rel="noopener noreferrer" data-attachment-download><span class="v2-mail-attachments__badge" data-xp-slot="badge" aria-hidden="true"></span><span class="v2-mail-attachments__file"><span><bdi dir="auto" data-xp-slot="name"></bdi></span><span class="v2-mail-attachments__size"><bdi dir="ltr" data-xp-slot="size"></bdi></span></span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg></a></li>')
-    case 'compose-attachments': return template('mail-compose-attachment-row', '<li><span><span><bdi dir="auto" data-xp-slot="name"></bdi></span><span><bdi dir="ltr" data-xp-slot="size"></bdi></span></span><button type="button" class="v2-btn" data-xp-slot="remove"></button></li>') + button('mail-compose-attachment-dismiss')
-    case 'search': return template('mail-search-row', '<li><button type="button" class="v2-btn v2-mail-search__result" data-xp-slot="open"><strong dir="auto" data-xp-slot="subject"></strong><bdi dir="auto" data-xp-slot="sender"></bdi><bdi dir="ltr" data-xp-slot="date"></bdi><span dir="auto" data-xp-slot="preview"></span></button></li>')
-    case 'forwarders': return template('mail-forwarder-row', '<tr><td><bdi dir="ltr" data-xp-slot="address"></bdi></td><td><button type="button" class="v2-btn" data-xp-slot="remove"></button></td></tr>') + empty('mail-forwarder-empty', 2)
-    case 'identities': return template('mail-identity-card', '<article class="v2-mail-identities__row"><header><strong data-xp-slot="name"></strong><span class="v2-muted" data-xp-slot="badge"></span></header><dl data-xp-slot="facts"></dl><div class="v2-mail-identities__actions" data-xp-slot="actions"></div></article>') + template('mail-identity-fact', '<div class="v2-mail-identities__datum"><dt data-xp-slot="label"></dt><dd><bdi data-xp-slot="value" dir="ltr"></bdi></dd></div>') + button('mail-identity-action') + template('mail-identity-empty', '<p class="v2-muted" data-xp-slot="message"></p>')
-    case 'contacts': return template('mail-contact-row', '<tr><td><button type="button" class="v2-btn" data-xp-slot="select"></button></td><td><bdi dir="ltr" class="v2-mono" data-xp-slot="email"></bdi></td><td data-xp-slot="organization"></td><td data-xp-slot="access"></td></tr>') + empty('mail-contact-empty', 4)
-    case 'contact-tools': return template('mail-contact-share', '<li><span><bdi dir="ltr" class="v2-mono" data-xp-slot="address"></bdi><span data-xp-slot="permission"></span></span><button type="button" class="v2-btn" data-xp-slot="remove"></button></li>') + template('mail-contact-share-empty', '<li data-xp-slot="message"></li>')
-    case 'calendar-settings': return template('mail-calendar-share', '<li><span><bdi dir="ltr" data-xp-slot="address"></bdi><span data-xp-slot="permission"></span></span><button type="button" class="v2-btn" data-xp-slot="remove"></button></li>') + template('mail-calendar-share-empty', '<li data-xp-slot="message"></li>')
-    case 'folders': return template('mail-folder-admin-row', '<tr><td><div class="v2-mail-folders__name" data-xp-slot="tree"><strong><bdi dir="auto" data-xp-slot="name"></bdi></strong><span class="v2-muted" data-xp-slot="system" hidden></span><span class="v2-muted" data-xp-slot="raw" hidden></span></div></td><td><bdi dir="ltr" data-xp-slot="messages"></bdi></td><td><bdi dir="ltr" data-xp-slot="unseen"></bdi></td><td><input type="checkbox" data-xp-slot="subscription" data-mail-folders-subscribe><span data-xp-slot="unknown" hidden></span></td><td><span data-xp-slot="protected" hidden></span><div class="v2-mail-folders__row-actions" data-xp-slot="actions"></div></td></tr>') + button('mail-folder-admin-action') + empty('mail-folder-admin-empty', 5)
-    case 'mailing-lists': return template('mail-membership-row', '<tr><td><bdi dir="ltr" data-xp-slot="address"></bdi></td><td data-xp-slot="name"></td><td data-xp-slot="observed"></td><td data-xp-slot="subscription"></td><td data-xp-slot="posting"></td><td data-xp-slot="membership"></td><td><button type="button" class="v2-btn" data-xp-slot="action"></button></td></tr>') + empty('mail-membership-empty', 7)
+    case 'attachments': return template('mail-attachment-row', `<li><a class="v2-mail-attachments__download ${FILE}" data-xp-slot="link" target="_blank" rel="noopener noreferrer" data-attachment-download><span class="v2-mail-attachments__badge ${FILE_BADGE}" data-xp-slot="badge" aria-hidden="true"></span><span class="v2-mail-attachments__file ${FILE_TEXT}"><span class="${NAME}"><bdi dir="auto" data-xp-slot="name"></bdi></span><span class="v2-mail-attachments__size v2-num ${META}"><bdi dir="ltr" data-xp-slot="size"></bdi></span></span>${icon('download', 16)}</a></li>`)
+    case 'compose-attachments': return template('mail-compose-attachment-row', `<li class="flex flex-wrap items-center gap-2.5 min-w-0 px-3.5 py-2.5 rounded-lg border border-border bg-muted/40"><span class="${FILE_TEXT}"><span class="${NAME}"><bdi dir="auto" data-xp-slot="name"></bdi></span><span class="v2-num ${META}"><bdi dir="ltr" data-xp-slot="size"></bdi></span></span><button type="button" class="${ROW_REMOVE}" data-xp-slot="remove"></button></li>`) + button('mail-compose-attachment-dismiss')
+    case 'search': return template('mail-search-row', `<li><button type="button" class="v2-btn v2-mail-search__result" data-xp-slot="open"><strong class="${NAME}" dir="auto" data-xp-slot="subject"></strong><bdi class="text-sm font-normal text-secondary-foreground" dir="auto" data-xp-slot="sender"></bdi><bdi class="v2-num ${META}" dir="ltr" data-xp-slot="date"></bdi><span class="text-sm font-normal text-secondary-foreground" dir="auto" data-xp-slot="preview"></span></button></li>`)
+    case 'forwarders': return template('mail-forwarder-row', `<tr><td><bdi dir="ltr" class="${NAME}" data-xp-slot="address"></bdi></td><td class="text-end"><button type="button" class="${ROW_REMOVE}" data-xp-slot="remove"></button></td></tr>`) + empty('mail-forwarder-empty', 2)
+    case 'identities': return template('mail-identity-card', `<article class="v2-mail-identities__row kt-card shadow-none p-5 gap-4 min-w-0"><header class="flex flex-wrap items-center justify-between gap-2.5"><strong class="text-sm font-semibold text-mono" data-xp-slot="name"></strong><span class="v2-muted kt-badge kt-badge-sm kt-badge-outline empty:hidden" data-xp-slot="badge"></span></header><dl class="v2-mail-workspace__facts" data-xp-slot="facts"></dl><div class="v2-mail-identities__actions flex flex-wrap items-center gap-2.5" data-xp-slot="actions"></div></article>`) + template('mail-identity-fact', '<div class="v2-mail-identities__datum"><dt data-xp-slot="label"></dt><dd><bdi data-xp-slot="value" dir="ltr"></bdi></dd></div>') + button('mail-identity-action') + template('mail-identity-empty', '<p class="v2-muted text-sm text-muted-foreground" data-xp-slot="message"></p>')
+    case 'contacts': return template('mail-contact-row', `<tr><td><button type="button" class="${ROW_BUTTON}" data-xp-slot="select"></button></td><td><bdi dir="ltr" class="v2-mono text-sm text-foreground" data-xp-slot="email"></bdi></td><td class="text-sm text-secondary-foreground" data-xp-slot="organization"></td><td class="text-sm text-secondary-foreground" data-xp-slot="access"></td></tr>`) + empty('mail-contact-empty', 4)
+    case 'contact-tools': return share('mail-contact-share')
+    case 'calendar-settings': return share('mail-calendar-share')
+    case 'folders': return template('mail-folder-admin-row', `<tr><td><div class="v2-mail-folders__name" data-xp-slot="tree"><strong class="${NAME}"><bdi dir="auto" data-xp-slot="name"></bdi></strong><span class="v2-muted ${META}" data-xp-slot="system" hidden></span><span class="v2-muted ${META}" data-xp-slot="raw" hidden></span></div></td><td><bdi dir="ltr" data-xp-slot="messages"></bdi></td><td><bdi dir="ltr" data-xp-slot="unseen"></bdi></td><td><input class="kt-switch kt-switch-sm" type="checkbox" data-xp-slot="subscription" data-mail-folders-subscribe><span class="${META}" data-xp-slot="unknown" hidden></span></td><td><span class="${META}" data-xp-slot="protected" hidden></span><div class="v2-mail-folders__row-actions flex flex-wrap items-center gap-2" data-xp-slot="actions"></div></td></tr>`) + button('mail-folder-admin-action') + empty('mail-folder-admin-empty', 5)
+    case 'mailing-lists': return template('mail-membership-row', `<tr><td><bdi dir="ltr" class="${NAME}" data-xp-slot="address"></bdi></td><td data-xp-slot="name"></td><td data-xp-slot="observed"></td><td data-xp-slot="subscription"></td><td data-xp-slot="posting"></td><td data-xp-slot="membership"></td><td><button type="button" class="${ROW_BUTTON}" data-xp-slot="action"></button></td></tr>`) + empty('mail-membership-empty', 7)
     case 'preferences': return template('mail-preferences-technical', '<bdi dir="ltr" class="v2-mono"></bdi>')
     case 'vacation': return template('mail-vacation-technical', '<bdi dir="ltr" class="v2-mono"></bdi>')
-    case 'folder-workspace': return template('mail-folder-filter-empty', '<p class="v2-mail-filter-empty" data-mail-filter-empty role="status"></p>') + template('mail-folder-move-menu', '<ul class="v2-mail-move-menu" id="move-list" data-mail-move="true"></ul>') + template('mail-folder-move-choice', '<li><button type="button" data-mail-action="move" data-xp-slot="label"></button></li>') + template('mail-folder-attachment-info', '<li><button type="button" class="v2-btn" disabled data-xp-slot="button"><span data-xp-slot="badge" aria-hidden="true"></span><span><bdi dir="auto" data-xp-slot="name"></bdi><bdi dir="ltr" data-xp-slot="size"></bdi></span></button></li>')
-    case 'track': return template('mail-track-row', '<tr><td><bdi dir="ltr" data-xp-slot="time"></bdi></td><td data-xp-slot="direction"></td><td data-xp-slot="counterpart"></td><td data-xp-slot="status"></td><td><bdi dir="ltr" data-xp-slot="dsn"></bdi></td><td><button type="button" class="v2-btn" data-xp-slot="view"></button></td></tr>') + empty('mail-track-empty', 6)
+    case 'folder-workspace': return template('mail-folder-filter-empty', '<p class="v2-mail-filter-empty px-5 py-10 text-center text-sm text-secondary-foreground" data-mail-filter-empty role="status"></p>') + template('mail-folder-move-menu', '<ul class="v2-mail-move-menu kt-menu kt-menu-default flex-col absolute top-full start-0 z-20 mt-1.5 min-w-56 rounded-md border border-border bg-popover text-popover-foreground shadow-md" id="move-list" data-mail-move="true"></ul>') + template('mail-folder-move-choice', '<li class="kt-menu-item"><button type="button" class="kt-menu-link text-start text-2sm font-medium text-foreground hover:bg-accent hover:text-primary" data-mail-action="move" data-xp-slot="label"></button></li>') + template('mail-folder-attachment-info', `<li><button type="button" class="${FILE}" disabled data-xp-slot="button"><span class="${FILE_BADGE}" data-xp-slot="badge" aria-hidden="true"></span><span class="${FILE_TEXT}"><bdi class="${NAME}" dir="auto" data-xp-slot="name"></bdi><bdi class="v2-num ${META}" dir="ltr" data-xp-slot="size"></bdi></span></button></li>`)
+    case 'track': return template('mail-track-row', `<tr><td><bdi dir="ltr" class="${NAME}" data-xp-slot="time"></bdi></td><td data-xp-slot="direction"></td><td data-xp-slot="counterpart"></td><td data-xp-slot="status"></td><td><bdi dir="ltr" data-xp-slot="dsn"></bdi></td><td><button type="button" class="${ROW_BUTTON}" data-xp-slot="view"></button></td></tr>`) + empty('mail-track-empty', 6)
     case 'calendar-view': return [
-      ['calview-row', '<div class="v2-mail-calview__row" role="row"></div>'], ['calview-head', '<div class="v2-mail-calview__head" role="columnheader"></div>'], ['calview-day', '<div class="v2-mail-calview__day" role="gridcell"></div>'],
-      ['calview-week', '<div class="v2-mail-calview__week"></div>'], ['calview-gutter', '<div class="v2-mail-calview__gutter"></div>'], ['calview-timeline', '<div class="v2-mail-calview__timeline"></div>'], ['calview-chip', '<button type="button" class="v2-mail-calview__chip"></button>'],
-      ['calview-long', '<span class="v2-mail-calview__long"></span>'], ['calview-short', '<span class="v2-mail-calview__short"></span>'], ['calview-more', '<span class="v2-mail-calview__more"></span>'], ['calview-swatch', '<span class="v2-mail-calview__swatch"></span>'], ['calview-help', '<span class="v2-muted"></span>'], ['calview-empty', '<li class="v2-muted"></li>'], ['calview-notes', '<dd class="v2-mail-calview__notes"></dd>'], ['calview-date', '<bdi dir="ltr" class="v2-mail-calview__date"></bdi>'],
+      ['calview-row', '<div class="v2-mail-calview__row" role="row"></div>'],
+      ['calview-head', '<div class="v2-mail-calview__head flex flex-col gap-1 min-w-0 p-2 border-s border-border bg-muted/50 text-xs font-medium text-muted-foreground" role="columnheader"></div>'],
+      ['calview-day', '<div class="v2-mail-calview__day group flex flex-col gap-1 min-w-0 min-h-32 border-t border-s border-border" role="gridcell"></div>'],
+      ['calview-week', '<div class="v2-mail-calview__week v2-num px-1 py-2 bg-muted/50 text-center text-xs font-medium whitespace-nowrap text-muted-foreground"></div>'],
+      ['calview-gutter', '<div class="v2-mail-calview__gutter v2-num bg-muted/50 text-center text-xs font-medium whitespace-nowrap text-muted-foreground"></div>'],
+      ['calview-timeline', '<div class="v2-mail-calview__timeline"></div>'],
+      ['calview-chip', '<button type="button" class="v2-mail-calview__chip v2-num flex flex-wrap items-center gap-x-1.5 gap-y-0.5 px-2 py-1 rounded-md text-start text-xs font-medium leading-snug text-foreground break-words cursor-pointer"></button>'],
+      ['calview-long', '<span class="v2-mail-calview__long"></span>'], ['calview-short', '<span class="v2-mail-calview__short"></span>'],
+      ['calview-more', '<span class="v2-mail-calview__more v2-num text-xs font-medium text-primary"></span>'],
+      ['calview-swatch', '<span class="v2-mail-calview__swatch shrink-0 size-2.5 rounded-full"></span>'],
+      ['calview-help', '<span class="v2-muted text-xs font-normal text-muted-foreground"></span>'],
+      ['calview-empty', '<li class="v2-muted text-sm text-muted-foreground"></li>'],
+      ['calview-notes', '<dd class="v2-mail-calview__notes whitespace-pre-wrap break-words"></dd>'],
+      ['calview-date', '<bdi dir="ltr" class="v2-mail-calview__date v2-num text-xs font-medium text-foreground group-aria-[current=date]:font-semibold group-aria-[current=date]:text-primary group-data-[outside=true]:text-muted-foreground"></bdi>'],
     ].map(([name, body]) => template(name!, body!)).join('')
     default: throw new Error('unknown_mail_client_template_kind')
   }
@@ -39,57 +63,36 @@ export function v2MailClientTemplatesForHooks(hooks?: object): string {
   return kinds.filter(([hook]) => Object.hasOwn(hooks, hook)).map(([, kind]) => v2MailClientTemplates(kind)).join('')
 }
 
+// Structure and controller state of the fragments above; their look is in the Metronic classes of the templates.
 export const V2_MAIL_DYNAMIC_CSS = `.v2-mail-reading-fragment{display:contents}
-.v2-mail-attachment-row,.v2-mail-compose-attachments li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);min-inline-size:0}
-.v2-mail-attachments__download{display:flex;align-items:center;gap:12px;max-inline-size:100%;text-align:start;white-space:normal;padding:10px 14px;transition:background-color 140ms ease-out,border-color 140ms ease-out}
-.v2-mail-attachments__badge,.v2-mail-attachments [data-xp-slot=badge]{display:grid;place-items:center;flex:none;inline-size:36px;block-size:36px;border-radius:8px;border:1px solid var(--line);background:var(--subtle);color:var(--text-2);font:600 12px/1 var(--font-mono);text-transform:uppercase}
-.v2-mail-attachments__file{display:grid;gap:var(--space-1);min-inline-size:0;flex:1;overflow-wrap:anywhere;text-align:start}
-.v2-mail-attachments__size,.v2-mail-attachments [data-xp-slot=size],.v2-mail-compose-attachments [data-xp-slot=size]{display:block;font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;font-family:var(--font-mono)}
-.v2-mail-compose-attachments li>span{display:grid;gap:var(--space-1);flex:1;min-inline-size:0;overflow-wrap:anywhere}
 .v2-mail-compose-attachments li>span>span{display:block}
-.v2-mail-identities__row{display:grid;gap:var(--space-3);padding:var(--v2-panel-padding);border:1px solid var(--line);border-radius:12px;background:var(--subtle);min-inline-size:0}
-.v2-mail-identities__row>header,.v2-mail-identities__actions,.v2-mail-folders__row-actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
-.v2-mail-identities__row>header{justify-content:space-between}
-.v2-mail-identities__row dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:var(--space-2)}
-.v2-mail-identities__datum{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0;text-align:start}
-.v2-mail-identities__datum dt{font-size:12px;color:var(--muted)}
-.v2-mail-identities__datum dd{font-size:14px;font-variant-numeric:tabular-nums}
-.v2-mail-identities__datum :is(dd,bdi){min-inline-size:0;overflow-wrap:anywhere;max-inline-size:100%;white-space:normal}
-.v2-mail-folders__name{display:grid;gap:var(--space-1);padding-inline-start:calc(var(--mail-folder-depth,0)*16px)}
-.v2-mail-folders__name [data-xp-slot=raw]{font-family:var(--font-mono);font-size:12px;direction:ltr;unicode-bidi:isolate}
+.v2-mail-workspace__facts>.v2-mail-identities__datum{gap:var(--space-1)}
+.v2-mail-folders__name{display:grid;gap:.125rem;padding-inline-start:calc(var(--mail-folder-depth,0)*1rem)}
+.v2-mail-folders__name [data-xp-slot=raw]{font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate}
 .v2-mail-workspace [data-xp-slot=messages],.v2-mail-workspace [data-xp-slot=unseen],.v2-mail-workspace [data-xp-slot=date],.v2-mail-workspace [data-xp-slot=time],.v2-mail-workspace [data-xp-slot=dsn]{font-variant-numeric:tabular-nums}
 .v2-mail-workspace [data-xp-slot=dsn],.v2-mail-workspace [data-xp-slot=address]{font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate}
-.v2-mail-search__result{display:grid;gap:var(--space-1);inline-size:100%;padding:12px 16px;border-radius:12px;white-space:normal;text-align:start;justify-items:start;overflow-wrap:anywhere;transition:background-color 140ms ease-out,border-color 140ms ease-out}
-.v2-mail-search__result>[data-xp-slot=date]{font-family:var(--font-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.v2-mail-search__result>[data-xp-slot=preview]{font-weight:400;color:var(--muted)}
-.v2-mail-filter-empty{margin:var(--space-3) var(--space-3);padding:40px var(--space-3);border:1px dashed var(--line-strong);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.6;text-align:center}
-.v2-mail-move{position:relative}
-.v2-mail-move-menu{position:absolute;inset-block-start:calc(100% + 6px);inset-inline-start:0;z-index:20;list-style:none;margin:0;padding:6px;min-inline-size:220px;max-inline-size:calc(100vw - 32px);border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);box-shadow:0 14px 34px rgb(7 14 26/.18),0 2px 8px rgb(7 14 26/.08);display:flex;flex-direction:column;gap:2px}
-.v2-mail-move-menu button{display:flex;align-items:center;inline-size:100%;min-inline-size:44px;min-block-size:44px;padding:8px 12px;border:none;border-radius:8px;background:transparent;font:inherit;font-size:14px;font-weight:500;text-align:start;color:var(--text);cursor:pointer;transition:background-color 140ms ease-out,color 140ms ease-out}
-.v2-mail-move-menu button:hover{background:var(--subtle)}
+.v2-mail-search__result{display:grid;gap:.25rem;inline-size:100%;block-size:auto;padding:.875rem 1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);box-shadow:none;white-space:normal;text-align:start;justify-items:start;overflow-wrap:anywhere;cursor:pointer;transition:background-color 140ms ease-out,border-color 140ms ease-out}
+.v2-mail-search__result:hover{background:var(--subtle);border-color:var(--line-strong)}
+.v2-mail-search__result:hover>strong{color:var(--accent)}
+.v2-mail-move-menu button{inline-size:100%}
 .v2-mail-move-menu button:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
-[data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-grid]{display:flex;flex-direction:column;min-inline-size:640px}
-.v2-mail-calview__row{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr))}
-.v2-mail-calview__head{display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-1);font-size:12px;font-weight:600;background:var(--subtle);border-inline-start:1px solid var(--line);min-inline-size:0}
+[data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-grid]{display:flex;flex-direction:column;min-inline-size:40rem}
+.v2-mail-calview__row{display:grid;grid-template-columns:3.5rem repeat(7,minmax(0,1fr))}
 .v2-mail-calview__short{display:none}
-.v2-mail-calview__day{display:flex;flex-direction:column;gap:4px;min-block-size:128px;padding:var(--space-1);border-block-start:1px solid var(--line);border-inline-start:1px solid var(--line);min-inline-size:0;outline-offset:-2px}
-.v2-mail-calview__day[data-outside=true]{background:var(--sunken);color:var(--muted)}
-.v2-mail-calview__day[aria-current=date]{background:var(--accent-soft)}
-.v2-mail-calview__day[aria-selected=true]{box-shadow:inset 0 0 0 2px var(--focus)}
-.v2-mail-calview__date{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
-.v2-mail-calview__week,.v2-mail-calview__gutter{background:var(--subtle);padding:var(--space-1) 4px;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted);text-align:center;white-space:nowrap}
-.v2-mail-calview__chip{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;min-inline-size:44px;min-block-size:44px;border:1px solid var(--line);border-inline-start:3px solid var(--calview-chip,var(--accent));border-radius:8px;background:var(--surface);color:var(--text);padding:6px 8px;font-size:12px;font-variant-numeric:tabular-nums;line-height:1.4;text-align:start;overflow-wrap:anywhere;cursor:pointer;transition:background-color 140ms ease-out,border-color 140ms ease-out}
-.v2-mail-calview__chip:hover{background:var(--subtle)}
-.v2-mail-calview__chip>bdi{flex:none;white-space:nowrap;overflow-wrap:normal}
+.v2-mail-calview__day{padding:.5rem;outline-offset:-2px}
+.v2-mail-calview__day[data-outside=true]{background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
+.v2-mail-calview__day[aria-current=date]{background:color-mix(in oklab,var(--kt-accent) 50%,transparent)}
+.v2-mail-calview__day[aria-selected=true]{box-shadow:inset 0 0 0 2px var(--accent)}
+.v2-mail-calview__chip{min-inline-size:2.75rem;border-inline-start:3px solid var(--calview-chip,var(--accent));background:color-mix(in oklab,var(--calview-chip,var(--accent)) 10%,var(--surface));transition:background-color 140ms ease-out}
+.v2-mail-calview__chip:hover{background:color-mix(in oklab,var(--calview-chip,var(--accent)) 18%,var(--surface))}
+.v2-mail-calview__chip>bdi{flex:none;white-space:nowrap;overflow-wrap:normal;font-weight:400;color:var(--text-2)}
 .v2-mail-calview__chip>span:last-child{min-inline-size:0;overflow:hidden;text-overflow:ellipsis}
-.v2-mail-calview__more{font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted)}
-.v2-mail-calview__swatch{inline-size:12px;block-size:12px;flex:none;border-radius:4px;background:var(--calview-chip,var(--accent))}
-.v2-mail-calview__notes{white-space:pre-wrap;overflow-wrap:anywhere}
-[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__row{grid-template-columns:56px repeat(var(--calview-days,7),minmax(0,1fr))}
+.v2-mail-calview__swatch{background:var(--calview-chip,var(--accent))}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__row{grid-template-columns:3.5rem repeat(var(--calview-days,7),minmax(0,1fr))}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__day{padding:0}
-[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__gutter{display:grid;grid-template-rows:repeat(24,40px);padding:0 4px}
-.v2-mail-calview__timeline{position:relative;block-size:960px;inline-size:100%;background:repeating-linear-gradient(180deg,transparent 0,transparent 39px,var(--line) 39px,var(--line) 40px)}
-.v2-mail-calview__timeline>.v2-mail-calview__chip{position:absolute;inset-block-start:var(--calview-top);block-size:var(--calview-height);inset-inline-start:var(--calview-start);inline-size:var(--calview-width);overflow:hidden;min-block-size:24px;min-inline-size:0}
-@media(max-width:600px){.v2-mail-calview__long{display:none}.v2-mail-calview__short{display:inline}.v2-mail-identities__row dl{grid-template-columns:minmax(0,1fr)}.v2-mail-filter-empty{margin:var(--space-2)}}
-@media(prefers-reduced-motion:reduce){.v2-mail-attachments__download,.v2-mail-search__result,.v2-mail-move-menu button,.v2-mail-calview__chip{transition:none}}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__gutter{display:grid;grid-template-rows:repeat(24,2.5rem);padding:0 .25rem}
+.v2-mail-calview__timeline{position:relative;block-size:60rem;inline-size:100%;background:repeating-linear-gradient(180deg,transparent 0,transparent calc(2.5rem - 1px),var(--line) calc(2.5rem - 1px),var(--line) 2.5rem)}
+.v2-mail-calview__timeline>.v2-mail-calview__chip{position:absolute;inset-block-start:var(--calview-top);block-size:var(--calview-height);inset-inline-start:var(--calview-start);inline-size:var(--calview-width);overflow:hidden;min-block-size:1.5rem;min-inline-size:0}
+@media(max-width:600px){.v2-mail-calview__long{display:none}.v2-mail-calview__short{display:inline}}
+@media(prefers-reduced-motion:reduce){.v2-mail-search__result,.v2-mail-calview__chip{transition:none}}
 `

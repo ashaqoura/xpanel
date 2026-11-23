@@ -142,7 +142,7 @@ try {
       assert.equal(response.status(), 200)
       await page.evaluate(() => document.fonts.ready)
       const isV2 = await page.locator('[data-ui-theme="v2"]').count() > 0
-      outcome.font = await assertAppliedFont(page, 'h1', locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans')
+      outcome.font = await assertAppliedFont(page, 'h1', locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans'))
       if (surface.startsWith('v2-')) {
         outcome.geometry = await page.evaluate(() => {
           const readV2Meter = group => {

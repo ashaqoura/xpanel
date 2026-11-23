@@ -51,7 +51,7 @@ describe('V2 WHM account tools', () => {
   it('retains bilingual announcement authoring, named audience selectors and owner previews', () => {
     const html = render('/whm/accounts/announcements')
     expect(html.match(/data-xp-template="account-announcement-notice-/g)).toHaveLength(3)
-    expect(html).toContain('class="v2-notice v2-notice--warn v2-account-announcement"')
+    expect(html).toMatch(/class="v2-notice v2-notice--warn v2-account-announcement[ "]/)
     expect(html).not.toContain('class="xp-account-announcement')
     const nodes = parseMarkup(html)
     for (const name of ['title-en', 'body-en', 'title-ar', 'body-ar', 'severity', 'audience', 'plan', 'reseller', 'usernames', 'starts', 'ends']) {

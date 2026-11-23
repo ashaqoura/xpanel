@@ -3,7 +3,8 @@ import type { DocumentProps } from '../contract.ts'
 import type { WebBranding } from '../../branding.ts'
 import { renderV2Document } from './document.ts'
 import { PLEX_FONTS_STYLESHEET_HREF } from '../../vendor/plex.ts'
-import { v2Stylesheet } from './assets.ts'
+import { METRONIC_ICONS_STYLESHEET_HREF, METRONIC_STYLESHEET_HREF } from '../../vendor/metronic.ts'
+import { v2Assets, v2Stylesheet } from './assets.ts'
 import { v2SharedStylesheets, v2StylesheetsForDocument, v2ViewStylesheets } from './route-assets.ts'
 import { v2Messages } from './messages.ts'
 import { renderV2EmailAccountsPage } from './pages/xpanel/email/accounts.ts'
@@ -47,8 +48,28 @@ describe('v2 document contract', () => {
     expect(html.indexOf(v2Stylesheet.href)).toBeLessThan(html.indexOf(props.headHtml))
     expect(html.match(/id="i18n"/g)).toHaveLength(1)
     expect(html.match(/id="content"/g)).toHaveLength(1)
-    expect(html).toContain(`<body>${props.bodyHtml}</body>`)
+    expect(html).toContain(`<body class="antialiased text-sm text-foreground bg-muted">${props.bodyHtml}</body>`)
     expect(html).not.toContain('data-brand-footer')
+  })
+
+  it('links the Metronic icon font and stylesheet from the panel origin before every v2 stylesheet', () => {
+    const html = renderV2Document({ ...props, surface: 'xpanel', route: '/files/trash' })
+    expect(METRONIC_ICONS_STYLESHEET_HREF).toMatch(/^\/assets\/metronic\/keenicons\.css\?v=[0-9a-f]{16}$/)
+    expect(METRONIC_STYLESHEET_HREF).toMatch(/^\/assets\/metronic\/styles\.css\?v=[0-9a-f]{16}$/)
+    expect(html.split(`<link rel="stylesheet" href="${METRONIC_ICONS_STYLESHEET_HREF}">`)).toHaveLength(2)
+    expect(html.split(`<link rel="stylesheet" href="${METRONIC_STYLESHEET_HREF}">`)).toHaveLength(2)
+    expect(html.indexOf(METRONIC_ICONS_STYLESHEET_HREF)).toBeLessThan(html.indexOf(METRONIC_STYLESHEET_HREF))
+    expect(html.indexOf(METRONIC_STYLESHEET_HREF)).toBeLessThan(html.indexOf('/assets/themes/v2/'))
+    expect(html.indexOf(METRONIC_STYLESHEET_HREF)).toBeLessThan(html.indexOf(v2Stylesheet.href))
+  })
+
+  it('emits every v2 stylesheet inside the v2 cascade layer, below the Metronic components and utilities', () => {
+    expect(v2Assets.length).toBeGreaterThan(10)
+    for (const asset of v2Assets) {
+      expect(asset.body.startsWith('@layer v2{\n'), asset.path).toBe(true)
+      expect(asset.body.endsWith('\n}\n'), asset.path).toBe(true)
+      expect(asset.body.match(/@layer v2\{/g), asset.path).toHaveLength(1)
+    }
   })
 
   it('loads only the trusted surface route chunk in head after the shared foundation', () => {
@@ -60,7 +81,7 @@ describe('v2 document contract', () => {
     expect(html.split(page.path)).toHaveLength(2)
     expect(html).not.toContain('/assets/themes/v2/mail-workspace.css')
     expect(html.indexOf(page.href)).toBeLessThan(html.indexOf('</head>'))
-    expect(html).toContain(`<body>${props.bodyHtml}</body>`)
+    expect(html).toContain(`<body class="antialiased text-sm text-foreground bg-muted">${props.bodyHtml}</body>`)
   })
 
   it('adds no route stylesheet for a different surface or an unimplemented alias', () => {
@@ -71,7 +92,7 @@ describe('v2 document contract', () => {
     ]) {
       const html = renderV2Document({ ...props, ...context })
       const stylesheetLinks = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map(match => match[1])
-      expect(stylesheetLinks).toEqual([PLEX_FONTS_STYLESHEET_HREF, v2Stylesheet.href, ...v2SharedStylesheets.map(asset => asset.href)])
+      expect(stylesheetLinks).toEqual([PLEX_FONTS_STYLESHEET_HREF, METRONIC_ICONS_STYLESHEET_HREF, METRONIC_STYLESHEET_HREF, v2Stylesheet.href, ...v2SharedStylesheets.map(asset => asset.href)])
     }
   })
 
@@ -80,7 +101,7 @@ describe('v2 document contract', () => {
     const html = renderV2Document({ ...props, surface: 'xpanel', route: '/software/htaccess', viewKind: 'workspace' })
     const stylesheetLinks = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map(match => match[1])
     expect(stylesheetLinks).toEqual([
-      PLEX_FONTS_STYLESHEET_HREF, v2Stylesheet.href,
+      PLEX_FONTS_STYLESHEET_HREF, METRONIC_ICONS_STYLESHEET_HREF, METRONIC_STYLESHEET_HREF, v2Stylesheet.href,
       ...v2SharedStylesheets.map(asset => asset.href), ...editor.map(asset => asset.href),
     ])
     expect(editor.map(asset => asset.path)).toEqual(['/assets/themes/v2/panel-settings.css', '/assets/themes/v2/panel-htaccess.css'])
@@ -89,7 +110,7 @@ describe('v2 document contract', () => {
     expect(store).toContain('/assets/themes/v2/whm-data.css?v=')
     expect(store).not.toContain('/assets/themes/v2/panel-settings.css')
     expect(store).not.toContain('/assets/themes/v2/panel-htaccess.css')
-    expect(store).toContain(`<body>${props.bodyHtml}</body>`)
+    expect(store).toContain(`<body class="antialiased text-sm text-foreground bg-muted">${props.bodyHtml}</body>`)
   })
 
   it('delivers shared diagnostic fragment CSS once in the head of its owning documents', () => {
@@ -102,7 +123,7 @@ describe('v2 document contract', () => {
         expect(html.split(asset.href), route).toHaveLength(2)
         expect(html.indexOf(asset.href), route).toBeLessThan(html.indexOf('</head>'))
       }
-      expect(html).toContain(`<body>${props.bodyHtml}</body>`)
+      expect(html).toContain(`<body class="antialiased text-sm text-foreground bg-muted">${props.bodyHtml}</body>`)
     }
     expect(renderV2Document({ ...props, surface: 'xwhm', route: '/whm/monitoring/logs', viewKind: 'workspace' })).not.toContain('/assets/themes/v2/whm-diagnostics.css')
     expect(renderV2Document({ ...props, surface: 'xwhm', route: '/whm/monitoring/health', viewKind: 'status' })).not.toContain('/assets/themes/v2/whm-diagnostics.css')
@@ -138,7 +159,7 @@ describe('v2 document contract', () => {
       const html = renderV2Document({ ...props, ...context, bodyHtml: page.bodyHtml })
       expect(html.split(stylesheet.href)).toHaveLength(2)
       expect(html.indexOf(stylesheet.href)).toBeLessThan(html.indexOf('</head>'))
-      expect(html).toContain(`<body>${page.bodyHtml}</body>`)
+      expect(html).toContain(`<body class="antialiased text-sm text-foreground bg-muted">${page.bodyHtml}</body>`)
     }
   })
 

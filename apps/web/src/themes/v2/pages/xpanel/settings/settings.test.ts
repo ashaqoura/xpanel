@@ -111,16 +111,16 @@ describe('v2 remaining account workspaces', () => {
     expect(nodes(html, '[data-acct-team-save]')[0]!.attrs.has('disabled')).toBe(true)
     expect(nodes(html, '[data-acct-team-signin-state]')[0]!.attrs.get('data-state-chip')).toBe('unread')
     expect(nodes(html, '[data-acct-team-link-url]')).toHaveLength(1)
-    // The editor and the help run full width; the six help facts sit in three columns.
+    // The editor and the help run full width; the six help facts read as Metronic "General info" rows.
     expect(html).not.toContain('v2-panel-settings__split')
-    expect(html.slice(html.indexOf('id="v2-team-help"'))).toContain('data-cols="3"')
+    expect(html.slice(html.indexOf('id="v2-team-help"'))).toContain('data-rows')
   })
 
   it('shows every security section on the overview, as the board does, and narrows each other tab to its own area', () => {
     const html = render('/security/account', allowed)
     expect(html.indexOf('role="tablist"')).toBeLessThan(html.indexOf('id="v2-team-audit"'))
     for (const [view, id] of [['overview sessions', 'v2-account-sessions'], ['overview tokens', 'v2-account-tokens'], ['overview signin', 'v2-account-password'], ['overview ssh" data-v2-row="wide', 'v2-account-ssh'], ['overview ssh" data-v2-row="narrow', 'v2-account-shell'], ['overview site" data-v2-row="wide', 'v2-account-ip'], ['overview site" data-v2-row="narrow', 'v2-account-hotlink'], ['overview site', 'v2-account-privacy'], ['overview', 'v2-team-audit']]) {
-      expect(html).toContain(`data-presentation-tab-visible="${view}"><section class="v2-card" id="${id}"`)
+      expect(html).toContain(`data-presentation-tab-visible="${view}"><section class="v2-card kt-card" id="${id}"`)
     }
     // The shell card reads the saved account; the header chips and the checks never invent a count.
     expect(html).toContain('data-v2-account-shell><bdi dir="ltr" class="v2-mono">jailed</bdi>')
@@ -160,7 +160,7 @@ describe('v2 remaining account workspaces', () => {
     const html = render('/security/ssl/files', allowed)
     expect(html).not.toContain('v2-panel-settings__split')
     expect(html.indexOf('id="v2-certificate-file-limits"')).toBeLessThan(html.indexOf('id="v2-certificate-installed"'))
-    expect(html).toContain(`<table id="v2-certificate-installed-table" style="--v2-pl2:'Source';--v2-pl3:'Expires';--v2-pl4:'Private key'">`)
+    expect(html).toContain(`<table class="kt-table" id="v2-certificate-installed-table" style="--v2-pl2:'Source';--v2-pl3:'Expires';--v2-pl4:'Private key'">`)
   })
 
   it('shows certificate names while hiding stored keys and foreign certificate metadata', () => {

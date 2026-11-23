@@ -33,13 +33,15 @@ describe('v2 sealed mailbox workspace pages', () => {
   it('names each table column for phone rows and gives every select the house chevron', () => {
     const html = render('/mail/folders')
     expect(html).toContain(`style="--h1:&#39;Folder&#39;;--h2:&#39;Messages&#39;;--h3:&#39;Unread&#39;;--h4:&#39;Shown in mail apps&#39;;--h5:&#39;Actions&#39;"`)
-    expect(html).toMatch(/<span class="v2-select"><select id="mail-folders-parent"[^>]*>[^]*?<\/select><svg class="v2-icon"/)
+    expect(html).toMatch(/<span class="v2-select"><select class="kt-select" id="mail-folders-parent"[^>]*>[^]*?<\/select><(?:svg|i) class="v2-icon/)
     expect(MAIL_WORKSPACES_CSS).toContain('td:nth-child(2)::before{content:var(--h2) ": "}')
   })
 
   it('keeps long loaded names inside the page: phone rows cap the value column and buttons may wrap', () => {
     expect(MAIL_WORKSPACES_CSS).toContain('.v2-mail-workspace__table tr{display:grid;grid-template-columns:minmax(0,1fr) fit-content(50%);')
-    expect(MAIL_WORKSPACES_CSS).toContain('.v2-mail-workspace :is(.v2-mail-workspace__actions,td)>.v2-btn{max-inline-size:100%;block-size:auto;padding-block:8px;white-space:normal;text-align:start}')
+    // An action button grows with a long loaded label instead of pushing its card wider.
+    const folders = render('/mail/folders')
+    for (const hook of ['data-mail-folders-submit', 'data-mail-folders-editor-cancel']) expect(folders).toMatch(new RegExp(`class="v2-btn [^"]*max-w-full h-auto min-h-8[.]5 py-1[.]5 whitespace-normal text-start" ${hook}`))
   })
 
   it('retains the folder create/rename/destructive confirmation contract and an unread table', () => {

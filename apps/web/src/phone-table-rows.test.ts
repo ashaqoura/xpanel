@@ -24,10 +24,11 @@ describe('phone table rows keep two columns instead of scrolling sideways', () =
   }
 
   it('separates V2 phone rows with one full-width line instead of a line per cell', () => {
-    // The foundation cell border adds no specificity, so the phone reset `tr>*{border:0}` wins for cells and row headers alike.
-    expect(V2_BASE_CSS).toContain(':where(td,tbody th){padding:14px 16px;border-top:1px solid var(--line)')
+    // The foundation cell padding adds no specificity; the phone reset is !important because the Metronic table class
+    // (kt-table, a later cascade layer) also pads and borders cells and row headers.
+    expect(V2_BASE_CSS).toContain(':where(td,th){padding:.75rem 1rem;vertical-align:middle}')
     expect(V2_BASE_CSS).not.toContain(':is(td,tbody th)')
-    expect(V2_PHONE_TABLE_ROWS_CSS).toContain(' tr>*{grid-column:1;padding:0!important;border:0;')
+    expect(V2_PHONE_TABLE_ROWS_CSS).toContain(' tr>*{grid-column:1;padding:0!important;border:0!important;')
     expect(V2_PHONE_TABLE_ROWS_CSS).toContain(' tbody tr:not(:last-child){border-block-end:1px solid var(--line)}')
   })
 
@@ -62,6 +63,6 @@ describe('phone table rows keep two columns instead of scrolling sideways', () =
     }
     // The services page puts the facts under the name and its state as one wrapping line.
     expect(WHM_SERVICES_CSS).toMatch(/\.v2-services tbody tr:not\(\[hidden\]\)\{display:flex!important;flex-wrap:wrap/)
-    expect(dataTable(t, { id: 'units', caption: 'Units', columns: [{ label: 'Unit' }], rows: [], phoneValueColumn: 3 })).toContain('class="v2-table v2-table--value-3"')
+    expect(dataTable(t, { id: 'units', caption: 'Units', columns: [{ label: 'Unit' }], rows: [], phoneValueColumn: 3 })).toContain('class="v2-table v2-table--value-3 kt-table text-start"')
   })
 })
