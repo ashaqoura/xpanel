@@ -1,20 +1,20 @@
 import { mailxArchiveClientTemplates } from './mailx-collection-client-templates.ts'
 import type { PanelSurfaceProps } from '../../../../contract.ts'
 import { icon } from '../../../icons.ts'
-import { actions, button, emailContext, endActions, esc, facts, header, page, panelMailCards, section, state, table, unread, type PanelEmailAuthority } from './common.ts'
+import { button, emailContext, endActions, esc, facts, header, page, panelMailCards, section, state, table, unread, type PanelEmailAuthority } from './common.ts'
 
 export function renderV2PanelEmailArchive(props: PanelSurfaceProps, authority?: PanelEmailAuthority): string {
   const { locale, t, account, canManage } = emailContext(props, authority)
   const route = '/email/archive', title = t(msgid('Email archive'))
   const summary = section('v2-email-archive-state', t(msgid('Archive state')),
     `<p>${esc(t(msgid('A copy of each archived message is delivered to the mailbox you choose and counts toward its quota.')))}</p>`
-    + actions(button(t(msgid('Refresh')), { 'data-mailx-archive-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
     + state(t(msgid('The email archive has not been read.')), { 'data-mailx-archive-status': true })
     + facts([
       { label: t(msgid('Saved policy')), key: 'saved' }, { label: t(msgid('Host agent')), key: 'host' }, { label: t(msgid('Applied on this server')), key: 'state' },
       { label: t(msgid('Observed at (UTC)')), key: 'observed-at' }, { label: t(msgid('Last saved')), key: 'updated' },
     ].map(row => ({ label: row.label, valueHtml: esc(t(msgid('Not read'))), hooks: { 'data-mailx-archive-fact': row.key } })))
-    + `<p>${esc(t(msgid('Retention removes archived messages older than the number of days you set; 0 keeps them until you delete them. Retention runs only when you start it.')))}</p>`)
+    + `<p>${esc(t(msgid('Retention removes archived messages older than the number of days you set; 0 keeps them until you delete them. Retention runs only when you start it.')))}</p>`,
+    undefined, button(t(msgid('Refresh')), { 'data-mailx-archive-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
   const tag = canManage ? 'form' : 'div'
   const domains = section('v2-email-archive-domains', t(msgid('Archived domains')),
     `<${tag} class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''} data-mailx-archive-form${canManage ? ' novalidate' : ''}>`

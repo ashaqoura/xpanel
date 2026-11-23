@@ -67,7 +67,7 @@ ${facts(t, [['saved', msgid('Saved policy')], ['host', msgid('Host agent')], ['s
   const tag = canManage ? 'form' : 'div'
   const editor = formGroup(`${kind}-policy`, t(TITLES[kind]), `<${tag} class="v2-whm-mail__form" data-mailx-form${canManage ? ' novalidate' : ''}>`, `</${tag}>`,
     `${rows(controls)}${status('', { 'data-mailx-form-status': true })}`,
-    `${button(t(msgid('Apply saved policy again')), { 'data-mailx-apply': true }, true, 'default', icon('refresh', 16))}<button type="${canManage ? 'submit' : 'button'}" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-mailx-save disabled>${escapeHtml(t(msgid('Save and apply')))}</button>`)
+    `${button(t(msgid('Apply saved policy again')), { 'data-mailx-apply': true }, true, 'default', icon('refresh', 16))}<button type="${canManage ? 'submit' : 'button'}" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-mailx-save disabled><i class="ki-filled ki-check" aria-hidden="true"></i>${escapeHtml(t(msgid('Save and apply')))}</button>`)
   return page(input, `/whm/email/${kind}`, t(TITLES[kind]), t(NOTES[kind]),
     `<div class="v2-whm-mail__stack" data-mailx-whm data-mailx-page="${kind}" data-mailx-can-read="${canRead}" data-mailx-can-manage="${canManage}" lang="${locale}" dir="${dir}">${summary}${editor}</div>`)
 }

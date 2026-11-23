@@ -11,7 +11,7 @@ export const SUBGROUP_TITLE = 'text-sm font-medium text-mono'
 export const switchSetting = (props: { titleHtml: string; descriptionHtml?: string; labelHtml?: string; hook: string }): string => {
   const input = `<input type="checkbox" class="kt-switch kt-switch-sm" ${props.hook} disabled>`
   return props.labelHtml
-    ? `<div class="v2-panel-toggle flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5"><div class="flex flex-col gap-1 min-w-0">${props.titleHtml}${props.descriptionHtml ? `<p class="text-sm font-normal text-secondary-foreground">${props.descriptionHtml}</p>` : ''}</div><label class="kt-label shrink-0 font-normal text-secondary-foreground cursor-pointer">${props.labelHtml}${input}</label></div>`
+    ? `<div class="v2-panel-toggle flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-5"><div class="flex flex-col gap-1 min-w-0 sm:flex-1">${props.titleHtml}${props.descriptionHtml ? `<p class="text-sm font-normal text-secondary-foreground">${props.descriptionHtml}</p>` : ''}</div><label class="kt-label shrink-0 self-start sm:self-auto font-normal text-secondary-foreground cursor-pointer">${props.labelHtml}${input}</label></div>`
     : `<label class="v2-panel-toggle flex items-center justify-between gap-5 cursor-pointer"><span class="flex flex-col gap-1 min-w-0">${props.titleHtml}${props.descriptionHtml ? `<span class="text-sm font-normal text-secondary-foreground">${props.descriptionHtml}</span>` : ''}</span>${input}</label>`
 }
 
@@ -36,8 +36,7 @@ export const emptyBlock = (attr: string, glyph: string, titleHtml: string, textH
   `<div class="flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-input px-5 py-7.5 text-center" ${attr} hidden>${ki(glyph, 'text-3xl text-muted-foreground')}<h3 class="text-sm font-semibold text-mono">${titleHtml}</h3><p class="text-sm text-secondary-foreground">${textHtml}</p></div>`
 
 /** Structure, bidi and controller state only; the family layout comes from adminStyles and the Metronic classes in the markup. */
-export const WHM_PANEL_CSS = adminStyles('.v2-panel-page') + `.v2-panel-page fieldset>legend{float:inline-start;inline-size:100%;padding:0}
-.v2-panel-page [data-whm-whmcs-form]{gap:var(--space-3)}
+export const WHM_PANEL_CSS = adminStyles('.v2-panel-page') + `.v2-panel-page [data-whm-whmcs-form]{gap:var(--space-3)}
 @media(min-width:1024px){.v2-panel-page [data-whm-whmcs-form]{gap:var(--space-4)}}
 .v2-panel-page #v2-panel-whmcs-plan-table td :is(input,select){inline-size:100%;min-inline-size:0}
 .v2-panel-page #v2-panel-whmcs-plan-table td{vertical-align:middle}

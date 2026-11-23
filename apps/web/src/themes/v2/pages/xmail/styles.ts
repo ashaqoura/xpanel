@@ -52,7 +52,7 @@ ${R} .v2-mail-tools .kt-menu-arrow>.v2-icon{transition:transform 140ms ease-out}
 .v2-mail-remote-images img{display:block;max-inline-size:100%;block-size:auto;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--sunken)}
 .v2-mail-reader__body{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text)}
 .v2-mail-reader__body[data-mail-body=pending]{color:var(--muted)}
-.v2-mail-attachments ul{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr));gap:.625rem}
+.v2-mail-attachments ul{margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr));gap:.625rem}
 .v2-mail-attachments ul:empty{display:none}
 .v2-mail-attachments li{display:flex;min-inline-size:0;overflow-wrap:anywhere}
 .v2-mail-quick-reply__status[data-state=failed]{padding:0;border:0;background:none;color:var(--bad)}
@@ -62,7 +62,7 @@ ${R} .v2-mail-tools .kt-menu-arrow>.v2-icon{transition:transform 140ms ease-out}
 .v2-mail-compose-head p[data-state=failed]{padding:0;border:0;background:none;color:var(--bad)}
 .v2-mail-recipient input{flex:1 1 10rem;min-inline-size:7.5rem;min-block-size:1.5rem;text-align:match-parent;text-align:-webkit-match-parent}
 .v2-mail-recipient:has(input:disabled){opacity:.6}
-.v2-mail-recipient>ul{order:-1;display:flex;flex-wrap:wrap;gap:.375rem}
+.v2-mail-recipient>ul{order:-1;display:flex;flex-wrap:wrap;gap:.375rem;margin:0;padding:0!important}
 .v2-mail-recipient>ul:empty{display:none}
 .v2-mail-recipient [data-mail-chip]{min-block-size:1.5rem!important;padding:0!important;padding-inline-start:.5rem!important;border:1px solid var(--line)!important;border-radius:var(--radius-control)!important;background:var(--sunken)!important;color:var(--text)!important;font-size:.75rem!important}
 .v2-mail-recipient [data-mail-chip][data-invalid=true]{border-color:var(--bad-line)!important;background:var(--bad-soft)!important}
@@ -102,7 +102,7 @@ ${R} .v2-mail-tools .kt-menu-arrow>.v2-icon{transition:transform 140ms ease-out}
 .v2-mail-size-meter__bar::-moz-progress-bar{background:var(--accent-fill);border-radius:var(--radius-pill)}
 .v2-mail-size-meter[data-tone=warn] .v2-mail-size-meter__bar::-moz-progress-bar{background:var(--warn)}
 .v2-mail-size-meter[data-tone=bad] .v2-mail-size-meter__bar::-moz-progress-bar{background:var(--bad)}
-.v2-mail-compose-attachments>ul{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,18.75rem),1fr));gap:.625rem}
+.v2-mail-compose-attachments>ul{margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,18.75rem),1fr));gap:.625rem}
 .v2-mail-compose-attachments>ul:empty{display:none}
 .v2-mail-vacation input[type=number]{font-variant-numeric:tabular-nums}
 .v2-mail-vacation pre{padding:1rem;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--code,var(--sunken));color:var(--code-text,var(--text));font:.75rem/1.7 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere;min-inline-size:0;direction:ltr;text-align:start}

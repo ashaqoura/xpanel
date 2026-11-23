@@ -99,7 +99,7 @@ ${hostTable(t, 'php-versions', t(msgid('Installed PHP versions')), [t(msgid('Ver
   const common = `<div class="v2-host__fields">${INI_FIELDS.map(name => input(name, name)).join('')}${formField({ id: 'v2-php-display-errors', label: 'display_errors', control: { kind: 'input', disabled: true, mono: true, dir: 'ltr', hooks: { 'data-php-display-errors': true }, placeholder: unread } })}</div>${hostActions(button('discard-ini', msgid('Discard'), false, { ghost: true }) + button('apply-ini', msgid('Test and apply'), false, { primary: true, icon: 'check' }))}`
   const file = formField({ id: 'v2-php-ini', label: t(msgid('File contents')), control: { kind: 'textarea', name: 'php-ini', disabled: true, rows: 12, mono: true, dir: 'ltr' } }) + `<p role="status">${escapeHtml(t(msgctxt('theme:v2', 'The managed file has not been read.')))}</p>`
   const editor = `<div class="v2-host__groups" data-php-editor-modes data-presentation-tabs="panels">${tabs({ label: t(msgid('Editor mode')), tabs: [{ id: 'v2-php-common-tab', label: t(msgid('Common settings')), panelId: 'v2-php-common-panel', selected: true, hooks: { 'data-presentation-tab': 'common' } }, { id: 'v2-php-file-tab', label: t(msgid('Edit file')), panelId: 'v2-php-file-panel', selected: false, hooks: { 'data-presentation-tab': 'file' } }] })}${tabPanel({ id: 'v2-php-common-panel', tabId: 'v2-php-common-tab', sectionSpacing: true, bodyHtml: common })}${tabPanel({ id: 'v2-php-file-panel', tabId: 'v2-php-file-tab', sectionSpacing: true, hidden: true, bodyHtml: file })}</div>`
-  const configuration = hostCard('php-configure', t(msgctxt('theme:v2', 'Global php.ini')), `<div class="v2-host__fields">${select('php-version', msgid('Version'))}</div>${editor}${note}`, scope('php-configure'), undefined, 3)
+  const configuration = hostCard('php-configure', t(msgctxt('theme:v2', 'Global php.ini')), `<div class="v2-host__fields grid-cols-1">${select('php-version', msgid('Version'))}</div>${editor}${note}`, scope('php-configure'), undefined, 3)
   const effective = hostCard('php-effective', t(msgctxt('theme:v2', 'Saved and effective values')), hostTable(t, 'php-effective', t(msgctxt('theme:v2', 'Saved and effective values')), [t(msgid('Setting')), t(msgid('Saved')), t(msgctxt('theme:v2', 'Effective in pools'))], [...INI_FIELDS, 'display_errors', 'pm'].map(name => ({ cellsHtml: [
     technical(name),
     name === 'pm'
@@ -120,7 +120,8 @@ ${hostActions(button('grant-exception', msgid('Grant exception'), false, { prima
 }
 
 /** PHP-only composition rules; the route asset owner appends this to the existing host stylesheet. */
-export const WHM_PHP_CSS = `.v2-host[data-whm-detail-route="/whm/software/php"] .v2-php-config-split{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:1.25rem;align-items:stretch}
+export const WHM_PHP_CSS = `.v2-host[data-whm-detail-route="/whm/software/php"] .v2-field:has(>.v2-select>:is(#v2-php-version,#v2-php-extension-version)){max-inline-size:none}
+.v2-host[data-whm-detail-route="/whm/software/php"] .v2-php-config-split{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:1.25rem;align-items:stretch}
 .v2-host[data-whm-detail-route="/whm/software/php"] :is(.v2-php-config-split,.v2-php-install-split)>.v2-card,.v2-host[data-whm-detail-route="/whm/software/php"] .v2-php-config-split>.v2-host__stack>.v2-card:last-child{flex:1 1 auto}
 .v2-host[data-whm-detail-route="/whm/software/php"] .v2-php-config-split>.v2-host__stack>.v2-card:last-child>.v2-card__body{display:flex;flex-direction:column;flex:1 1 auto}
 .v2-host[data-whm-detail-route="/whm/software/php"] table:has(>tbody[data-whm-php-version-entries]){min-inline-size:860px}

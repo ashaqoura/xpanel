@@ -107,7 +107,7 @@ describe('v2 component kit', () => {
     expect(loading).toContain('aria-busy="true"')
     expect(loading).toContain('data-table-state="loading"')
     expect(loading).toContain('colspan="2"')
-    expect(kit.dataTable(t, { id: 'e', caption: 'E', columns: [], rows: [] })).toContain('data-table-state="empty"><td colspan="0"><p role="status">')
+    expect(kit.dataTable(t, { id: 'e', caption: 'E', columns: [], rows: [] })).toContain('data-table-state="empty"><td colspan="0" class="py-7.5 text-center text-sm text-muted-foreground"><p role="status">')
     const failed = kit.dataTable(t, { id: 'f', caption: 'F', columns: [{ label: 'A' }], rows: [], state: 'error', error: { lead: 'Not read.', retry: { 'data-retry': true } } })
     expect(failed).toMatch(/data-table-state="error">.*role="alert".*data-retry>.*Retry/)
 

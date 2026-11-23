@@ -29,18 +29,18 @@ export function v2MailClientTemplates(kind: string): string {
     case 'mailing-lists': return template('mail-membership-row', `<tr><td><bdi dir="ltr" class="${NAME}" data-xp-slot="address"></bdi></td><td data-xp-slot="name"></td><td data-xp-slot="observed"></td><td data-xp-slot="subscription"></td><td data-xp-slot="posting"></td><td data-xp-slot="membership"></td><td><button type="button" class="${ROW_BUTTON}" data-xp-slot="action"></button></td></tr>`) + empty('mail-membership-empty', 7)
     case 'preferences': return template('mail-preferences-technical', '<bdi dir="ltr" class="v2-mono"></bdi>')
     case 'vacation': return template('mail-vacation-technical', '<bdi dir="ltr" class="v2-mono"></bdi>')
-    case 'folder-workspace': return template('mail-folder-filter-empty', '<p class="v2-mail-filter-empty px-5 py-10 text-center text-sm text-secondary-foreground" data-mail-filter-empty role="status"></p>') + template('mail-folder-move-menu', '<ul class="v2-mail-move-menu kt-menu kt-menu-default flex-col absolute top-full start-0 z-20 mt-1.5 min-w-56 rounded-md border border-border bg-popover text-popover-foreground shadow-md" id="move-list" data-mail-move="true"></ul>') + template('mail-folder-move-choice', '<li class="kt-menu-item"><button type="button" class="kt-menu-link text-start text-2sm font-medium text-foreground hover:bg-accent hover:text-primary" data-mail-action="move" data-xp-slot="label"></button></li>') + template('mail-folder-attachment-info', `<li><button type="button" class="${FILE}" disabled data-xp-slot="button"><span class="${FILE_BADGE}" data-xp-slot="badge" aria-hidden="true"></span><span class="${FILE_TEXT}"><bdi class="${NAME}" dir="auto" data-xp-slot="name"></bdi><bdi class="v2-num ${META}" dir="ltr" data-xp-slot="size"></bdi></span></button></li>`)
+    case 'folder-workspace': return template('mail-folder-filter-empty', '<p class="v2-mail-filter-empty px-5 py-10 text-center text-sm text-secondary-foreground" data-mail-filter-empty role="status"></p>') + template('mail-folder-move-menu', '<ul class="v2-mail-move-menu kt-menu kt-menu-default flex-col gap-0.5 p-2 absolute top-full start-0 z-20 mt-1.5 min-w-56 rounded-md border border-border bg-popover text-popover-foreground shadow-md" id="move-list" data-mail-move="true"></ul>') + template('mail-folder-move-choice', '<li class="kt-menu-item"><button type="button" class="kt-menu-link text-start text-2sm font-medium text-foreground hover:bg-accent hover:text-primary" data-mail-action="move" data-xp-slot="label"></button></li>') + template('mail-folder-attachment-info', `<li><button type="button" class="${FILE}" disabled data-xp-slot="button"><span class="${FILE_BADGE}" data-xp-slot="badge" aria-hidden="true"></span><span class="${FILE_TEXT}"><bdi class="${NAME}" dir="auto" data-xp-slot="name"></bdi><bdi class="v2-num ${META}" dir="ltr" data-xp-slot="size"></bdi></span></button></li>`)
     case 'track': return template('mail-track-row', `<tr><td><bdi dir="ltr" class="${NAME}" data-xp-slot="time"></bdi></td><td data-xp-slot="direction"></td><td data-xp-slot="counterpart"></td><td data-xp-slot="status"></td><td><bdi dir="ltr" data-xp-slot="dsn"></bdi></td><td><button type="button" class="${ROW_BUTTON}" data-xp-slot="view"></button></td></tr>`) + empty('mail-track-empty', 6)
     case 'calendar-view': return [
       ['calview-row', '<div class="v2-mail-calview__row" role="row"></div>'],
       ['calview-head', '<div class="v2-mail-calview__head flex flex-col gap-1 min-w-0 p-2 border-s border-border bg-muted/50 text-xs font-medium text-muted-foreground" role="columnheader"></div>'],
-      ['calview-day', '<div class="v2-mail-calview__day group flex flex-col gap-1 min-w-0 min-h-32 border-t border-s border-border" role="gridcell"></div>'],
+      ['calview-day', '<div class="v2-mail-calview__day group min-w-0 border-t border-s border-border" role="gridcell"></div>'],
       ['calview-week', '<div class="v2-mail-calview__week v2-num px-1 py-2 bg-muted/50 text-center text-xs font-medium whitespace-nowrap text-muted-foreground"></div>'],
       ['calview-gutter', '<div class="v2-mail-calview__gutter v2-num bg-muted/50 text-center text-xs font-medium whitespace-nowrap text-muted-foreground"></div>'],
       ['calview-timeline', '<div class="v2-mail-calview__timeline"></div>'],
-      ['calview-chip', '<button type="button" class="v2-mail-calview__chip v2-num flex flex-wrap items-center gap-x-1.5 gap-y-0.5 px-2 py-1 rounded-md text-start text-xs font-medium leading-snug text-foreground break-words cursor-pointer"></button>'],
+      ['calview-chip', '<button type="button" class="v2-mail-calview__chip v2-num flex gap-x-1.5 gap-y-0.5 text-start font-medium leading-snug text-foreground cursor-pointer"></button>'],
       ['calview-long', '<span class="v2-mail-calview__long"></span>'], ['calview-short', '<span class="v2-mail-calview__short"></span>'],
-      ['calview-more', '<span class="v2-mail-calview__more v2-num text-xs font-medium text-primary"></span>'],
+      ['calview-more', '<span class="v2-mail-calview__more v2-num font-medium text-primary"></span>'],
       ['calview-swatch', '<span class="v2-mail-calview__swatch shrink-0 size-2.5 rounded-full"></span>'],
       ['calview-help', '<span class="v2-muted text-xs font-normal text-muted-foreground"></span>'],
       ['calview-empty', '<li class="v2-muted text-sm text-muted-foreground"></li>'],
@@ -71,7 +71,7 @@ export const V2_MAIL_DYNAMIC_CSS = `.v2-mail-reading-fragment{display:contents}
 .v2-mail-folders__name [data-xp-slot=raw]{font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate}
 .v2-mail-workspace [data-xp-slot=messages],.v2-mail-workspace [data-xp-slot=unseen],.v2-mail-workspace [data-xp-slot=date],.v2-mail-workspace [data-xp-slot=time],.v2-mail-workspace [data-xp-slot=dsn]{font-variant-numeric:tabular-nums}
 .v2-mail-workspace [data-xp-slot=dsn],.v2-mail-workspace [data-xp-slot=address]{font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate}
-.v2-mail-search__result{display:grid;gap:.25rem;inline-size:100%;block-size:auto;padding:.875rem 1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);box-shadow:none;white-space:normal;text-align:start;justify-items:start;overflow-wrap:anywhere;cursor:pointer;transition:background-color 140ms ease-out,border-color 140ms ease-out}
+[data-ui-theme="v2"] .v2-mail-workspace .v2-mail-search__result{display:grid;justify-content:stretch;align-items:start;align-content:start;gap:.25rem;inline-size:100%;block-size:auto;padding:.875rem 1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);box-shadow:none;white-space:normal;text-align:start;justify-items:start;overflow-wrap:anywhere;cursor:pointer;transition:background-color 140ms ease-out,border-color 140ms ease-out}
 .v2-mail-search__result:hover{background:var(--subtle);border-color:var(--line-strong)}
 .v2-mail-search__result:hover>strong{color:var(--accent)}
 .v2-mail-move-menu button{inline-size:100%}
@@ -79,20 +79,40 @@ export const V2_MAIL_DYNAMIC_CSS = `.v2-mail-reading-fragment{display:contents}
 [data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-grid]{display:flex;flex-direction:column;min-inline-size:40rem}
 .v2-mail-calview__row{display:grid;grid-template-columns:3.5rem repeat(7,minmax(0,1fr))}
 .v2-mail-calview__short{display:none}
-.v2-mail-calview__day{padding:.5rem;outline-offset:-2px}
+.v2-mail-calview__day{display:flex;flex-direction:column;gap:.25rem;min-block-size:8rem;padding:.5rem;outline-offset:-2px}
 .v2-mail-calview__day[data-outside=true]{background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
 .v2-mail-calview__day[aria-current=date]{background:color-mix(in oklab,var(--kt-accent) 50%,transparent)}
 .v2-mail-calview__day[aria-selected=true]{box-shadow:inset 0 0 0 2px var(--accent)}
-.v2-mail-calview__chip{min-inline-size:2.75rem;border-inline-start:3px solid var(--calview-chip,var(--accent));background:color-mix(in oklab,var(--calview-chip,var(--accent)) 10%,var(--surface));transition:background-color 140ms ease-out}
+.v2-mail-calview__chip{flex-wrap:wrap;align-items:center;min-inline-size:2.75rem;padding:.25rem .5rem;border-radius:var(--radius-control);font-size:.75rem;overflow-wrap:anywhere;border-inline-start:3px solid var(--calview-chip,var(--accent));background:color-mix(in oklab,var(--calview-chip,var(--accent)) 10%,var(--surface));transition:background-color 140ms ease-out}
 .v2-mail-calview__chip:hover{background:color-mix(in oklab,var(--calview-chip,var(--accent)) 18%,var(--surface))}
 .v2-mail-calview__chip>bdi{flex:none;white-space:nowrap;overflow-wrap:normal;font-weight:400;color:var(--text-2)}
 .v2-mail-calview__chip>span:last-child{min-inline-size:0;overflow:hidden;text-overflow:ellipsis}
+.v2-mail-calview__more{font-size:.75rem}
+.v2-mail-calview__day>.v2-mail-calview__chip,.v2-mail-calview__head>.v2-mail-calview__chip{overflow:hidden;overflow-wrap:normal}
+.v2-mail-calview__day>.v2-mail-calview__chip>*,.v2-mail-calview__head>.v2-mail-calview__chip>*{min-inline-size:0;max-inline-size:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-ui-theme="v2"] [data-calview-detail] .v2-mail-workspace__facts>div{grid-template-columns:minmax(0,1fr);gap:.25rem}
 .v2-mail-calview__swatch{background:var(--calview-chip,var(--accent))}
+[data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-grid][data-mode=day]{min-inline-size:0}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__row{grid-template-columns:3.5rem repeat(var(--calview-days,7),minmax(0,1fr))}
-[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__day{padding:0}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__day{padding:0;min-block-size:0}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__gutter{display:grid;grid-template-rows:repeat(24,2.5rem);padding:0 .25rem}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day])>.v2-mail-calview__row:first-child{position:sticky;inset-block-start:0;z-index:2;background:var(--surface)}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day])>.v2-mail-calview__row:first-child>.v2-mail-calview__gutter{display:block}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__head>bdi{white-space:nowrap}
 .v2-mail-calview__timeline{position:relative;block-size:60rem;inline-size:100%;background:repeating-linear-gradient(180deg,transparent 0,transparent calc(2.5rem - 1px),var(--line) calc(2.5rem - 1px),var(--line) 2.5rem)}
-.v2-mail-calview__timeline>.v2-mail-calview__chip{position:absolute;inset-block-start:var(--calview-top);block-size:var(--calview-height);inset-inline-start:var(--calview-start);inline-size:var(--calview-width);overflow:hidden;min-block-size:1.5rem;min-inline-size:0}
+.v2-mail-calview__timeline>.v2-mail-calview__chip{position:absolute;inset-block-start:var(--calview-top);block-size:var(--calview-height);inset-inline-start:var(--calview-start);inline-size:var(--calview-width);flex-direction:column;flex-wrap:nowrap;align-items:stretch;overflow:hidden;min-block-size:1.5rem;min-inline-size:0;overflow-wrap:normal}
+.v2-mail-calview__timeline>.v2-mail-calview__chip>*{min-inline-size:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:600px){.v2-mail-calview__long{display:none}.v2-mail-calview__short{display:inline}}
+@media(max-width:640px){[data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-grid][data-mode=month]{min-inline-size:0}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__row{position:relative;grid-template-columns:repeat(7,minmax(0,1fr))}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__week{position:absolute;inline-size:1px;block-size:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__head{padding:.5rem .125rem;align-items:center;text-align:center}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__day{flex-flow:row wrap;align-content:flex-start;justify-content:center;gap:.1875rem;min-block-size:3.5rem;padding:.375rem .125rem}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__date{flex:0 0 100%;text-align:center}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__day>.v2-mail-calview__chip{inline-size:.375rem;block-size:.375rem;min-inline-size:0;padding:0;border:0;border-radius:50%;background:var(--calview-chip,var(--accent))}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__day>.v2-mail-calview__chip>*{display:none}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__more{flex:0 0 100%;font-size:0;line-height:1;text-align:center}
+[data-ui-theme="v2"] [data-calview-grid][data-mode=month] .v2-mail-calview__more>bdi{font-size:.625rem}}
+[data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-scroll]:has(>[data-calview-grid]:not([data-mode=month])){max-block-size:min(40rem,75vh);overflow-y:auto}
 @media(prefers-reduced-motion:reduce){.v2-mail-search__result,.v2-mail-calview__chip{transition:none}}
 `

@@ -12,6 +12,11 @@ import {
 import { renderV2DbWizard } from './wizard.ts'
 
 /** Saved account metadata is distinct from native service, size and connection observations. */
+/** Keenicon tiles of the four count tiles. The controller rebuilds the entries of [data-db-counts], so the tiles sit in a
+ * decorative grid laid over the same columns instead of inside the entries. */
+const KPI_TILES = ['ki-filled ki-data', 'ki-filled ki-users', 'ki-filled ki-disk', 'ki-filled ki-trash']
+  .map(name => `<span><span class="v2-tile v2-tile--info"><i class="${name} text-lg"></i></span></span>`).join('')
+
 export function renderV2MariaDbPage(props: DatabasePageProps, authority: DatabasePageAuthority = NO_DATABASE_AUTHORITY): string {
   const { account, canRead, canManage, canReadDatabaseFacts, canReadUserFacts, direction, locale, t } = databaseContext(props, authority)
   const unread = t('Not read')
@@ -30,11 +35,13 @@ export function renderV2MariaDbPage(props: DatabasePageProps, authority: Databas
 <p data-db-status data-state="unread" role="status" aria-live="polite">${escapeHtml(t('Saved database and user records have not been read.'))}</p>
 <p class="text-sm text-secondary-foreground" data-db-application>${escapeHtml(t('Database service, grants and connections remain unverified.'))}</p>
 <p class="v2-db-notes">${escapeHtml(t('Plan caps, disk usage and live connection readings have not been loaded; no values are inferred from configuration.'))}</p>`)
+  // KPI numbers use the body font like the kit KPI tiles (the controller writes the same plain bdi).
+  const count = (value: number): string => `<bdi dir="ltr">${value}</bdi>`
   const summary = dbFacts([
-    { label: t('Databases'), valueHtml: active === undefined ? escapeHtml(unread) : technical(active.length) },
-    { label: t('Database users'), valueHtml: users === undefined ? escapeHtml(unread) : technical(users.length) },
+    { label: t('Databases'), valueHtml: active === undefined ? escapeHtml(unread) : count(active.length) },
+    { label: t('Database users'), valueHtml: users === undefined ? escapeHtml(unread) : count(users.length) },
     { label: t('Size on disk'), valueHtml: escapeHtml(unread) },
-    { label: t(msgctxt('theme:v2', 'In trash')), valueHtml: trash === undefined ? escapeHtml(unread) : technical(trash.length) },
+    { label: t(msgctxt('theme:v2', 'In trash')), valueHtml: trash === undefined ? escapeHtml(unread) : count(trash.length) },
   ], { 'data-db-counts': true })
   const databaseRows = active === undefined ? dbEmptyRow(7, t('Records have not been read.')) : active.length === 0
     ? dbEmptyRow(7, t(msgctxt('theme:v2', 'No saved databases. Create a database configuration to begin.')))
@@ -99,7 +106,7 @@ ${dbButton(t('Show {count} advanced privileges', { count: advanced.length }), { 
     ['remote', t('Remote access'), `${remote}`],
   ]
   const body = `<div class="v2-db-workspace" data-database-workspace data-db-account="${escapeHtml(account?.id ?? '')}" data-db-username="${escapeHtml(account?.username ?? '')}" data-db-home="${escapeHtml(account?.home ?? '')}" data-db-manage="${canManage}"${canRead ? '' : ' data-capability-unavailable="true"'} lang="${locale}" dir="${direction}">
-${summary}${status}<p role="status" data-db-row-status hidden></p>
+<div class="v2-db-kpis">${summary}<div class="v2-db-kpi-icons" aria-hidden="true">${KPI_TILES}</div></div>${status}<p role="status" data-db-row-status hidden></p>
 <div class="v2-db-stack" data-presentation-tabs="panels">${tabs({ label: t(msgctxt('theme:v2', 'Database sections')), tabs: sections.map(([key, label], index) => ({ id: `v2-db-tab-${key}`, label, panelId: `v2-db-section-${key}`, selected: index === 0, hooks: { 'data-presentation-tab': key } })) })}${sections.map(([key, , bodyHtml], index) => tabPanel({ id: `v2-db-section-${key}`, tabId: `v2-db-tab-${key}`, hidden: index > 0, sectionSpacing: true, bodyHtml })).join('')}</div>${databaseWorkspaceTemplates(message => escapeHtml(t(message)))}</div>`
   return dbPage(t, '/databases/mariadb', t('MariaDB databases'), t(msgctxt('theme:v2', 'Account database names, users and saved grants. Service observations are shown only after they are read.')), body)
 }

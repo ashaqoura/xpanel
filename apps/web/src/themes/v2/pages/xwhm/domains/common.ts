@@ -32,8 +32,21 @@ export function networkContext(props: WhmNetworkProps, authority: WhmNetworkAuth
 export const netTechnical = (value: string | number | undefined | null, fallback = '—'): string =>
   `<bdi class="v2-mono" dir="ltr">${escapeHtml(value === null || value === undefined ? fallback : value)}</bdi>`
 
+// The leading Keenicon of a server-rendered action, read from its controller hook (full literal class names, so the
+// stylesheet build finds them). Paging, cancel and clear actions keep their label alone.
+const NET_ICONS: readonly (readonly [RegExp, string])[] = [
+  [/refresh|reload|-load=/, 'ki-arrows-circle'], [/export/, 'ki-file-down'], [/import/, 'ki-file-up'], [/preview|inspect/, 'ki-eye'],
+  [/delete|remove/, 'ki-trash'], [/connect|=.link.$/, 'ki-fasten'], [/add|create-submit/, 'ki-plus'], [/run=.check/, 'ki-magnifier'],
+  [/save|apply/, 'ki-check'], [/sync-run/, 'ki-arrows-loop'], [/issue/, 'ki-key'],
+]
+const netIcon = (hooks: HookAttributes | undefined): string => {
+  const key = hooks ? Object.entries(hooks).map(([name, value]) => `${name}=${JSON.stringify(value)}`).join(' ') : ''
+  const name = key ? NET_ICONS.find(([pattern]) => pattern.test(key))?.[1] : undefined
+  return name ? `<i class="ki-filled ${name}" aria-hidden="true"></i>` : ''
+}
+
 export function netButton(label: string, hooks?: HookAttributes, options: { enabled?: boolean; primary?: boolean; danger?: boolean; submit?: boolean } = {}): string {
-  return `<button type="${options.submit ? 'submit' : 'button'}" class="v2-btn${options.primary ? ' v2-btn--primary' : ''}${options.danger ? ' v2-btn--danger' : ''} kt-btn ${options.danger ? 'kt-btn-destructive' : options.primary ? 'kt-btn-primary' : 'kt-btn-outline'}"${hookAttrs(hooks)}${options.enabled ? '' : ' disabled'}>${escapeHtml(label)}</button>`
+  return `<button type="${options.submit ? 'submit' : 'button'}" class="v2-btn${options.primary ? ' v2-btn--primary' : ''}${options.danger ? ' v2-btn--danger' : ''} kt-btn ${options.danger ? 'kt-btn-destructive' : options.primary ? 'kt-btn-primary' : 'kt-btn-outline'}"${hookAttrs(hooks)}${options.enabled ? '' : ' disabled'}>${netIcon(hooks)}${escapeHtml(label)}</button>`
 }
 
 export const netField = (id: string, label: string, control: FieldControl, help?: string, exactId = false): string =>
@@ -43,7 +56,8 @@ export const netCard = (key: string, title: string, bodyHtml: string, hooks?: Ho
   card({ title, titleId: `v2-whm-network-${key}-heading`, bodyHtml, hooks, actionsHtml })
 
 export function netTable(t: Translate, key: string, caption: string, columns: readonly string[], rows: readonly DataTableRow[], emptyText: string, hooks?: HookAttributes, tableHooks?: HookAttributes): string {
-  return dataTable(t, { id: `v2-whm-network-${key}-table`, caption, columns: columns.map(label => ({ label })), rows, emptyText, bodyHooks: hooks, ...(tableHooks ? { tableHooks } : {}) })
+  // Metronic frame: the table sits inside a card body next to other content, so it gets its own rounded border.
+  return `<div class="v2-whm-network__table min-w-0 overflow-hidden rounded-lg border border-border">${dataTable(t, { id: `v2-whm-network-${key}-table`, caption, columns: columns.map(label => ({ label })), rows, emptyText, bodyHooks: hooks, ...(tableHooks ? { tableHooks } : {}) })}</div>`
 }
 
 export const netFacts = (rows: readonly { label: string; valueHtml: string; hooks?: HookAttributes }[]): string =>
@@ -70,6 +84,7 @@ export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:f
 .v2-whm-network__facts dd{font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;unicode-bidi:plaintext;text-align:var(--v2-control-align,match-parent)}
 .v2-whm-network__facts bdi{unicode-bidi:isolate}
 .v2-whm-network__actions,.v2-whm-network__chips{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
+.v2-whm-network .v2-card__body>.v2-whm-network__actions,.v2-whm-network .v2-card__body>:is(form,section)>.v2-whm-network__actions{justify-content:flex-end}
 .v2-whm-network .v2-segmented>button{min-inline-size:var(--target);min-block-size:var(--target)}
 .v2-whm-network select{min-inline-size:0;max-inline-size:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v2-whm-network .v2-muted{font-size:13px;line-height:1.45}
@@ -146,13 +161,14 @@ export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:f
 .v2-whm-network__names label{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target)}
 .v2-whm-network__names{display:flex;flex-direction:column;gap:var(--space-1)}
 .v2-whm-network .v2-table :is(th,td){text-align:start}
+.v2-whm-network__table>.v2-table-scroll{border-block-start:0}
+.v2-whm-network .v2-table tbody>:is(tr.v2-table__state,tr:only-child)>td[colspan]:only-child{text-align:center;color:var(--muted)}
 .v2-whm-network .v2-table td{font-variant-numeric:tabular-nums}
 .v2-whm-network .v2-table th{white-space:normal;vertical-align:bottom}
 .v2-whm-network__split .v2-table :is(th,td){padding-inline:12px}
 .v2-whm-network__split .v2-table td{white-space:normal;overflow-wrap:break-word}
 .v2-whm-network .v2-table-scroll{max-inline-size:100%;min-inline-size:0}
 .v2-whm-network [data-ssl-rows] :is(th,td),.v2-whm-network table:has([data-ssl-rows]) th{padding-inline:10px}
-.v2-whm-network [data-ssl-rows] td:last-child .v2-btn{min-block-size:36px;padding-inline:12px;font-size:13px}
 .v2-whm-network [data-ssl-rows] td:last-child .v2-whm-network__actions{gap:8px}
 .v2-whm-network select.v2-mono:has(>option[value=""]:checked){font-family:inherit}
 .v2-whm-network [data-ssl-install-choices] .v2-whm-network__facts{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -177,6 +193,6 @@ export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:f
 .v2-whm-network tbody[data-ssl-rows]>tr>td:nth-child(7):not([colspan])::before{content:var(--v2-col-7)}}
 @media(max-width:1100px){.v2-whm-network__split{grid-template-columns:minmax(0,1fr)}.v2-whm-network__split>aside{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));align-items:start}}
 @media(max-width:1100px){.v2-whm-network__pair--even>:last-child{padding-inline-start:0;border-inline-start:0;padding-block-start:var(--space-3);border-block-start:1px solid var(--line)}.v2-whm-network__filters,.v2-whm-network .v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.v2-whm-network table:has(>[data-dns-records]){display:block}.v2-whm-network tbody[data-dns-records]{display:block}.v2-whm-network tbody[data-dns-records] tr{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-block:16px}.v2-whm-network tbody[data-dns-records] tr>td:not([colspan]){grid-column:auto;grid-row:auto;justify-self:stretch;text-align:start;display:flex;flex-direction:column;gap:var(--space-1)}.v2-whm-network tbody[data-dns-records] tr>td:is(:nth-child(1),:nth-child(4)):not([colspan]){grid-column:1/-1}.v2-whm-network tbody[data-dns-records] tr>td:nth-child(6):not([colspan]){justify-content:flex-end;align-items:flex-end}.v2-whm-network tbody[data-dns-records] label{position:static;inline-size:auto;block-size:auto;clip-path:none;font-size:12px;font-weight:600;color:var(--muted)}.v2-whm-network tbody[data-whm-dns-zone-rows] tr>td:first-child:not([colspan]){grid-column:1/-1;font-weight:600}.v2-whm-network tbody[data-whm-dns-zone-rows] tr>td:nth-child(n+2):not([colspan]){grid-column:auto;grid-row:auto;justify-self:start;text-align:start}.v2-whm-network tbody[data-whm-dns-zone-rows] tr>td:is(:nth-child(3),:nth-child(5)):not([colspan]){justify-self:end;text-align:end}.v2-whm-network__newzone>.v2-whm-network__filters{grid-template-columns:minmax(0,1fr)}.v2-whm-network tbody[data-ssl-rows]>tr{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-whm-network tbody[data-ssl-rows] td:last-child .v2-btn{min-block-size:var(--target)}.v2-whm-network table[data-whm-filter-table] tr{padding-inline-start:16px}.v2-whm-network table[data-whm-filter-table] tr>:first-child{position:static}.v2-whm-network table[data-whm-filter-table] tr>:nth-child(n+2):not([colspan]){grid-column:auto;grid-row:auto;justify-self:start;text-align:start}.v2-whm-network table[data-whm-filter-table] tr>:first-child:not([colspan]){grid-column:1/-1}.v2-whm-network table[data-whm-filter-table] tr>:is(:nth-child(3),:nth-child(5),:nth-child(7)):not([colspan]){justify-self:end;text-align:end}.v2-whm-network table[data-whm-filter-table] tr>:nth-child(8):not([colspan]){grid-column:1/-1;justify-self:end}.v2-whm-network [data-whm-filter-table] .v2-cell-lead .v2-cell-lead__text{max-inline-size:none;min-inline-size:0}}
+@media(max-width:600px){.v2-whm-network table:has(>[data-dns-records]){display:block}.v2-whm-network tbody[data-dns-records]{display:block}.v2-whm-network tbody[data-dns-records] tr{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-block:16px}.v2-whm-network tbody[data-dns-records] tr>td:not([colspan]){grid-column:auto;grid-row:auto;justify-self:stretch;text-align:start;display:flex;flex-direction:column;gap:var(--space-1)}.v2-whm-network tbody[data-dns-records] tr>td:is(:nth-child(1),:nth-child(4)):not([colspan]){grid-column:1/-1}.v2-whm-network tbody[data-dns-records] tr>td:nth-child(6):not([colspan]){justify-content:flex-end;align-items:flex-end}.v2-whm-network tbody[data-dns-records] label{position:static;inline-size:auto;block-size:auto;clip-path:none;font-size:12px;font-weight:600;color:var(--muted)}.v2-whm-network tbody[data-whm-dns-zone-rows] tr>td:first-child:not([colspan]){grid-column:1/-1;font-weight:600}.v2-whm-network tbody[data-whm-dns-zone-rows] tr>td:nth-child(n+2):not([colspan]){grid-column:auto;grid-row:auto;justify-self:start;text-align:start}.v2-whm-network tbody[data-whm-dns-zone-rows] tr>td:is(:nth-child(3),:nth-child(5)):not([colspan]){justify-self:end;text-align:end}.v2-whm-network__newzone>.v2-whm-network__filters{grid-template-columns:minmax(0,1fr)}.v2-whm-network tbody[data-ssl-rows]>tr{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-whm-network table[data-whm-filter-table] tr{padding-inline-start:16px}.v2-whm-network table[data-whm-filter-table] tr>:first-child{position:static}.v2-whm-network table[data-whm-filter-table] tr>:nth-child(n+2):not([colspan]){grid-column:auto;grid-row:auto;justify-self:start;text-align:start}.v2-whm-network table[data-whm-filter-table] tr>:first-child:not([colspan]){grid-column:1/-1}.v2-whm-network table[data-whm-filter-table] tr>:is(:nth-child(3),:nth-child(5),:nth-child(7)):not([colspan]){justify-self:end;text-align:end}.v2-whm-network table[data-whm-filter-table] tr>:nth-child(8):not([colspan]){grid-column:1/-1;justify-self:end}.v2-whm-network [data-whm-filter-table] .v2-cell-lead .v2-cell-lead__text{max-inline-size:none;min-inline-size:0}}
 @media(max-width:640px){.v2-whm-network__filters{grid-template-columns:minmax(0,1fr)}.v2-whm-network .v2-segmented>button{min-block-size:var(--target)}.v2-whm-network__fields{grid-template-columns:minmax(0,1fr)}.v2-whm-network__facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 `

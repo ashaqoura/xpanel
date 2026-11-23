@@ -28,7 +28,7 @@ export function renderV2Rearrange(t: Translate, editable: boolean): string {
   return toolCard('rearrange', t(msgid('Rearrange an account')), `<p>${esc(t(msgid('Moves an account to another home root, on the same disk or another one. The account stops serving while its files move, and every copied file is compared before the old directory is removed.')))}</p>`
     + formBlock(editable, 'data-rearrange-form', rows(select('v2-rearrange-account', 'account', t(msgid('Account')), t(msgid('Select an account'))) + select('v2-rearrange-root', 'root', t(msgid('Home root')), t(msgid('Select a home root'))))
       + choice(`name="acknowledge"${off}`, t(msgid('Scripts with the old home path written in them will break.')))
-      + actions(`<button type="button" class="v2-btn kt-btn kt-btn-outline" data-rearrange-recover hidden${off}>${keenicon('arrows-loop')}${esc(t(msgid('Settle an interrupted move')))}</button><button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-rearrange-submit${off}>${esc(t(msgid('Move account')))}</button>`, true))
+      + actions(`<button type="button" class="v2-btn kt-btn kt-btn-outline" data-rearrange-recover hidden${off}>${keenicon('arrows-loop')}${esc(t(msgid('Settle an interrupted move')))}</button><button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-rearrange-submit${off}>${keenicon('arrow-right-left')}${esc(t(msgid('Move account')))}</button>`, true))
     + status(t(msgid('Accounts have not been read.')), { 'data-rearrange-status': true }),
   { 'data-whm-rearrange': true, 'data-account-admin-editable': String(editable) })
 }
@@ -62,16 +62,21 @@ export function renderV2EnhancementAssign(t: Translate, editable: boolean): stri
   const select = (id: string, name: string, label: string, first: string): string => row(id, label, `<select id="${id}" name="${name}" dir="ltr"${off}><option value="">${esc(first)}</option></select>`)
   return toolCard('assign-enhancements', t(msgid('Assign enhancements')), `<p>${esc(t(msgid('Root sets which enhancements you may assign and how many.')))}</p>`
     + formBlock(editable, 'data-enh-assign-form', rows(select('v2-enh-account', 'account', t(msgid('Account')), t(msgid('Select an account'))) + select('v2-enh-enhancement', 'enhancement', t(msgid('Enhancement')), t(msgid('Select an enhancement'))) + row('v2-enh-value', t(msgid('Value')), `<input id="v2-enh-value" name="value" type="number" dir="ltr" min="0"${off}>`))
-      + actions(button(t(msgid('Remove')), { 'data-enh-unassign': true }, editable) + `<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-enh-assign${off}>${esc(t(msgid('Assign')))}</button>`, true))
+      + actions(button(t(msgid('Remove')), { 'data-enh-unassign': true }, editable) + `<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-enh-assign${off}>${keenicon('check')}${esc(t(msgid('Assign')))}</button>`, true))
     + status(t(msgid('Enhancements have not been read.')), { 'data-enh-assign-status': true }),
   { 'data-whm-account-enhancements': true, 'data-account-admin-editable': String(editable) })
 }
 
 /** WHM Home: the administrator's favorites and notifications, filled by WHM_HOME_CLIENT_BINDING. */
 export function renderV2WhmHome(t: Translate): string {
-  return `<div class="v2-whm-overview__secondary">${toolCard('favorites', t(msgid('Favorites')), `<p class="v2-muted" data-whm-favorites-empty>${esc(t(msgid('Star a page in the quick bar to keep it here and in the side menu.')))}</p><ul class="v2-whm-overview__services" data-whm-favorites-list data-sortable-list></ul>`
-    + `${choice('data-whm-favorites-descriptions checked', t(msgid('Show descriptions')))}<p role="status" data-whm-favorites-status hidden></p>`, { 'data-whm-favorites': true })}`
-    + `${card({ title: t(msgid('Notifications')), titleId: 'whm-inbox-heading', hooks: { 'data-whm-inbox': true }, actionsHtml: `<label class="v2-whm-inbox__filter kt-label"><input type="checkbox" class="kt-checkbox kt-checkbox-sm" data-whm-inbox-unread-only><span>${esc(t(msgid('Unread only')))}</span></label>`, bodyHtml: status(t(msgid('Notifications have not been read.')), { 'data-whm-inbox-status': true }) + '<ul class="v2-whm-overview__services" data-whm-inbox-list></ul>' + actions(button(t(msgid('Mark all as read')), { 'data-whm-inbox-read': true }), true) })}</div>`
+  // Metronic list cards: the view choice sits in the header toolbar, the rows form a divided list in the body and the
+  // card-wide action closes the card in its footer. Rows are painted by the client into the lists.
+  const favorites = toolCard('favorites', t(msgid('Favorites')), `<p class="v2-whm-home__empty flex items-center gap-2 text-sm text-secondary-foreground" data-whm-favorites-empty><i class="ki-filled ki-star text-base text-muted-foreground" aria-hidden="true"></i><span>${esc(t(msgid('Star a page in the quick bar to keep it here and in the side menu.')))}</span></p><ul class="v2-whm-overview__services v2-whm-home__list" data-whm-favorites-list data-sortable-list></ul>`
+    + status('', { 'data-whm-favorites-status': true }, 'unread', true), { 'data-whm-favorites': true }, choice('data-whm-favorites-descriptions checked', t(msgid('Show descriptions'))))
+  const inbox = card({ title: t(msgid('Notifications')), titleId: 'whm-inbox-heading', hooks: { 'data-whm-inbox': true }, actionsHtml: choice('data-whm-inbox-unread-only', t(msgid('Unread only'))).replace('v2-account-tool__choice', 'v2-whm-inbox__filter v2-account-tool__choice'),
+    bodyHtml: status(t(msgid('Notifications have not been read.')), { 'data-whm-inbox-status': true }) + '<ul class="v2-whm-overview__services v2-whm-home__list" data-whm-inbox-list></ul>',
+    footerHtml: actions(button(t(msgid('Mark all as read')), { 'data-whm-inbox-read': true }), true) })
+  return `<div class="v2-whm-overview__secondary">${favorites}${inbox}</div>`
 }
 
 /** WHM Web Template Editor: one editor per page; the host publishes each save. */
@@ -81,7 +86,7 @@ export function renderV2WebTemplates(t: Translate, editable: boolean): string {
     + row(`v2-web-template-${kind}`, label, `<textarea id="v2-web-template-${kind}" name="html" class="v2-mono" rows="12" dir="ltr" spellcheck="false"${off}></textarea>`)
     + actions(`<label class="v2-btn kt-btn kt-btn-outline">${keenicon('exit-up')}${esc(t(msgid('Upload a file')))}<input type="file" accept=".html,.htm,text/html" hidden data-web-template-upload${off}></label>`
       + button(t(msgid('Preview')), { 'data-web-template-action': 'preview' }, editable) + button(t(msgid('Revert to last saved')), { 'data-web-template-action': 'revert' }, editable) + button(t(msgid('Restore the shipped page')), { 'data-web-template-action': 'shipped' }, editable)
-      + `<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off}>${esc(t(msgid('Save')))}</button>`, true))
+      + `<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off}>${keenicon('check')}${esc(t(msgid('Save')))}</button>`, true))
   return toolCard('web-templates', t(msgid('Web template editor')), `<p>${esc(t(msgid('Your pages apply to the accounts you own. %contact% becomes your contact address. Saving publishes the page through the web server.')))}</p>`
     + page('default', t(msgid('Default website page')), t(msgid('Shown for a site with an empty public_html instead of an access error.'))) + page('suspended', t(msgid('Suspended account page')), t(msgid('Shown while an account is suspended.')))
     + `<iframe title="${esc(t(msgid('Preview')))}" sandbox="" data-web-template-preview hidden></iframe>`
@@ -97,7 +102,7 @@ export function renderV2Skeleton(t: Translate, editable: boolean): string {
     + table(t(msgid('Skeleton directory')), [t(msgid('File')), t(msgid('Size')), t(msgid('Actions'))], { 'data-skeleton-rows': true }, t(msgid('The skeleton has not been read.')))
     + formBlock(editable, 'data-skeleton-form', rows(row('v2-skeleton-path', t(msgid('File path')), `<input id="v2-skeleton-path" name="path" class="v2-mono" dir="ltr" maxlength="240" placeholder="public_html/index.html" autocomplete="off" spellcheck="false"${off}>`) + row('v2-skeleton-file', t(msgid('File')), `<input id="v2-skeleton-file" name="file" type="file"${off}>`)
       + row('v2-skeleton-text', t(msgid('Or type the content')), `<textarea id="v2-skeleton-text" name="text" class="v2-mono" rows="4" dir="ltr" spellcheck="false"${off}></textarea>`))
-      + actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off}>${esc(t(msgid('Save file')))}</button>`, true))
+      + actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off}>${keenicon('check')}${esc(t(msgid('Save file')))}</button>`, true))
     + status(t(msgid('The skeleton has not been read.')), { 'data-skeleton-status': true }),
   { 'data-whm-skeleton': true, 'data-account-admin-editable': String(editable) })
 }
@@ -109,7 +114,7 @@ export function renderV2LocaleCopy(t: Translate, editable: boolean): string {
   return toolCard('locale-copy', t(msgid('Copy a locale')), `<p>${esc(t(msgid('A copy holds every string of its source. It joins the panels at the next panel start, and can then be offered and translated like any other language.')))}</p>${line}`
     + table(t(msgid('Locale copies')), [t(msgid('Code')), t(msgid('Name')), t(msgid('Source')), t(msgid('Strings')), t(msgid('Status')), t(msgid('Actions'))], { 'data-locale-copy-rows': true }, t(msgid('Locale copies have not been read.')))
     + formBlock(editable, 'data-locale-copy-form', rows(row('v2-locale-copy-source', t(msgid('Source locale')), `<select id="v2-locale-copy-source" name="source" dir="ltr"${off}></select>`) + row('v2-locale-copy-tag', t(msgid('New code')), `<input id="v2-locale-copy-tag" name="tag" class="v2-mono" dir="ltr" maxlength="35" placeholder="pt-BR" autocomplete="off" spellcheck="false"${off}>`))
-      + actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off}>${esc(t(msgid('Copy locale')))}</button>`, true))
+      + actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off}>${keenicon('copy')}${esc(t(msgid('Copy locale')))}</button>`, true))
     + status(t(msgid('Locale copies have not been read.')), { 'data-locale-copy-status': true }),
   { 'data-whm-locale-copy': true, 'data-account-admin-editable': String(editable) })
 }

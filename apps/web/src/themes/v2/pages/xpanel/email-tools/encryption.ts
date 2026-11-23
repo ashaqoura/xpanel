@@ -1,7 +1,7 @@
 import { accountPgpClientTemplates } from './routing-client-templates.ts'
 import type { PanelSurfaceProps } from '../../../../contract.ts'
 import { icon } from '../../../icons.ts'
-import { actions, button, emailContext, endActions, esc, field, fields, header, input, mailGlyph, page, section, select, state, table, unread, type PanelEmailAuthority } from './common.ts'
+import { button, emailContext, endActions, esc, field, fields, header, input, mailGlyph, page, section, select, state, table, unread, type PanelEmailAuthority } from './common.ts'
 
 export function renderV2PanelEmailEncryption(props: PanelSurfaceProps, authority?: PanelEmailAuthority): string {
   const { locale, t, account, canManage } = emailContext(props, authority)
@@ -9,8 +9,8 @@ export function renderV2PanelEmailEncryption(props: PanelSurfaceProps, authority
   const keys = section('v2-pgp-keyring', t(msgid('OpenPGP keys')),
     `<p>${esc(t(msgid('Manage keys for your account mailbox addresses. Keys are stored privately in')))} <bdi dir="ltr" class="v2-mono">~/.gnupg</bdi>.</p><p>${esc(t(msgid('This page manages keys only. xMail does not sign, encrypt or decrypt messages with these keys. Exported files contain public keys only; keep your passphrase safe.')))}</p>`
     + table('v2-pgp-records', t(msgid('OpenPGP keys')), [t(msgid('Identity / fingerprint')), t(msgid('Algorithm')), t(msgid('Created / expires')), t(msgid('Private key')), t(msgid('Actions'))], unread(t, 5), { 'data-pgp-rows': true })
-    + state(t(msgid('Read the keyring to begin.')), { 'data-pgp-status': true })
-    + actions(button(t(msgid('Read keys')), { 'data-pgp-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true })))
+    + state(t(msgid('Read the keyring to begin.')), { 'data-pgp-status': true }),
+    undefined, button(t(msgid('Read keys')), { 'data-pgp-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
   const generate = section('v2-pgp-generate', t(msgid('Generate key pair')),
     fields(field('pgp-name', t(msgid('Name')), input('pgp-name', { 'data-pgp-name': true }, ' type="text" maxlength="100" autocomplete="off"', !canManage))
       + field('pgp-address', t(msgctxt('account-pgp-workspace', 'Mailbox address')), select('pgp-address', [['', t(msgctxt('account-pgp-workspace', 'Read mailboxes first'))]], { 'data-pgp-address': true }, !canManage, ' dir="ltr"'))

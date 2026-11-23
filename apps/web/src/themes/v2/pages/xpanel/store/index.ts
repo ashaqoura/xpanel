@@ -19,7 +19,7 @@ export function renderV2PanelStorePage(props: PanelSurfaceProps, authority: Pane
   const target = section('v2-store-target', t(msgid('Installation target')), c.domains === undefined ? status(t(msgctxt('theme:v2', 'Installation domains have not been read.')))
     : c.domains.length === 0 ? status(t(msgid('The read returned no domains.')))
       : facts(c.domains.map(domain => ({ label: t(msgid('Domain')), valueHtml: technical(domain.name) })), { 'data-rows': true }))
-  const actionsCard = section('v2-store-actions', t(msgid('Available actions')), note(t(msgctxt('theme:v2', 'These actions require a verified signed catalog, an authorized target and a connected installer.'))) + actions([msgid('Update'), msgid('Roll back'), msgid('Uninstall'), msgid('Retry'), msgid('Install')].map((copy, i) => button(t(copy), undefined, true, i === 4)).join('')))
+  const actionsCard = section('v2-store-actions', t(msgid('Available actions')), note(t(msgctxt('theme:v2', 'These actions require a verified signed catalog, an authorized target and a connected installer.'))) + actions([msgid('Update'), msgid('Roll back'), msgid('Uninstall'), msgid('Retry'), msgid('Install')].map((copy, i) => i === 4 ? button(t(copy), undefined, true, true).replace(' disabled>', ' disabled><i class="ki-filled ki-exit-down" aria-hidden="true"></i>') : button(t(copy), undefined, true, false)).join('')))
   let body: string
   if (canonical === '/software/store/app') {
     body = section('v2-store-application', t(msgid('Application metadata')), facts([msgid('Name'), msgid('Version'), msgid('Requirements'), msgid('Requested permissions'), msgid('Changelog')].map(copy => ({ label: t(copy), valueHtml: esc(t(msgid('Not read'))) }))))

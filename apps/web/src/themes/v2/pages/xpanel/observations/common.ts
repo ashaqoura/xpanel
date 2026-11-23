@@ -96,7 +96,8 @@ export const PANEL_OBSERVATIONS_CSS = `.v2-panel-extra{display:flex;flex-directi
 .v2-panel-extra [data-state-chip=problem]{color:var(--bad);background:var(--bad-soft);border-color:var(--bad-line)}
 .v2-panel-extra [data-state-chip=unavailable]{color:var(--warn);background:var(--warn-soft);border-color:var(--warn-line)}
 .v2-panel-extra__scope{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:var(--space-3);padding:0;list-style:none}
-.v2-panel-extra__scope>li{padding:var(--space-2);border:1px solid var(--line);border-radius:var(--radius-card);font-size:.8125rem;line-height:1.25rem;color:var(--text-2)}
+.v2-panel-extra__scope>li{display:flex;align-items:center;gap:.75rem;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-card);font-size:.875rem;line-height:1.25rem;color:var(--text-2)}
+.v2-panel-extra__scope>li>.v2-tile{flex:none}
 .v2-panel-extra :is(p,dd){overflow-wrap:anywhere}
 .v2-panel-extra .v2-card__body>p:not([role=status],[role=alert],[class]){font-size:.875rem;line-height:1.25rem;color:var(--text-2)}
 .v2-panel-extra :is([role=status],[role=alert])[data-state]:not([data-state=failed],[data-state=error]){font-size:.8125rem;line-height:1.25rem;color:var(--text-2)}

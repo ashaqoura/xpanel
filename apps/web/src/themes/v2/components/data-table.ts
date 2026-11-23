@@ -56,7 +56,7 @@ export function dataTable(t: Translate, props: DataTableProps): string {
     props.actions ? `<th scope="col" class="v2-table__actions text-end"><span class="v2-sr">${escapeHtml(t('Actions'))}</span></th>` : '',
   ].join('')
   const row = (item: DataTableRow): string => dataTableRow(props, item)
-  const stateRow = (kind: Exclude<DataTableState, 'ready'>, content: string): string => `<tr class="v2-table__state" data-table-state="${kind}"><td colspan="${span}">${content}</td></tr>`
+  const stateRow = (kind: Exclude<DataTableState, 'ready'>, content: string): string => `<tr class="v2-table__state" data-table-state="${kind}"><td colspan="${span}"${kind === 'loading' ? '' : ' class="py-7.5 text-center text-sm text-muted-foreground"'}>${content}</td></tr>`
   const skeleton = `<span class="v2-skeleton v2-skeleton--tile"></span><span class="v2-skeleton-lines"><span class="v2-skeleton" style="inline-size:40%"></span><span class="v2-skeleton v2-skeleton--thin" style="inline-size:24%"></span></span><span class="v2-skeleton v2-skeleton--pill"></span>`
   const body = state === 'ready' ? props.rows.map(row).join('')
     : state === 'empty' ? stateRow('empty', `<p role="status">${escapeHtml(props.emptyText ?? t(msgctxt('theme:v2', 'Nothing to show yet.')))}</p>`)

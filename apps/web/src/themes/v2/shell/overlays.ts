@@ -126,6 +126,7 @@ export const OVERLAYS_CSS = `.v2-cmdk,.v2-sheet{position:fixed;inset:0;z-index:9
 .v2-cmdk__head>.v2-icon{color:var(--muted)}
 .v2-cmdk__head>input{flex:1 1 auto;min-inline-size:0}
 .v2-cmdk__head>input:focus-visible{outline:none;box-shadow:none}
+.v2-cmdk__head>input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
 .v2-cmdk__scopes{flex:none;gap:var(--space-3);padding-inline:var(--space-3);overflow-x:auto}
 .v2-cmdk__scopes>button{flex:none;padding-block:12px;border-inline:0;border-block-start:0;background:transparent;white-space:nowrap}
 .v2-cmdk__scopes>button[aria-pressed="true"]{color:var(--accent)!important;border-block-end-color:var(--accent)!important}

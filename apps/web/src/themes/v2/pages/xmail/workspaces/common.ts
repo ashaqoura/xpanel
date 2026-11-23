@@ -132,6 +132,7 @@ export const MAIL_WORKSPACES_CSS = `.v2-mail-workspace{max-inline-size:75rem}
 .v2-mail-workspace .v2-security__form{max-inline-size:35rem}
 .v2-mail-workspace .v2-table-wrap{border:1px solid var(--line);border-radius:var(--radius-notice);overflow-x:auto}
 .v2-mail-workspace__table{max-inline-size:100%;min-inline-size:0;font-variant-numeric:tabular-nums}
+.v2-mail-workspace #v2-mail-forwarder-table th:last-child{inline-size:1%;white-space:nowrap}
 .v2-mail-workspace[data-mail-mailing-lists] .v2-mail-workspace__table td:nth-child(-n+2){overflow-wrap:anywhere}
 @media(min-width:601px){.v2-mail-workspace__table .v2-mail-folders__row-actions{flex-wrap:nowrap}.v2-mail-workspace [data-contact-table] bdi{white-space:nowrap}}
 .v2-mail-workspace__list{display:grid;gap:.625rem;padding:0;list-style:none;min-inline-size:0;font-size:.875rem;color:var(--text)}
@@ -140,7 +141,8 @@ export const MAIL_WORKSPACES_CSS = `.v2-mail-workspace{max-inline-size:75rem}
 .v2-mail-workspace__list>li>span{min-inline-size:0;overflow-wrap:anywhere}
 .v2-mail-workspace :is([data-filter-list],[data-filter-trace],[data-mail-track-detail-events])>li{padding:.875rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
 .v2-mail-workspace [data-calview-legend]:not(:empty){display:flex;flex-wrap:wrap;gap:.5rem 1.25rem}
-.v2-mail-workspace [data-calview-legend]>li{display:inline-flex;align-items:center;gap:.375rem;font-size:.8125rem;font-weight:500;color:var(--text-2)}
+.v2-mail-workspace [data-calview-legend]>li{display:block;min-inline-size:0;font-size:.8125rem;font-weight:500;color:var(--text-2);overflow-wrap:anywhere}
+.v2-mail-workspace [data-calview-legend]>li>.v2-mail-calview__swatch{display:inline-block;margin-inline-end:.375rem;vertical-align:baseline}
 .v2-mail-workspace__preview{display:grid;gap:1.25rem;min-inline-size:0;padding:1.25rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
 .v2-mail-workspace :is(input,select,textarea){min-inline-size:0;max-inline-size:100%}
 .v2-mail-workspace input[type=number]{font-variant-numeric:tabular-nums}

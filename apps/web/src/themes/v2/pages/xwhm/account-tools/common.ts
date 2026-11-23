@@ -26,16 +26,22 @@ export const technical = (value: string): string => `<bdi dir="ltr">${escapeHtml
 /** A literal Keenicon the v2 icon set lacks; decorative, sized by the control it sits in. */
 export const keenicon = (name: string): string => `<i class="ki-filled ki-${name}" aria-hidden="true"></i>`
 // The leading icon of a secondary action, read from its controller hook: Metronic shows one on refresh, preview,
-// remove, restore and send buttons. Primary buttons keep their label alone, as the Metronic save buttons do.
+// remove, restore and send buttons.
 const ACTION_ICONS: readonly (readonly [RegExp, string])[] = [
   [/refresh|recheck/, icon('refresh', 16)], [/preview/, keenicon('eye')], [/remove|unassign/, keenicon('trash')],
   [/revert|shipped|recover/, keenicon('arrows-loop')], [/inbox-read/, keenicon('double-check')], [/repair-run/, icon('tools', 16)],
 ]
-const actionIcon = (hooks: HookAttributes | undefined): string => {
+// Primary actions lead with the Keenicon Metronic shows for the verb: review (eye), restore (download), convert,
+// run checks, enable, save. Full literal class names, so the stylesheet build finds them.
+const PRIMARY_ICONS: readonly (readonly [RegExp, string])[] = [
+  [/preview/, keenicon('eye')], [/restore/, keenicon('cloud-download')], [/convert/, keenicon('arrow-right-left')],
+  [/health-run/, keenicon('shield-tick')], [/enable/, keenicon('toggle-on-circle')], [/save|assign/, keenicon('check')],
+]
+const actionIcon = (hooks: HookAttributes | undefined, primary = false): string => {
   const key = hooks ? Object.entries(hooks).map(([name, value]) => `${name}=${String(value)}`).join(' ') : ''
-  return key ? ACTION_ICONS.find(([pattern]) => pattern.test(key))?.[1] ?? '' : ''
+  return key ? (primary ? PRIMARY_ICONS : ACTION_ICONS).find(([pattern]) => pattern.test(key))?.[1] ?? '' : ''
 }
-export const button = (label: string, hooks?: HookAttributes, enabled = false, primary = false): string => `<button type="button" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${primary ? '' : actionIcon(hooks)}${escapeHtml(label)}</button>`
+export const button = (label: string, hooks?: HookAttributes, enabled = false, primary = false): string => `<button type="button" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${actionIcon(hooks, primary)}${escapeHtml(label)}</button>`
 /** Adds the Metronic control class to the text controls a caller hands to {@link field}; choices and hidden inputs stay as they are. */
 const metronicControl = (html: string): string => html.replace(/<(input|select|textarea)\b([^>]*)>/g, (tag, name: string, attrs: string) => {
   if (name === 'input' && /type="(?:checkbox|radio|hidden)"/.test(attrs)) return tag
@@ -110,7 +116,7 @@ ${STATUS}:is([data-state=ok],[data-state=saved],[data-state=success]):not(:empty
 .v2-account-tool__scroll:has(>table>tbody:empty){display:none}
 .v2-account-tool__scroll table{inline-size:100%}
 .v2-account-tool__scroll td{font-variant-numeric:tabular-nums}
-.v2-account-tool__scroll td[colspan]{color:var(--muted)}
+.v2-account-tool__scroll td[colspan]{color:var(--muted);text-align:center}
 .v2-account-tool__scroll :is(th,td){overflow-wrap:anywhere}
 .v2-account-tool__empty{display:flex;flex-direction:column;align-items:center;gap:.375rem;padding:1.875rem 1.25rem;border:1px dashed var(--line-strong);border-radius:var(--radius-card);text-align:center}
 .v2-account-tool__empty>i{margin-block-end:.25rem;font-size:1.5rem;line-height:1;color:var(--muted)}
@@ -123,6 +129,14 @@ ${STATUS}:is([data-state=ok],[data-state=saved],[data-state=success]):not(:empty
 .v2-account-tool__previews{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;min-inline-size:0}
 .v2-account-tools [data-web-template-preview]{inline-size:100%;block-size:20rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--subtle)}
 .v2-account-tool__preview{padding:1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--subtle);min-inline-size:0}
+.v2-whm-home__list.v2-whm-overview__services>li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.625rem;padding-inline:0}
+.v2-whm-home__list.v2-whm-overview__services>li[hidden]{display:none}
+.v2-whm-home__list .v2-whm-inbox__main>strong{font-size:.875rem;line-height:1.25rem;font-weight:500;color:var(--mono,var(--text))}
+.v2-whm-home__list .v2-whm-inbox__row[data-read=true] .v2-whm-inbox__main>strong{font-weight:400;color:var(--text-2)}
+.v2-whm-home__list .v2-whm-favorites__link>small{font-size:.75rem;line-height:1rem;color:var(--muted)}
+.v2-whm-home__list>li .v2-btn:not(.kt-btn){min-block-size:1.75rem;padding-inline:.625rem;font-size:.75rem;font-weight:500}
+.v2-whm-home__list .v2-whm-favorites__actions{gap:.375rem}
+.v2-whm-home__empty>i{flex:none}
 .v2-whm-quotas__table{min-inline-size:45rem}
 .v2-whm-quotas__table td small{display:block;font-size:.75rem;line-height:1rem;color:var(--muted)}
 .v2-whm-quotas__sort{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:.375rem;min-block-size:var(--target);cursor:pointer;font:inherit;color:inherit;border-radius:var(--radius-control)}

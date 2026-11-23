@@ -62,8 +62,13 @@ export function operationTable(id: string, title: string, heads: readonly string
 
 export const unreadRow = (columns: number, message: string): string => `<tr><td colspan="${columns}"><p role="status">${escapeHtml(message)}</p></td></tr>`
 
-export function operationCard(id: string, title: string, bodyHtml: string, description?: string): string {
-  return card({ title, titleId: id, bodyHtml, ...(description ? { description } : {}) })
+export function operationCard(id: string, title: string, bodyHtml: string, description?: string, actionsHtml?: string): string {
+  return card({ title, titleId: id, bodyHtml, ...(description ? { description } : {}), ...(actionsHtml ? { actionsHtml } : {}) })
+}
+
+/** A card's re-read action for its header toolbar: the small Metronic outline button with the refresh Keenicon. */
+export function operationToolbarButton(label: string, hooks: HookAttributes, disabled = true): string {
+  return `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${actionGlyph(hooks) || '<i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>'}${escapeHtml(label)}</button>`
 }
 
 export function operationPage(props: PanelSurfaceProps, route: string, title: string, description: string, bodyHtml: string, hooks?: HookAttributes, authority: PanelOperationAuthority = deniedOperationAuthority): string {

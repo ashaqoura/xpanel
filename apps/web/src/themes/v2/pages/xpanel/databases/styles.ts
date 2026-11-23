@@ -68,7 +68,11 @@ export const PANEL_DATABASES_CSS = `.v2-db-page{--v2-db-gap:1.25rem;display:grid
 .v2-db-workspace [data-db-counts]>div{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:.5rem;min-inline-size:0;padding:1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);box-shadow:var(--shadow)}
 .v2-db-workspace [data-db-counts] dt{flex:none;font-size:.875rem;line-height:1.4;font-weight:400;color:var(--text-2)}
 .v2-db-workspace [data-db-counts] dd{flex:none;font-size:1.5rem;line-height:2rem;font-weight:600;color:var(--mono,var(--text))}
-.v2-db-workspace [data-db-counts] dd,.v2-db-workspace [data-db-counts] dd *{font-family:var(--font-sans);font-variant-numeric:tabular-nums}
+.v2-db-workspace [data-db-counts] dd{font-variant-numeric:tabular-nums}
+.v2-db-kpis{position:relative;min-inline-size:0}
+.v2-db-workspace [data-db-counts] dt{padding-inline-end:3rem}
+.v2-db-kpi-icons{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.25rem;pointer-events:none}
+.v2-db-kpi-icons>span{display:flex;justify-content:flex-end;align-items:flex-start;padding:1.25rem}
 .v2-db-workspace [data-db-counts] dd:not(:has(bdi)){font-size:1.125rem}
 .v2-db-workspace .v2-code{overflow:auto;border-radius:var(--radius-notice)}
 .v2-db-workspace [data-dbu-secret-note]:empty{display:none}
@@ -79,7 +83,7 @@ export const PANEL_DATABASES_CSS = `.v2-db-page{--v2-db-gap:1.25rem;display:grid
 .v2-db-legend li{display:inline-flex;align-items:center;gap:.375rem}
 .v2-db-workspace:dir(rtl) *,[data-ui-theme="v2"] [dir=rtl] .v2-db-workspace *{letter-spacing:0}
 @media(max-width:1100px){.v2-db-columns{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:800px){.v2-db-workspace [data-db-counts]{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.v2-db-options{grid-template-columns:minmax(0,1fr)}.v2-db-workspace [data-db-counts]>div{padding:1rem}.v2-db-workspace [data-db-counts] dd{overflow-wrap:anywhere}.v2-db-actions>.v2-btn{flex:1 1 auto}}
+@media(max-width:800px){.v2-db-workspace [data-db-counts],.v2-db-kpi-icons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.v2-db-options{grid-template-columns:minmax(0,1fr)}.v2-db-workspace [data-db-counts]>div,.v2-db-kpi-icons>span{padding:1rem}.v2-db-workspace [data-db-counts] dd{overflow-wrap:anywhere}.v2-db-actions>.v2-btn{flex:1 1 auto}}
 @media(min-width:601px){.v2-db-table-region #v2-db-remote-hosts{table-layout:fixed;inline-size:100%;min-inline-size:0}.v2-db-table-region #v2-db-remote-hosts td{white-space:normal}.v2-db-table-region #v2-db-remote-hosts th:nth-child(1){inline-size:18%}.v2-db-table-region #v2-db-remote-hosts th:nth-child(2){inline-size:26%}.v2-db-table-region #v2-db-remote-hosts th:nth-child(3){inline-size:16%}.v2-db-table-region #v2-db-remote-hosts th:nth-child(4){inline-size:14%}.v2-db-table-region #v2-db-remote-hosts th:nth-child(5){inline-size:12%}.v2-db-table-region #v2-db-remote-hosts th:nth-child(6){inline-size:14%}}
 `

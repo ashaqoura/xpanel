@@ -16,9 +16,9 @@ export const tlsField = (id: string, label: string, control: FieldControl, help?
 export const TLS_HEADING = 'text-sm font-semibold text-mono'
 export const TLS_TEXT = 'text-sm text-secondary-foreground'
 export const TLS_ACTIONS = 'v2-whm-network__actions flex flex-wrap items-center justify-end gap-2.5'
-// Settings rows stacked 20px apart, their controls ending at the 36rem Metronic control width, and a group of
+// Settings rows stacked 20px apart, their controls growing with the row as Metronic's, and a group of
 // sections; both also hold where the network stylesheet is not loaded.
-export const TLS_ROWS = 'v2-whm-network__fields grid grid-cols-1 gap-5 max-w-[50.625rem]'
+export const TLS_ROWS = 'v2-whm-network__fields grid grid-cols-1 gap-5'
 const ROWS = TLS_ROWS
 const GROUPS = 'v2-whm-network__groups flex flex-col gap-5 min-w-0'
 

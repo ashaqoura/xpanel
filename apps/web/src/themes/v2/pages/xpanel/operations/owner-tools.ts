@@ -2,6 +2,7 @@ import type { Translate } from '../../../../../i18n.ts'
 import { escapeHtml as esc } from '../../../html.ts'
 import { operationCard, operationFacts, operationField, operationSelect, operationTable } from './common.ts'
 import { actionGlyph } from '../settings/common.ts'
+import { card } from '../../../components/index.ts'
 
 type Text = Translate
 const status = (hook: string, text: string): string => `<p ${hook} data-state="unread" role="status">${esc(text)}</p>`
@@ -18,7 +19,9 @@ const dataCard = (id: string, title: string, hook: string, body: string): string
 export function v2ServerInformationCard(t: Text): string {
   const items = ([[t(msgid('Plan')), 'plan'], [t(msgid('Hostname')), 'hostname'], [t(msgid('Panel version')), 'panel'], [t(msgid('Operating system')), 'os'], [t(msgid('Architecture')), 'arch'], [t(msgid('Kernel')), 'kernel'], ['Nginx', 'nginx'], ['Apache', 'apache'], ['MariaDB', 'mariadb'], ['PostgreSQL', 'postgresql'], ['Perl', 'perl'], ['Python', 'python'], [t(msgid('Path to sendmail')), 'sendmail']] as const)
     .map(([label, key]) => ({ label, valueHtml: `<bdi dir="ltr" data-server-info="${key}">${esc(t(msgid('Not read')))}</bdi>` }))
-  return dataCard('v2-server-info', t(msgid('Server information')), 'data-server-information', `${operationFacts(items)}${tableOf(t(msgid('Services')), [t(msgid('Service')), t(msgid('Status'))], 'data-server-services')}${status('data-server-info-status', t(msgid('Server information has not been read.')))}${row(button('data-server-info-read', t(msgid('Read again')), false, false))}`)
+  // Metronic keeps a card's refresh action in the header toolbar, not under the facts.
+  const reread = `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-server-info-read><i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>${esc(t(msgid('Read again')))}</button>`
+  return `<div data-server-information>${card({ title: t(msgid('Server information')), titleId: 'v2-server-info', actionsHtml: reread, bodyHtml: `${operationFacts(items)}${tableOf(t(msgid('Services')), [t(msgid('Service')), t(msgid('Status'))], 'data-server-services')}${status('data-server-info-status', t(msgid('Server information has not been read.')))}` })}</div>`
 }
 
 export function v2PerlModulesCard(t: Text): string {

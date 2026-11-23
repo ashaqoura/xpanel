@@ -3,9 +3,9 @@ import { escapeHtml } from '../../../html.ts'
 import { CLOSED_NETWORK_AUTHORITY, netCard, netFacts, networkContext, networkPage, type WhmNetworkAuthority, type WhmNetworkProps } from '../domains/common.ts'
 import { TLS_ACTIONS, TLS_HEADING, TLS_ROWS, TLS_TEXT, tlsButton, tlsField, v2WhmSslStore } from './store.ts'
 
-// A wizard step as a bordered Metronic panel: the legend is its section label, its fields stack as settings rows.
+// A wizard step as a bordered Metronic panel: the legend is its in-box section label, its fields stack as settings rows.
 const STEP_PANEL = 'flex flex-col gap-5 min-w-0 m-0 p-5 border border-border rounded-xl'
-const STEP_LEGEND = 'px-2 text-sm font-semibold text-mono'
+const STEP_LEGEND = 'float-start w-full p-0 text-sm font-semibold text-mono'
 
 export function renderV2WhmTlsInstallPage(props: WhmNetworkProps, authority: WhmNetworkAuthority = CLOSED_NETWORK_AUTHORITY): string {
   const { t, canRead, canManage, accounts } = networkContext(props, authority)

@@ -31,7 +31,7 @@ ${lifecycleField(t, 'v2-backup-destination-kind', msgid('Kind'), `<select id="v2
 ${input('endpoint', msgid('Service URL or local directory'))}${input('pathPrefix', msgid('Directory or object prefix'))}${input('bucket', msgid('Bucket'))}${input('region', msgid('Region'))}${input('username', msgid('Remote username'))}${input('retentionDays', msgid('Retention days'), 'number')}
 ${lifecycleField(t, 'v2-backup-destination-credential', msgid('Credential reference'), `<select id="v2-backup-destination-credential" class="kt-select" data-destination-field="credentialRef" disabled><option value="">${text(t, msgid('No trusted credential available'))}</option></select>`)}
 </div>
-<div class="v2-lifecycle__actions">${button('create-key', msgid('Create SFTP key pair'), { icon: 'key' })}</div>
+<div class="v2-lifecycle__actions justify-end">${button('create-key', msgid('Create SFTP key pair'), { icon: 'key' })}</div>
 <p class="v2-muted text-xs text-muted-foreground" data-destination-key-help hidden>${text(t, msgid('Add this public key to ~/.ssh/authorized_keys of the remote user. The private key stays on this server and is never shown.'))}</p>
 <pre class="v2-lifecycle__key" dir="ltr" data-destination-public-key hidden></pre>
 <div class="v2-lifecycle__actions justify-end"><button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-destination-save disabled>${lifecycleIcon('check')}${text(t, msgid('Save inactive destination'))}</button></div>

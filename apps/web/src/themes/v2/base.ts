@@ -130,9 +130,11 @@ ${W} ::-webkit-progress-value,${W} ::-webkit-meter-optimum-value{border-radius:v
 ${W} ::-webkit-meter-suboptimum-value{background:var(--warn)}
 ${W} ::-webkit-meter-even-less-good-value{background:var(--bad)}
 ${W} ::-moz-meter-bar,${W} ::-moz-progress-bar{background:var(--accent-fill)}
-${W} input[type=file]{max-inline-size:100%;font-size:.8125rem;color:var(--text-2)}
-${W} ::file-selector-button{min-height:var(--target);margin-inline-end:.75rem;padding:0 .75rem;border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg);color:var(--text-2);font:inherit;font-weight:500;cursor:pointer}
-${W} ::file-selector-button:hover{background:var(--kt-accent)}
+${W} :where(input[type=file]){max-inline-size:100%}
+${W} :where(input[type=file]:not(.kt-input)){display:block;inline-size:100%;block-size:var(--target);padding:0 .75rem;border:1px solid var(--line-strong);border-radius:var(--radius-control);background:var(--bg);box-shadow:0 1px 2px rgba(0,0,0,.05);color:var(--text);font-size:.8125rem}
+${W} :where(input[type=file]:not(.kt-input)):focus-visible{outline:none;border-color:var(--ring);box-shadow:${RING}}
+${W} :where(input[type=file]:disabled){cursor:not-allowed;opacity:.6}
+${W} :where(input[type=file])::file-selector-button{block-size:100%;margin:0;margin-inline-end:.75rem;padding:0;padding-inline-end:.75rem;border:0;border-inline-end:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--text);font:inherit;font-weight:500;cursor:pointer}
 ${W} table{width:100%;border-collapse:collapse;color:var(--text);font-size:.875rem;line-height:${LH_SM};text-align:start}
 ${W} caption{padding:0 0 .5rem;text-align:start;font-weight:600}
 ${W} :where(tr){border-block-end:1px solid var(--line)}
@@ -148,8 +150,10 @@ ${W} tbody tr:hover>td{background:${MUTED_50}}
 ${W} :where(p:is([role=alert],[data-state=failed],[data-state=error]):not(:empty)){padding:.875rem;border:1px solid color-mix(in oklab,var(--destructive) 10%,transparent);border-radius:var(--radius-notice);background:color-mix(in oklab,var(--destructive) 5%,transparent);color:var(--text);font-size:.875rem}
 ${W} :where(td[data-table-empty]){padding-block:1.25rem;text-align:center;color:var(--muted)}
 ${W} :where(td[data-label])::before{flex:0 1 auto;max-inline-size:45%;overflow-wrap:anywhere}
-${W} .v2-table-scroll{overflow-x:auto;scrollbar-width:thin;border-top:1px solid var(--line)}
-${W} :where(.v2-card__head)+.v2-table-scroll,${W} :where(.v2-card__body)>.v2-table-scroll:first-child{border-top:0}
+${W} :where(.kt-table,.v2-table)>tbody>tr:not([class])>td[colspan]:only-child:not(:has(form,input,select,textarea,dl,table)){padding-block:1.25rem;text-align:center;color:var(--muted)}
+${W} .v2-table-scroll{overflow-x:auto;scrollbar-width:thin;border:1px solid var(--line);border-radius:.5rem}
+${W} :is(.kt-card,.border,.kt-card-table,.v2-card--flush)>.v2-table-scroll,${W} :is(.kt-card-table,.v2-card--flush) .v2-table-scroll{border:0;border-radius:0}
+${W} :is(.kt-card-table,.v2-card--flush) .v2-table-scroll:not(:first-child,.v2-card__head+*){border-top:1px solid var(--line)}
 ${W} .v2-table-scroll:focus-visible{outline-offset:-2px}
 @keyframes v2-pulse{0%,100%{opacity:1}50%{opacity:.55}}
 @keyframes v2-spin{to{transform:rotate(360deg)}}

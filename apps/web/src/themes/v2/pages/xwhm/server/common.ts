@@ -68,7 +68,7 @@ const BUTTON_VERBS: readonly (readonly [RegExp, Keenicon])[] = [
   [/^(?:add|create|new|link|generate|issue|assign|request|invite)\b/i, 'add'], [/^(?:remove|delete|revoke|unlink|purge|uninstall)\b/i, 'remove'],
   [/^copy\b/i, 'copy'], [/^(?:download|export)\b/i, 'download'], [/^(?:upload|import)\b/i, 'upload'], [/^(?:edit|rename)\b/i, 'edit'],
   [/^(?:review|preview|view|show|details)\b/i, 'view'], [/^(?:search|find)\b/i, 'search'], [/^(?:reset|restore|roll back|discard)\b/i, 'reset'],
-  [/^(?:close|cancel|clear)\b/i, 'close'],
+  [/^(?:close|cancel|clear)\b/i, 'close'], [/^stage\b/i, 'add'], [/^(?:deploy|publish)\b/i, 'rocket'], [/^load preview\b/i, 'view'],
 ]
 const BUTTON_HOOKS: readonly (readonly [RegExp, Keenicon])[] = [
   [/refresh|reload|rebuild|[-=]read\b/, 'refresh'], [/[-=](?:save|apply)\b/, 'save'], [/[-=](?:add|create|import|upload|invite)\b/, 'add'],
@@ -147,7 +147,7 @@ ${s} ${facts} dt{flex:0 0 40%;max-inline-size:14rem;min-inline-size:0;font-size:
 ${s} ${facts} dd{flex:1 1 0;min-inline-size:0;margin:0;font-size:.875rem;line-height:1.25rem;font-weight:500;color:var(--mono,var(--text));overflow-wrap:anywhere;unicode-bidi:plaintext;font-variant-numeric:tabular-nums;text-align:start;text-align:-webkit-match-parent;text-align:match-parent}
 `
 /** A boolean setting as a Metronic switch row: label and hint on the start edge, the switch on the end edge. */
-export const toggleCss = (s: string, toggle: string): string => `${s} ${toggle}{display:flex;align-items:center;justify-content:space-between;gap:1.25rem;min-inline-size:0;max-inline-size:50.625rem;min-block-size:var(--target)}
+export const toggleCss = (s: string, toggle: string): string => `${s} ${toggle}{display:flex;align-items:center;justify-content:space-between;gap:1.25rem;min-inline-size:0;min-block-size:var(--target)}
 ${s} ${toggle} label{cursor:pointer}
 `
 /** Action rows: buttons 10px apart; inside a card body they sit on the end edge, as a Metronic card's closing actions. */
@@ -166,18 +166,20 @@ ${s} ${scroll} td .v2-btn:not(.kt-btn){min-block-size:1.75rem;padding-inline:.62
 /**
  * Field groups stack as Metronic settings rows. A kit field asks `formField` for the row (`layout: 'row'`); a family with
  * its own field markup (`cssRows`) takes it here: from 1024px the label keeps a 14rem column and the control grows
- * beside it, while rails, fieldsets, table cells and filter groups keep the label above. Controls stop at 36rem.
+ * beside it, while rails, fieldsets, table cells and filter groups keep the label above. Text controls grow with the
+ * row, as Metronic's `grow` control; short values (numbers, units) stop at SHORT_CONTROL.
  */
+const SHORT_CONTROL = '16rem'
 export function fieldsCss(s: string, fields: string, field: string, cssRows = false): string {
   const row = `${s} ${field}:not(:where(aside,fieldset,td,${fields}:has(input[type=search])) *)`
   return `${s} ${fields}{display:grid;grid-template-columns:minmax(0,1fr);gap:1.25rem;min-inline-size:0}
 ${s} fieldset ${fields}{grid-template-columns:repeat(auto-fill,minmax(min(100%,11rem),1fr))}
 ${s} .v2-field--row{max-inline-size:none}
-${s} .v2-field--row>:not(label){max-inline-size:36rem}
+${s} :is(.v2-field--row,${field})>:is(input[type=number],.v2-field__unit){max-inline-size:${SHORT_CONTROL}}
 ${cssRows ? `${s} ${fields}:has(input[type=search]){grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),20rem));gap:.625rem 1.25rem;align-items:end}
 ${s} ${field}{display:flex;flex-direction:column;gap:.625rem;min-inline-size:0;max-inline-size:none;text-align:start}
 ${s} ${field} :is(input:not([type=checkbox],[type=radio]),select,textarea){inline-size:100%;min-inline-size:0;max-inline-size:100%;box-sizing:border-box}
-@media(min-width:1024px){${row}{display:grid;grid-template-columns:minmax(0,14rem) minmax(0,36rem);align-items:baseline}
+@media(min-width:1024px){${row}{display:grid;grid-template-columns:minmax(0,14rem) minmax(0,1fr);align-items:baseline}
 ${row}>label{grid-column:1}
 ${row}>:not(label){grid-column:2}}
 ` : ''}`
@@ -207,7 +209,7 @@ ${settingsCss(scope, { fields: 'div.v2-admin-fields', field: ':is(.v2-admin-fiel
 ${scope} :is(bdi,time,code){unicode-bidi:isolate;overflow-wrap:break-word}
 ${scope} .v2-admin-choice{display:flex;align-items:center;gap:.625rem;min-block-size:var(--target);cursor:pointer}
 ${scope} fieldset{display:flex;flex-direction:column;gap:1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);padding:1.25rem;min-inline-size:0}
-${scope} legend{padding-inline:.5rem;font-size:.875rem;line-height:1.25rem;font-weight:600;color:var(--mono,var(--text))}
+${scope} legend{float:inline-start;inline-size:100%;padding:0;font-size:.875rem;line-height:1.25rem;font-weight:600;color:var(--mono,var(--text))}
 ${scope} details{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface)}
 ${scope} details>summary{display:flex;align-items:center;justify-content:space-between;gap:.625rem;min-block-size:3rem;padding-inline:1.25rem;font-size:.875rem;font-weight:500;color:var(--mono,var(--text));cursor:pointer;border-radius:inherit;list-style:none}
 ${scope} details>summary::-webkit-details-marker{display:none}

@@ -374,7 +374,10 @@ export function renderV2PanelHome(props: PanelPageProps, authority?: SurfaceAuth
       ...(routes.has('/resources') ? { action: { label: t('Resources & quotas'), href: '/resources' } } : {}) }) : ''
   const noticesHtml = renderV2HomeNotices(props, t, routes)
   const hasUrgentWarning = noticesHtml.includes('data-account-warning=')
+  // The announcements status line reads as a light Metronic alert; its tone follows the banner state the client sets
+  // (failed: destructive, unavailable: warning, otherwise primary). The client only writes its text, never its class.
   const announcementsHtml = props.personal?.notifications.announcements === false ? '' : renderV2AccountAnnouncementsBanner(t, canReadAnnouncements)
+    .replace('<p class="v2-muted" data-account-announcements-status', `<p class="v2-muted ${ANNOUNCEMENT_STATUS_ALERT}" data-account-announcements-status`)
   const resourceCard = card({
     title: t('Resource usage'), titleId: 'v2-home-resources-title', bodyHtml: meters.map(item => meter(item)).join(''),
     ...(routes.has('/resources') ? { footerHtml: `<a class="kt-link kt-link-underlined kt-link-dashed" href="/resources">${escapeHtml(t('Resources & quotas'))}${icon('arrow', 16)}</a>` } : {}),
@@ -388,6 +391,8 @@ ${sites(props, t, routes)}${hasUrgentWarning ? '' : noticesHtml}${certRenewal.ur
 ${renderV2AccountPlugins(t, canReadAnnouncements)}
 </div>`
 }
+
+const ANNOUNCEMENT_STATUS_ALERT = 'kt-alert kt-alert-light kt-alert-primary text-foreground in-data-[state=failed]:bg-destructive/5 in-data-[state=failed]:border-destructive/10 in-data-[state=unavailable]:bg-yellow-50 in-data-[state=unavailable]:border-yellow-200 dark:in-data-[state=unavailable]:bg-yellow-950/30 dark:in-data-[state=unavailable]:border-yellow-950/50'
 
 export const V2_PANEL_HOME_CSS = V2_HOME_ANNOUNCEMENTS_CSS + V2_HOME_PLUGINS_CSS + '\n' + V2_HOME_NOTICES_CSS + '\n' + `.v2-panel-home :is(.v2-account-announcements__list,[data-account-plugins-list]):empty{display:none}
 .v2-panel-home .v2-account-plugins__link{min-block-size:4rem;padding:.75rem var(--space-2);border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);font-size:.875rem;font-weight:500;color:var(--mono,var(--text));text-decoration:none;transition:border-color 140ms ease-out,background-color 140ms ease-out}.v2-panel-home .v2-account-plugins__link:hover{border-color:var(--line-strong);background:var(--subtle)}.v2-panel-home .v2-account-plugins__link:focus-visible{outline:2px solid var(--accent-fill);outline-offset:2px}.v2-panel-home .v2-account-plugins__link img{inline-size:2.5rem;block-size:2.5rem;border-radius:var(--radius-control);background:var(--sunken)}

@@ -146,6 +146,7 @@ export const PANEL_ADDITIONAL_CSS = `.v2-panel-extra{--v2-extra-gap:1.25rem;disp
 .v2-panel-extra textarea{inline-size:100%;resize:vertical;min-block-size:6rem}
 .v2-panel-extra pre{white-space:pre-wrap;overflow-wrap:anywhere;max-inline-size:100%;min-inline-size:0;text-align:start}
 .v2-panel-extra pre.v2-panel-extra__raw{direction:ltr;white-space:pre;overflow:auto;padding:.875rem;background:var(--code);color:var(--code-text);border-radius:var(--radius-notice);font-size:.75rem;line-height:1.6}
+.v2-panel-extra .v2-card p[role=status]:is([data-state=unavailable],[data-state=invalid])${STATUS}{border-color:var(--warn-line);background:var(--warn-soft)}
 .v2-panel-extra [role=status][data-state=uncertain]{padding:.875rem;border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:var(--radius-notice)}
 .v2-panel-extra :is(p,ol,pre):empty{display:none}
 .v2-panel-extra .v2-mail-card__scroll{border:1px solid var(--line);border-radius:var(--radius-notice)}

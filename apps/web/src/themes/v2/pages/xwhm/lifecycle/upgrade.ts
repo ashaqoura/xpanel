@@ -62,7 +62,7 @@ ${status('preflight-summary', msgid('Preflight has not run. Every value is read 
 <div class="v2-lifecycle__scroll kt-scrollable-x-auto rounded-lg border border-border" role="region" tabindex="0" aria-label="${text(t, msgid('Upgrade progress'))}"><table class="v2-lifecycle__table kt-table" data-phone-value="2"><caption class="v2-sr">${text(t, msgid('Upgrade progress'))}</caption><thead><tr><th scope="col">${text(t, msgid('Phase'))}</th><th scope="col">${text(t, msgid('State'))}</th></tr></thead><tbody data-upgrade-phases>${PHASES.map(([key, label]) => `<tr data-upgrade-phase="${key}"><th scope="row">${text(t, label)}</th><td class="text-sm text-secondary-foreground" data-upgrade-phase-state>${text(t, msgid('Not read'))}</td></tr>`).join('')}</tbody></table></div>
 ${lifecycleHeading(t, msgid('Upgrade log'))}
 <ol class="v2-upgrade-log" data-upgrade-log-list><li><span class="v2-upgrade-log__msg">${text(t, msgid('No upgrade log entries have been read.'))}</span></li></ol>
-${actions(button('cancel-pending', msgid('Cancel pending upgrade'), false, { icon: 'xCircle', kind: 'danger' }))}
+${actions(button('cancel-pending', msgid('Cancel pending upgrade'), false, { icon: 'xCircle', kind: 'danger' }), true)}
 ${lifecycleNote(t, msgid('The upgrade machine has no cancel step. Once handed off it finishes or rolls back on its own.'), undefined, true)}
 `, { 'data-whm-detail-section': 'upgrade-job' })
 

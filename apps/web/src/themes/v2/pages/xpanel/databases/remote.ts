@@ -21,8 +21,7 @@ ${dbFacts([
     { label: t('Applies to'), valueHtml: escapeHtml(unread), hooks: { 'data-remote-scope': true } },
     { label: t('Remote hosts'), valueHtml: `<bdi dir="ltr" data-remote-count>— / 100</bdi>` },
   ])}
-${dbTable('v2-db-remote-hosts', t('Remote database hosts'), [t('Host'), t('Comment'), t('Added (UTC)'), t('Firewall'), t('Grants'), t('Actions')], dbEmptyRow(6, t('No host policy has been read.')), { 'data-remote-rows': true })}
-<div class="v2-db-actions">${dbButton(t('Refresh'), { 'data-remote-refresh': true }, { disabled: !connected, icon: icon('refresh', 16) })}</div>`)
+${dbTable('v2-db-remote-hosts', t('Remote database hosts'), [t('Host'), t('Comment'), t('Added (UTC)'), t('Firewall'), t('Grants'), t('Actions')], dbEmptyRow(6, t('No host policy has been read.')), { 'data-remote-rows': true })}`, { actionsHtml: dbButton(t('Refresh'), { 'data-remote-refresh': true }, { disabled: !connected, icon: icon('refresh', 16), small: true }) })
   const editor = dbCard('remote-editor', t('Add or edit a host'), `<div data-remote-selected-panel class="v2-db-stack" hidden>
 ${dbFacts([{ label: t('Selected host'), valueHtml: '<bdi dir="ltr" data-remote-selected></bdi>' }])}
 ${dbField('v2-db-remote-confirmation', t('Type the selected host to confirm a change or removal'), '<input class="kt-input" id="v2-db-remote-confirmation" data-remote-confirmation dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" disabled>')}</div>

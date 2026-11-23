@@ -12,10 +12,12 @@ export function renderV2IpBlockerPage(props: PanelSurfaceProps, authority: Panel
     + fields(field('v2-ipb-input', t(msgid('Address, range or host name')), input('v2-ipb-input', '', 'text', ' class="v2-mono" dir="ltr" maxlength="255" spellcheck="false" autocomplete="off" data-ipb-input aria-describedby="v2-ipb-input-help v2-ipb-error"'),
       t(msgid('For example 192.0.2.7, 10.5.3.3-40, 192.0.2.0/24, 10. or bad.example.com. Ranges are saved as the exact CIDR blocks that cover them; a host name is saved as the addresses it resolves to now.'))))
     + '<p class="v2-field__error" id="v2-ipb-error" data-ipb-error hidden></p>'
-    + actions(button(t(msgid('Add')), { 'data-ipb-add': true }, true, true) + button(t(msgid('Read blocked addresses')), { 'data-ipb-refresh': true }))
+    + actions(button(t(msgid('Add')), { 'data-ipb-add': true }, true, true))
     + status(t(msgid('The blocked addresses have not been read.')), { 'data-ipb-status': true }))
   const list = section('v2-ipb-list', t(msgid('Currently blocked addresses')), `<p class="v2-num text-sm text-secondary-foreground" data-ipb-count>${esc(t(msgid('Not read')))}</p>`
-    + table('v2-ipb-table', t(msgid('Currently blocked addresses')), [t(msgid('Server setting')), t(msgid('First address')), t(msgid('Last address')), t(msgid('Actions'))], unreadRow(4, t(msgid('Not read.'))), { 'data-ipb-rows': true }))
+    + table('v2-ipb-table', t(msgid('Currently blocked addresses')), [t(msgid('Server setting')), t(msgid('First address')), t(msgid('Last address')), t(msgid('Actions'))], unreadRow(4, t(msgid('Not read.'))), { 'data-ipb-rows': true }),
+    // Re-reading the list is the list card's own toolbar action, as in Metronic.
+    button(t(msgid('Read blocked addresses')), { 'data-ipb-refresh': true }).replace('kt-btn-outline"', 'kt-btn-outline kt-btn-sm"'))
   const limits = section('v2-ipb-limits', t(msgid('Limits of this page')), `<ul class="list-disc marker:text-muted-foreground">${[msgid('At most 1000 blocks per account. Loopback addresses that the server uses to reach its own sites cannot be blocked.'), msgid('Behind a CDN or another proxy, the edge sees the visitor address only when the server trusts that proxy (Trusted proxies). Otherwise the proxy address is what is blocked.'), msgid('A host name is resolved once, when it is added. Later changes to its addresses are not followed.')].map(copy => `<li>${esc(t(copy))}</li>`).join('')}</ul>`)
   return page(props, authority, '/security/ip-blocker', title, description, split(add, limits) + list + v2AccountEdgeTemplates(), { 'data-ip-blocker': true, 'data-ipb-account': c.account?.id ?? '', 'data-ipb-manage': String(c.editable) })
 }

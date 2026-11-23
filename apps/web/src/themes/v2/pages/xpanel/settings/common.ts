@@ -207,7 +207,9 @@ export const PANEL_SETTINGS_CSS = `${IDENTITY_ROWS_CSS}
 .v2-panel-settings__columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));align-items:stretch;gap:var(--space-3);min-inline-size:0}.v2-panel-settings__columns>*,.v2-panel-settings__lead>*{min-inline-size:0}
 .v2-panel-settings fieldset:has(>.v2-panel-settings__role){grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--space-2) var(--space-3)}
 .v2-panel-settings__lead{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,3fr);align-items:start;gap:var(--space-3);min-inline-size:0}
-.v2-panel-settings .v2-card__body>[role=status]:not([hidden]),.v2-panel-settings form>[role=status]:not(:empty):not([hidden]){font-size:.8125rem;line-height:1.25rem;color:var(--text-2);padding:.625rem .75rem;border-radius:var(--radius-notice,var(--radius-control));background:var(--sunken)}
+.v2-panel-settings .v2-card__body>[role=status]:not([hidden]),.v2-panel-settings form>[role=status]:not(:empty):not([hidden]){font-size:.875rem;line-height:1.25rem;color:var(--text);padding:.875rem;border:1px solid var(--line);border-radius:var(--radius-notice,var(--radius-control));background:var(--sunken)}
+.v2-panel-settings :is(.v2-card__body,form)>[role=status]:is([data-state=unavailable],[data-state=uncertain],[data-state=invalid]):not(:empty){border-color:var(--warn-line);background:var(--warn-soft)}
+.v2-panel-settings :is(.v2-card__body,form)>[role=status]:is([data-state=failed],[data-state=error]):not(:empty){border-color:var(--bad-line);background:var(--bad-soft)}
 .v2-panel-settings__table td>[role=status]{color:var(--muted)}
 .v2-panel-settings__table thead th{white-space:nowrap}
 .v2-panel-settings .v2-card__body>:is(ul,ol):not(.v2-panel-settings__list,.v2-panel-settings__steps){font-size:.8125rem;line-height:1.25rem;color:var(--text-2)}

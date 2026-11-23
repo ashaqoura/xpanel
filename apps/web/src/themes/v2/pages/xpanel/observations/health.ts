@@ -6,6 +6,11 @@ import { tableCard } from './common.ts'
 import { panelCount } from '../home.ts'
 import { formatAsciiBytes } from '../../../../../display-format.ts'
 
+/** One checked area: its Keenicon tile and the explanation, like the Home KPI tiles. Icon names are full literals. */
+const SCOPE_ICONS = { 'ki-route': 'ki-filled ki-route', 'ki-screen': 'ki-filled ki-screen', 'ki-shield-tick': 'ki-filled ki-shield-tick', 'ki-code': 'ki-filled ki-code' } as const
+const scopeItem = (name: keyof typeof SCOPE_ICONS, text: string): string =>
+  `<li><span class="v2-tile v2-tile--info" aria-hidden="true"><i class="${SCOPE_ICONS[name]} text-lg"></i></span><span>${esc(text)}</span></li>`
+
 export function renderV2PanelSiteHealth(props: PanelSurfaceProps, authority?: PanelEmailAuthority): string {
   const { locale, t, account } = emailContext(props, authority)
   const route = '/health', title = t(msgid('Site health'))
@@ -13,10 +18,10 @@ export function renderV2PanelSiteHealth(props: PanelSurfaceProps, authority?: Pa
   const summary = section('v2-site-health-summary', t(msgid('Health checks')),
     `<p>${esc(t(msgid('Checks every site you own and explains each problem with a link to the page that fixes it. Nothing is changed by a check.')))}</p>`
     + facts([{ label: t(msgid('Checked at (UTC)')), valueHtml: `<bdi dir="ltr" data-health-at>${notChecked}</bdi>` }, { label: t(msgid('Domains checked')), valueHtml: `<bdi dir="ltr" data-health-count>${notChecked}</bdi>` }, { label: t(msgid('Problems found')), valueHtml: `<bdi dir="ltr" data-health-problems>${notChecked}</bdi>` }])
-    + state(t(msgid('Checks have not run.')), { 'data-health-status': true }), undefined, button(t(msgid('Run checks')), { 'data-health-run': true }, false, true))
+    + state(t(msgid('Checks have not run.')), { 'data-health-status': true }), undefined, button(t(msgid('Run checks')), { 'data-health-run': true }, false, true, { icon: '<i class="ki-filled ki-shield-search" aria-hidden="true"></i>' }))
   const findings = tableCard('v2-site-health', t(msgid('Findings')), [t(msgid('Domain')), t(msgid('Check')), t(msgid('Result')), t(msgid('Details')), t(msgctxt('site-health-workspace', 'Fix'))], `<tr><td colspan="5">${esc(t(msgid('Checks have not run.')))}</td></tr>`, { bodyHooks: { 'data-health-rows': true } })
   const scope = section('v2-site-health-scope', t(msgid('What is checked')),
-    `<ul class="v2-panel-extra__scope"><li>${esc(t(msgid("DNS: the A and AAAA records the server's resolver sees, compared with the addresses saved for the site.")))}</li><li>${esc(t(msgid('Website: the home page through the local web server, not from the internet. Only the status code is read.')))}</li><li>${esc(t(msgid('Certificate: the expiry of the saved certificate that covers the name. The certificate the server presents is not fetched.')))}</li><li>${esc(t(msgid('PHP: the saved PHP version against the versions this server supports. At most 20 domains are checked at a time.')))}</li></ul>`)
+    `<ul class="v2-panel-extra__scope">${scopeItem('ki-route', t(msgid("DNS: the A and AAAA records the server's resolver sees, compared with the addresses saved for the site.")))}${scopeItem('ki-screen', t(msgid('Website: the home page through the local web server, not from the internet. Only the status code is read.')))}${scopeItem('ki-shield-tick', t(msgid('Certificate: the expiry of the saved certificate that covers the name. The certificate the server presents is not fetched.')))}${scopeItem('ki-code', t(msgid('PHP: the saved PHP version against the versions this server supports. At most 20 domains are checked at a time.')))}</ul>`)
   return page(locale, route, header(t, route, title, t(msgctxt('theme:v2', 'Read bounded checks for your sites without changing DNS, services or saved configuration.')))
     + `<div class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''} data-site-health data-account="${esc((account?.id ?? ''))}" data-health-manage="${!!account && authority?.canRead === true && authority.presentation !== 'read-only'}">${summary}${findings}${scope}${siteHealthClientTemplates()}</div>`)
 }

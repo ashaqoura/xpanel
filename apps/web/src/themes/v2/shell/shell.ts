@@ -222,11 +222,11 @@ function accountMenu(t: Translate, props: V2ShellProps): string {
   const avatar = `<span class="${AVATAR}" data-initial="${escapeHtml(initial)}" aria-hidden="true"></span>`
   const who = `<span${account.username ? ' dir="ltr"' : ''}>${escapeHtml(name)}</span>${account.roleLabel ? ` <span>${escapeHtml(account.roleLabel)}</span>` : ''}`
   const links = [
-    ...(account.securityHref ? [`<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(account.securityHref)}" data-security-link="true">${escapeHtml(t('Security'))}</a>`] : []),
-    ...(account.links ?? []).map(link => `<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(link.href)}"${hookAttrs(link.hooks)}>${escapeHtml(link.label)}</a>`),
+    ...(account.securityHref ? [`<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(account.securityHref)}" data-security-link="true">${icon('shield', 16)}${escapeHtml(t('Security'))}</a>`] : []),
+    ...(account.links ?? []).map(link => `<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(link.href)}"${hookAttrs(link.hooks)}>${icon('gear', 16)}${escapeHtml(link.label)}</a>`),
   ].join('')
   const session = account.signedIn
-    ? `<button type="button" class="v2-menu__item v2-menu__item--danger kt-btn kt-btn-outline justify-center w-full" data-action="logout">${escapeHtml(t('Sign out'))}</button>`
+    ? `<div class="v2-account__signout px-2.5 pt-1.5 pb-1"><button type="button" class="v2-menu__item v2-menu__item--danger kt-btn kt-btn-outline justify-center w-full" data-action="logout">${escapeHtml(t('Sign out'))}</button></div>`
     : account.signInHref ? `<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(account.signInHref)}">${escapeHtml(t('Sign in'))}</a>` : ''
   const timezoneOptions = [['UTC', t('Server time (UTC)')], ['local', t('Browser local time')], ['Africa/Cairo', 'Africa/Cairo'], ['Asia/Amman', 'Asia/Amman'], ['Asia/Gaza', 'Asia/Gaza'], ['Asia/Riyadh', 'Asia/Riyadh'], ['Asia/Dubai', 'Asia/Dubai'], ['Europe/London', 'Europe/London'], ['Europe/Berlin', 'Europe/Berlin'], ['America/New_York', 'America/New_York'], ['America/Chicago', 'America/Chicago'], ['America/Los_Angeles', 'America/Los_Angeles'], ['Asia/Tokyo', 'Asia/Tokyo'], ['Australia/Sydney', 'Australia/Sydney']] as const
   const timezoneChoice = !account.signedIn ? '' : `<div class="v2-tz flex flex-col gap-1.5 px-2.5 py-1.5"><label class="kt-form-label" for="v2-user-tz">${escapeHtml(t('Time zone'))}</label><select class="kt-select kt-select-sm" id="v2-user-tz" data-user-timezone-select>${timezoneOptions.map(([value, label]) => `<option value="${value}">${escapeHtml(label)}</option>`).join('')}</select></div>`

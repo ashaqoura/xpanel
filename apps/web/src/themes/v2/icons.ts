@@ -51,6 +51,8 @@ const GLYPHS = {
   store: 'ki-shop',
   sun: 'ki-sun',
   tools: 'ki-wrench',
+  trash: 'ki-trash',
+  upload: 'ki-exit-up',
   user: 'ki-user',
   users: 'ki-users',
   x: 'ki-cross',

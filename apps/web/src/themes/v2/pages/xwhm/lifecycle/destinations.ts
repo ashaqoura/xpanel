@@ -9,7 +9,7 @@ export type V2BackupDestinationsPageProps = LifecycleAccess
 export function renderV2BackupDestinationsPage(props: V2BackupDestinationsPageProps): string {
   const t = v2Messages.translator(props.locale)
   const manage = props.canRead && props.canManage
-  const actions = (body: string): string => `<div class="v2-lifecycle__actions">${body}</div>`
+  const actions = (body: string): string => `<div class="v2-lifecycle__actions justify-end">${body}</div>`
   const runsTable = (key: string, title: string, labels: readonly string[], empty: string, value: number): string => `${lifecycleTable(t, title, labels, { 'data-backup-runs-rows': key }, msgid('Not read'), { value })}<p class="text-sm text-secondary-foreground" data-backup-runs-empty="${key}" hidden>${text(t, empty)}</p>`
   const runsButton = (key: string, label: string, primary = false, look?: LifecycleButtonLook): string => lifecycleButton(t, label, { [`data-backup-${key}`]: true }, primary, look)
   // The run controller refuses to read without its four row templates inside this section.

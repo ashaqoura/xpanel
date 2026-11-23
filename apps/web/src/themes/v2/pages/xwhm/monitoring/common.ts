@@ -103,7 +103,7 @@ ${s} :where(p[role=status]:not([data-state=failed],[data-state=error])){font-siz
 ${s} p[role=status]:empty{display:none}
 ${s} :where(p:is([role=status],[role=alert]):is([data-state=problem],[data-state=bad],[data-state=invalid])){color:var(--bad)}
 ${s} :where(p[role=status]:is([data-state=ok],[data-state=saved],[data-state=success],[data-state=verified])){color:var(--ok)}
-${s} :where(.v2-card__body,.v2-card,.v2-observation__groups,.v2-host__groups,.v2-admin-form,.v2-lifecycle__column,.v2-services__panel)>:where(.v2-field,.v2-admin-field,.v2-host__field,.v2-lifecycle__field):not(:has(textarea)){max-inline-size:30rem}
+${s} :where(.v2-card__body,.v2-card,.v2-observation__groups,.v2-host__groups,.v2-admin-form,.v2-lifecycle__column,.v2-services__panel)>:where(.v2-field,.v2-admin-field,.v2-host__field,.v2-lifecycle__field):not(:has(textarea),.v2-field--row,.v2-admin-field){max-inline-size:30rem}
 ${s} :where(dt){font-size:.75rem;font-weight:400;color:var(--text-2)}
 ${s} :where(dd){font-variant-numeric:tabular-nums}
 ${s} :where(.v2-card__body :is(h3,legend)){font-size:.875rem;font-weight:600;color:var(--mono,var(--text))}
@@ -148,6 +148,7 @@ export const WHM_OBSERVATION_CSS = `${IDENTITY_ROWS_CSS}
 .v2-observation__scroll{max-inline-size:100%;overflow:auto;min-inline-size:0}
 .v2-observation :is(th,td){text-align:start;vertical-align:top;padding:.75rem 1rem;overflow-wrap:anywhere}
 .v2-observation td{font-variant-numeric:tabular-nums}
+.v2-observation tbody td[colspan]:only-child{padding-block:1.25rem;text-align:center;color:var(--muted)}
 .v2-observation__scroll tbody td:first-child:not([colspan]){font-weight:500;color:var(--mono,var(--text))}
 .v2-observation tr:has(button)>:is(th,td){vertical-align:middle}
 @media(min-width:601px){.v2-observation__scroll{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface)}.v2-observation__scroll table:not(.kt-table) thead th{background:var(--subtle)}.v2-observation__scroll tbody tr:last-child>:is(th,td){border-block-end:0}.v2-observation [data-whm-ssh-key-rows] td:nth-child(2){white-space:nowrap}.v2-observation [data-whm-ssh-key-rows] td:nth-child(3){overflow-wrap:break-word}}

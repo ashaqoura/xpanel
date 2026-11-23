@@ -29,7 +29,7 @@ export function renderV2TransferPage(props: V2TransferPageProps): string {
 ${status(msgid('No authenticated source inventory has been read.'), 'source-observation')}
 ${fields(select('transfer-session', msgid('Saved session'), 'session'))}
 <dl class="v2-lifecycle__fields v2-lifecycle__stats">${fact(msgid('Source'), 'source')}${fact(msgid('State'), 'state')}</dl>
-${actions(button('discover', msgid('Connect and discover'), false, { icon: 'search' }) + button('cancel', msgid('Cancel pending session'), false, { icon: 'x', kind: 'danger' }))}
+${actions(button('discover', msgid('Connect and discover'), false, { icon: 'search' }) + button('cancel', msgid('Cancel pending session'), false, { icon: 'x', kind: 'danger' }), true)}
 ${lifecycleHeading(t, msgid('Create a source review'))}
 ${fields(input('transfer-host', msgid('Source host or HTTPS API URL'), 'text', ' maxlength="1024"')
     + select('transfer-credential', msgid('Stored credential'), 'credential', (props.canRead ? props.credentials ?? [] : []).map(credential => `<option value="${escapeHtml(credential.id)}" data-kind="${credential.kind}">${escapeHtml(credential.label)}</option>`).join(''))
@@ -78,7 +78,7 @@ ${lifecycleHeading(t, msgid('Revert a cutover'))}
 ${fields(select('transfer-revert-account', msgid('Moved account'), 'revert-account'))}
 ${lifecycleNote(t, msgid('Revert first reads what changed here since the cutover and asks you to confirm that list. None of it is carried back to the source.'))}
 <div data-transfer-revert-loss></div>
-${actions(button('revert', msgid('Revert cutover'), false, { icon: 'undo', kind: 'danger' }))}
+${actions(button('revert', msgid('Revert cutover'), false, { icon: 'undo', kind: 'danger' }), true)}
 `)
 
   const importDetails = (key: string, title: string): string => `<details data-transfer-import-part="${key}"><summary>${text(t, title)}<i class="ki-filled ki-down text-sm text-muted-foreground" aria-hidden="true"></i></summary>${lifecycleTable(t, title, [msgid('Source'), msgid('Proposed'), msgid('Detail'), msgid('State')], { [`data-transfer-import-${key}`]: true }, msgid('No parsed archive review was returned.'), { value: 4 })}</details>`
@@ -88,14 +88,14 @@ ${fields(input('transfer-archive', msgid('Backup file'), 'file', ' accept=".tar.
     + input('transfer-archive-target', msgid('Destination username (optional)'), 'text', ' maxlength="16"'))}
 <div class="v2-dropzone" data-file-dropzone role="button" tabindex="0" aria-label="${text(t, msgid('Drop a cPanel backup archive (.tar.gz or .tgz) here'))}"><i class="ki-filled ki-folder-up text-2xl text-muted-foreground" aria-hidden="true"></i><span class="v2-dropzone__title">${text(t, msgid('Drop a cPanel backup archive (.tar.gz or .tgz) here'))}</span><span class="v2-dropzone__hint">${text(t, msgid('Or click to choose a local archive for inspection before import.'))}</span></div>
 ${status(msgid('The import limit has not been read.'), 'archive-limit')}
-${actions(button('inspect', msgid('Upload and read'), false, { icon: 'upload' }))}
+${actions(button('inspect', msgid('Upload and read'), false, { icon: 'upload' }), true)}
 ${lifecycleHeading(t, msgid('Or fetch it from the cPanel server over SSH'))}
 ${fields(input('transfer-cpanel-host', 'cPanel host', 'text', ' maxlength="253"')
     + input('transfer-cpanel-port', msgid('SSH port'), 'number', ' min="1" max="65535" value="22"')
     + input('transfer-cpanel-user', 'cPanel username', 'text', ' maxlength="16"')
     + input('transfer-cpanel-fingerprint', msgid('Pinned host key'), 'text', ' maxlength="128"'))}
 <p class="v2-muted text-xs text-muted-foreground">${text(t, msgid('The cPanel server runs pkgacct as root with this server\'s transfer key; add its public key there first.'))} <bdi class="v2-mono" dir="ltr" data-transfer-ssh-key-value></bdi></p>
-${actions(button('ssh-key', msgid('Show transfer key'), false, { icon: 'key' }) + button('fetch', msgid('Fetch over SSH'), false, { icon: 'download' }))}
+${actions(button('ssh-key', msgid('Show transfer key'), false, { icon: 'key' }) + button('fetch', msgid('Fetch over SSH'), false, { icon: 'download' }), true)}
 ${fields(select('transfer-import', msgid('Archive'), 'import') + select('transfer-import-plan', msgid('Plan here'), 'import-plan'))}
 <div data-transfer-archive-review${phoneColumns([msgid('Not imported or changed'), msgid('Detail'), msgid('Path')].map(label => t(label)))}></div>
 ${importDetails('domains', msgid('Domains'))}${importDetails('home', msgid('Home files'))}${importDetails('databases', msgid('Databases and users'))}${importDetails('mail', msgid('Mailboxes'))}${importDetails('dns', msgid('DNS zones'))}

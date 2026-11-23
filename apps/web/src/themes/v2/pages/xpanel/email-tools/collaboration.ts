@@ -10,10 +10,10 @@ export function renderV2PanelCalendarsContacts(props: PanelSurfaceProps, authori
   const route = '/email/calendars-contacts', title = t(msgid('Calendars and contacts'))
   const empty = t(msgid('Saved mailbox collections have not been read.'))
   const owned = section('v2-collaboration-collections', t(msgid('Mailbox collections')),
-    actions(button(t(msgid('Read saved collections')), { 'data-collaboration-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
-    + state(empty, { 'data-collaboration-status': true })
+    state(empty, { 'data-collaboration-status': true })
     + table('v2-collaboration-records', t(msgid('Saved mailbox collections')), [t(msgid('Mailbox')), t(msgid('Name')), t(msgid('Type')), t(msgid('Saved items')), t(msgid('Settings'))], unread(t, 5), { 'data-collaboration-collections': true })
-    + `<p>${esc(t(msgid('This account overview includes only current owned mailbox metadata. Event bodies and contact details are managed in an independently authenticated xMail session.')))}</p>`)
+    + `<p>${esc(t(msgid('This account overview includes only current owned mailbox metadata. Event bodies and contact details are managed in an independently authenticated xMail session.')))}</p>`,
+    undefined, button(t(msgid('Read saved collections')), { 'data-collaboration-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
   const creation = section('v2-collaboration-create', t(msgid('Create a calendar')),
     fields(field('collaboration-mailbox', t(msgid('Owner mailbox')), select('collaboration-mailbox', [['', t(msgid('Read mailboxes first'))]], { 'data-collaboration-mailbox': true }, true, ' dir="ltr"'))
       + field('collaboration-type', t(msgid('Collection type')), select('collaboration-type', [['calendar', t(msgctxt('account-collaboration-workspace', 'Calendar'))]]))

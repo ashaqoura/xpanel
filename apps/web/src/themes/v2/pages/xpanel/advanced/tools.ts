@@ -24,8 +24,10 @@ export function renderV2AccountApiExplorerPage(props: PanelSurfaceProps, authori
   const c = settingsContext(props, authority), { t } = c, title = t(msgid('API explorer')), description = t(msgid('Run API functions and supported reads with your current account session.'))
   const fact = (key: string, label: string) => ({ label, valueHtml: `<span data-dev-fact="${key}">${esc(t(msgid('Not read')))}</span>` })
   const request = section('v2-api-request', t(msgid('API request explorer')), note(t(msgid('Read live data using your current signed-in session. Choose a supported operation; its method and route are fixed. No server setting is changed.')))
-    + `<form data-dev-form>${field('v2-api-operation', t(msgid('Operation')), select('v2-api-operation', '', [['', t(msgid('Read supported operations first'))]], ' data-dev-operation'))}${facts([fact('method', t(msgid('Method'))), fact('path', t(msgid('API route')))])}${actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-dev-run disabled>${esc(t(msgid('Run read request')))}</button>` + button(t(msgid('Read supported operations')), { 'data-dev-refresh': true }, !c.readable))}</form>`
-    + status(t(msgid('Supported operations have not been read.')), { 'data-dev-status': true }))
+    + `<form data-dev-form>${field('v2-api-operation', t(msgid('Operation')), select('v2-api-operation', '', [['', t(msgid('Read supported operations first'))]], ' data-dev-operation'))}${facts([fact('method', t(msgid('Method'))), fact('path', t(msgid('API route')))])}${actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-dev-run disabled>${esc(t(msgid('Run read request')))}</button>`)}</form>`
+    + status(t(msgid('Supported operations have not been read.')), { 'data-dev-status': true }),
+    // Re-reading the operation list is the card's toolbar action, as in Metronic.
+    button(t(msgid('Read supported operations')), { 'data-dev-refresh': true }, !c.readable).replace('kt-btn-outline"', 'kt-btn-outline kt-btn-sm"'))
   const response = section('v2-api-response', t(msgid('Response')), note(t(msgid('Only reviewed response fields are shown. Credential values, session information and internal identifiers are omitted.')))
     + facts([fact('status', t(msgid('HTTP status'))), fact('observed', t(msgid('Read at (UTC)')))])
     + `<dl class="v2-panel-settings__facts" data-dev-result-fields><div><dt>${esc(t(msgid('Result')))}</dt><dd>${esc(t(msgid('No read request has run.')))}</dd></div></dl>`
