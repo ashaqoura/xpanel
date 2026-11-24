@@ -8,8 +8,12 @@ import { METRONIC_ICONS_STYLESHEET_HREF, METRONIC_STYLESHEET_HREF } from '../../
 import { v2Stylesheet } from './assets.ts'
 import { v2SharedStylesheets, v2StylesheetsForDocument } from './route-assets.ts'
 import { escapeHtml } from './html.ts'
+import { v2SidebarStateScriptTag } from './shell/sidebar-state.ts'
 
 export type V2DocumentProps = DocumentProps
+
+/** Documents that render the workspace shell restore its saved sidebar state before the first paint. */
+const hasShell = (props: V2DocumentProps): boolean => props.viewKind !== 'login' && props.viewKind !== 'status'
 
 /** Core owns document identity, admission and status attributes; preserve their escaped order exactly. */
 export const renderV2Document = (props: V2DocumentProps): string => `<!doctype html>
@@ -18,7 +22,8 @@ export const renderV2Document = (props: V2DocumentProps): string => `<!doctype h
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(props.title)}</title>
-<link rel="icon"${props.faviconContentType ? ` type="${escapeHtml(props.faviconContentType)}"` : ''} href="${escapeHtml(props.faviconHref)}">
+${hasShell(props) ? `${v2SidebarStateScriptTag()}
+` : ''}<link rel="icon"${props.faviconContentType ? ` type="${escapeHtml(props.faviconContentType)}"` : ''} href="${escapeHtml(props.faviconHref)}">
 <link rel="stylesheet" href="${escapeHtml(PLEX_FONTS_STYLESHEET_HREF)}">
 <link rel="stylesheet" href="${escapeHtml(METRONIC_ICONS_STYLESHEET_HREF)}">
 <link rel="stylesheet" href="${escapeHtml(METRONIC_STYLESHEET_HREF)}">

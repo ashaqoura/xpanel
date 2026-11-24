@@ -170,7 +170,7 @@ function bindMailDiskUsage(): void {
       const purgeField = panel.querySelector<HTMLElement>('[data-mail-usage-purge-field]')!
       purgeField.hidden = !value.isTrash || !value.batch.count; purgeConfirm.checked = false
       panel.querySelector<HTMLElement>('[data-mail-usage-purge-text]')!.textContent = t('Delete these {count} messages permanently', { count: value.batch.count })
-      apply.textContent = value.isTrash ? t('Delete permanently') : t('Move to Trash')
+      ;(apply.querySelector('[data-xp-slot="label"]') ?? apply).textContent = value.isTrash ? t('Delete permanently') : t('Move to Trash')
       panel.hidden = false; sync(); panel.focus()
     }
     const failure = (error: unknown, fallback: string): string => {

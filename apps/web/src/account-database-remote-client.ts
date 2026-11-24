@@ -76,7 +76,7 @@ function bindAccountDatabaseRemote(_ask: unknown): void {
       for (const button of rows.querySelectorAll<HTMLButtonElement>('button')) button.disabled = !canWrite()
       root.setAttribute('aria-busy', String(busy))
     }
-    const resetSelection = (): void => { selected = null; selectedPanel.hidden = true; confirmation.value = ''; host.value = ''; comment.value = ''; save.textContent = t('Add host'); lock() }
+    const resetSelection = (): void => { selected = null; selectedPanel.hidden = true; confirmation.value = ''; host.value = ''; comment.value = ''; (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Add host'); lock() }
     const paint = (): void => {
       if (!view) return
       rows.replaceChildren()
@@ -86,7 +86,7 @@ function bindAccountDatabaseRemote(_ask: unknown): void {
         const row = cloneClientTemplate(rowTemplate, 'tr', rowSlots)
         for (const [slot, text] of [['host', item.host], ['comment', item.comment || '—'], ['created', formatDisplayDateTime(item.createdAt)], ['firewall', item.firewall === 'verified' ? t('TCP/3306 verified') : t(msgctxt('account-database-remote-client', 'Not verified'))], ['grants', item.grants === 'verified' ? t(msgctxt('account-database-remote-client', 'Verified')) : t(msgctxt('account-database-remote-client', 'Not verified'))]] as const) clientTemplateSlot(row, slot).textContent = text
         const button = clientTemplateSlot(row, 'manage', 'button') as HTMLButtonElement; button.setAttribute('aria-label', t('Manage {host}', { host: item.host }))
-        button.addEventListener('click', () => { if (!canWrite()) return; selected = item.host; host.value = item.host; comment.value = item.comment; confirmation.value = ''; find('selected').textContent = item.host; selectedPanel.hidden = false; save.textContent = t('Save host'); confirmation.focus(); lock() }); rows.append(row)
+        button.addEventListener('click', () => { if (!canWrite()) return; selected = item.host; host.value = item.host; comment.value = item.comment; confirmation.value = ''; find('selected').textContent = item.host; selectedPanel.hidden = false; (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Save host'); confirmation.focus(); lock() }); rows.append(row)
       }
       if (!view.entries.length) { const row = cloneClientTemplate(emptyTemplate, 'tr', ['message']); clientTemplateSlot(row, 'message', 'td').textContent = t('No remote hosts are saved. Localhost remains available to your database users.'); rows.append(row) }
       lock()

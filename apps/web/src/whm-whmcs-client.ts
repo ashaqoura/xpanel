@@ -136,8 +136,8 @@ function bindWhmWhmcs(askDialog: ((options: Record<string, unknown>) => Promise<
       verifyWhmTemplates()
       if (planRows.querySelector('[data-whm-whmcs-plan-empty]')) planRows.replaceChildren()
       const row = document.createElement('tr'), index = planRows.children.length + 1
-      const name = document.createElement('input'); name.type = 'text'; name.dir = 'auto'; name.maxLength = 64; name.value = mapping.package; name.dataset.whmWhmcsPlanPackage = ''; name.setAttribute('aria-label', t('WHMCS package, row {index}', { index }))
-      const plan = document.createElement('select'); plan.dataset.whmWhmcsPlanId = ''; plan.setAttribute('aria-label', t('xPanel plan, row {index}', { index })); planOptions(plan, mapping.planId)
+      const name = document.createElement('input'); name.type = 'text'; name.dir = 'auto'; name.maxLength = 64; name.value = mapping.package; name.dataset.whmWhmcsPlanPackage = ''; if (document.documentElement.dataset.uiTheme === 'v2') name.className = 'kt-input'; name.setAttribute('aria-label', t('WHMCS package, row {index}', { index }))
+      const plan = document.createElement('select'); if (document.documentElement.dataset.uiTheme === 'v2') plan.className = 'kt-select'; plan.dataset.whmWhmcsPlanId = ''; plan.setAttribute('aria-label', t('xPanel plan, row {index}', { index })); planOptions(plan, mapping.planId)
       const count = document.createElement('td'); count.dataset.whmWhmcsPlanAccounts = ''
       const showCount = (): void => { const found = view?.plans.find(item => item.id === plan.value); count.textContent = found ? String(found.accounts) : '—' }
       plan.addEventListener('change', showCount); showCount()

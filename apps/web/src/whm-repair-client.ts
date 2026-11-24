@@ -193,7 +193,7 @@ function bindWhmRepair(askDialog: ((options: Record<string, unknown>) => Promise
           if (removals) removals.hidden = value.remove.length === 0
           if (removalText) removalText.textContent = t('This repair removes packages ({count}). Removed packages stop working until they are reinstalled.', { count: String(value.remove.length) })
           const evidence = find('preview-evidence'); if (evidence) evidence.textContent = value.evidence
-          start.textContent = value.remove.length ? t('Run repair and remove packages') : t('Run repair')
+          ;(start.querySelector('[data-xp-slot="label"]') ?? start).textContent = value.remove.length ? t('Run repair and remove packages') : t('Run repair')
           start.dataset.severity = value.remove.length ? 'danger' : 'normal'
           previewPanel.hidden = false
           note(value.state === 'ready' ? 'previewed' : 'failed', value.state === 'ready' ? t('Preview ready. Review it before running the repair.') : reasonText(value.reason))

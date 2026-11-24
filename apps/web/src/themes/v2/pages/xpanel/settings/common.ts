@@ -49,7 +49,7 @@ export const pair = (...columns: string[]): string => `<div class="v2-panel-sett
 export const split = (main: string, aside: string): string => `<div class="v2-panel-settings__split"><div class="v2-panel-settings__groups">${main}</div><aside class="v2-panel-settings__groups">${aside}</aside></div>`
 
 /** Leading Keenicons of the usual actions, read from the controller hooks of a button; Metronic shows one on add,
- * refresh, download, upload, copy, search and delete buttons. An action this table does not name stays text only. */
+ * refresh, download, upload, copy, search, delete, save, run and restore buttons. An action this table does not name stays text only. */
 const ACTION_GLYPHS: readonly (readonly [RegExp, string])[] = [
   [/(^|-)(refresh|reload)(-|$)/, '<i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>'],
   [/(^|-)(delete|remove|revoke|purge)(-|$)/, '<i class="ki-filled ki-trash" aria-hidden="true"></i>'],
@@ -58,6 +58,11 @@ const ACTION_GLYPHS: readonly (readonly [RegExp, string])[] = [
   [/(^|-)(upload|import)(-|$)/, '<i class="ki-filled ki-exit-up" aria-hidden="true"></i>'],
   [/(^|-)copy(-|$)/, '<i class="ki-filled ki-copy" aria-hidden="true"></i>'],
   [/(^|-)search(-|$)/, '<i class="ki-filled ki-magnifier" aria-hidden="true"></i>'],
+  [/(^|-)(save|apply|grant|install)(-|$)/, '<i class="ki-filled ki-check" aria-hidden="true"></i>'],
+  [/(^|-)(run|start|deploy)(-|$)/, '<i class="ki-filled ki-rocket" aria-hidden="true"></i>'],
+  [/(^|-)restore(-|$)/, '<i class="ki-filled ki-arrows-loop" aria-hidden="true"></i>'],
+  [/(^|-)read(-|$)/, '<i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>'],
+  [/(^|-)init(-|$)/, '<i class="ki-filled ki-plus" aria-hidden="true"></i>'],
 ]
 const DANGER_ACTION = /(^|-)(delete|remove|revoke|purge)(-|$)/
 const hookWords = (hooks?: HookAttributes): string => !hooks ? ''
@@ -209,7 +214,7 @@ export const PANEL_SETTINGS_CSS = `${IDENTITY_ROWS_CSS}
 .v2-panel-settings__lead{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,3fr);align-items:start;gap:var(--space-3);min-inline-size:0}
 .v2-panel-settings .v2-card__body>[role=status]:not([hidden]),.v2-panel-settings form>[role=status]:not(:empty):not([hidden]){font-size:.875rem;line-height:1.25rem;color:var(--text);padding:.875rem;border:1px solid var(--line);border-radius:var(--radius-notice,var(--radius-control));background:var(--sunken)}
 .v2-panel-settings :is(.v2-card__body,form)>[role=status]:is([data-state=unavailable],[data-state=uncertain],[data-state=invalid]):not(:empty){border-color:var(--warn-line);background:var(--warn-soft)}
-.v2-panel-settings :is(.v2-card__body,form)>[role=status]:is([data-state=failed],[data-state=error]):not(:empty){border-color:var(--bad-line);background:var(--bad-soft)}
+.v2-panel-settings :is(.v2-card__body,form) p:is([data-state=failed],[data-state=error],[role=alert]):not(:empty,.kt-alert,.v2-field>*){padding:.875rem;border:1px solid var(--bad-line);border-radius:var(--radius-notice,var(--radius-control));background:var(--bad-soft);color:var(--text);font-size:.875rem;line-height:1.25rem}
 .v2-panel-settings__table td>[role=status]{color:var(--muted)}
 .v2-panel-settings__table thead th{white-space:nowrap}
 .v2-panel-settings .v2-card__body>:is(ul,ol):not(.v2-panel-settings__list,.v2-panel-settings__steps){font-size:.8125rem;line-height:1.25rem;color:var(--text-2)}

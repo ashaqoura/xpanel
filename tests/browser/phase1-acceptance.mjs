@@ -336,14 +336,15 @@ export async function runPhase1Acceptance({ output } = {}) {
           assert.equal(metrics.navigation_mode, 'v2-shell', 'Each route must expose the unified v2 shell navigation primitive')
           await expect(page.locator('html')).toHaveAttribute('data-realtime-enabled', 'false')
           assert.ok(await page.locator('[data-ws-indicator="unavailable"]').count(), 'Synthetic transport must say unavailable')
+          // The Metronic demo3 header is 58px tall (the previous shell topbar was 64px); usability = within the viewport and not collapsed.
           if (state.width < 960) {
-            assert.ok(metrics.header && metrics.header.width <= state.width + 1 && metrics.header.height >= 64, 'Mobile/tablet header must remain usable within the viewport')
+            assert.ok(metrics.header && metrics.header.width <= state.width + 1 && metrics.header.height >= 56, 'Mobile/tablet header must remain usable within the viewport')
             assert.equal(metrics.sidebar_visibility, 'hidden', 'Mobile/tablet navigation must begin offcanvas')
             await expect(page.locator('[data-action="toggle-mobile-nav"]')).toBeVisible()
           } else {
-            assert.ok(metrics.header && metrics.header.width <= state.width + 1 && metrics.header.height >= 64, 'Desktop header must remain usable within the viewport')
+            assert.ok(metrics.header && metrics.header.width <= state.width + 1 && metrics.header.height >= 56, 'Desktop header must remain usable within the viewport')
             assert.ok(metrics.sidebar && metrics.sidebar.width <= state.width + 1, 'Desktop navigation must fit the viewport')
-            assert.ok(Math.abs(metrics.sidebar.width - 264) <= 1, 'Desktop rail must be 264px in the v2 shell')
+            assert.ok(Math.abs(metrics.sidebar.width - 280) <= 1, 'Desktop menu must be 280px in the v2 (Metronic demo3) shell')
           }
         }
         breadcrumb('interactions')

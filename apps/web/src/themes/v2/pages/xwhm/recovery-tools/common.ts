@@ -54,7 +54,6 @@ export const WHM_RECOVERY_TOOLS_CSS = WHM_ACCOUNT_TOOLS_CSS + `
 .v2-recovery__rules>li>i{flex:none;line-height:1.375rem}
 .v2-recovery-tools>p[role=status]:not([data-state=failed],[data-state=error]),.v2-recovery-tools>[data-acct-convert-empty]{padding:.875rem 1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--subtle);color:var(--text-2);font-size:.875rem;line-height:1.375rem}
 .v2-recovery-tools>[data-acct-convert-empty]{display:flex;flex-direction:column;gap:.375rem;border-style:dashed;border-color:var(--line-strong);background:transparent;text-align:center;align-items:center;padding:1.875rem 1.25rem}
-.v2-recovery-tools .v2-card__body>.v2-account-tool__field{max-inline-size:30rem}
 .v2-recovery-tools :is(.v2-account-tool__facts,.v2-account-tool__fields){grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
 .v2-recovery-tools .v2-account-tool__facts dd{font-variant-numeric:tabular-nums}
 .v2-recovery-tools .v2-account-tool__scroll{border:1px solid var(--line);border-radius:var(--radius-card)}

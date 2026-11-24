@@ -33,6 +33,8 @@ export const ki = (glyph: string, size = ''): string => `<i class="ki-filled ${g
 const ACTION_GLYPHS: readonly (readonly [RegExp, string])[] = [
   [/^(?:Read|Refresh|Reload|Check again|Re-run|Update)\b/, 'ki-arrows-circle'], [/^Download\b/, 'ki-exit-down'], [/^Upload\b/, 'ki-exit-up'],
   [/^(?:Add|Create|Install)\b/, 'ki-plus'], [/^(?:Delete|Remove|Revoke|Unban)\b/, 'ki-trash'], [/^Copy\b/, 'ki-copy'], [/^Send\b/, 'ki-paper-plane'], [/^(?:Save|Apply)\b/, 'ki-check'],
+  [/^(?:Run|Start)\b/, 'ki-to-right v2-flip'], [/^(?:Move|Switch|Migrate)\b/, 'ki-arrow-right-left'], [/^Trace\b/, 'ki-route'], [/^(?:Restore|Pull)\b/, 'ki-cloud-download'],
+  [/^(?:Repair|Fix)\b/, 'ki-wrench'], [/^Turn on\b/, 'ki-toggle-on'], [/^Change\b.*\bpassword\b/, 'ki-key'], [/^Issue\b/, 'ki-key'],
 ]
 export const actionGlyph = (text: string): string => ACTION_GLYPHS.find(([pattern]) => pattern.test(text))?.[1] ?? ''
 /** A slot button is filled by core, so it carries no icon of its own. */

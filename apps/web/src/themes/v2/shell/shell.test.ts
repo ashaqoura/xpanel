@@ -88,6 +88,15 @@ describe('v2 shell', () => {
     expect(SHELL_CSS).toMatch(/\.v2-search\{[^}]*min-width:0/)
   })
 
+  it('collapses the desktop rail from the root attribute the head script restores before the first paint', () => {
+    // The saved collapsed state applies from the root attribute the head script sets before the first paint.
+    expect(SHELL_CSS).toContain('[data-ui-theme="v2"][data-sidebar-collapsed="true"] .v2-shell{--v2-col:var(--v2-gutter)}')
+    expect(SHELL_CSS).toContain('[data-ui-theme="v2"][data-sidebar-collapsed="true"] .v2-shell>.v2-side>.v2-side__body{')
+    expect(SHELL_CSS).toContain('[data-ui-theme="v2"]:not([data-sidebar-collapsed="true"]) .v2-navbar{display:none}')
+    // Restoring never animates: the slide is reserved for a press of the toggle.
+    expect(SHELL_CSS).not.toMatch(/\[data-sidebar-collapsed="true"\][^{]*\{[^}]*transition:/)
+  })
+
   it('keeps the element shapes the runtime relies on', () => {
     const html = shell()
     expect(html).toMatch(/<aside class="v2-side" id="xp-sidebar" data-xp-sidebar tabindex="-1" aria-label="xWHM navigation">/)

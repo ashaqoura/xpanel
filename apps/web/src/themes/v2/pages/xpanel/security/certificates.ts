@@ -24,7 +24,7 @@ export function renderV2CertificateFilesPage(props: PanelSurfaceProps, authority
   const c = settingsContext(props, authority), { t } = c, title = t(msgctxt('theme:v2', 'Certificate files')), description = t(msgctxt('theme:v2', 'Inspect certificate metadata and prepare certificate files without exposing saved private keys.'))
   // Every control starts disabled; the SSL storage client enables it after an authorized read.
   const off = true, unread = t(msgid('SSL storage has not been read.'))
-  const submit = (label: string): string => `<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off ? ' disabled' : ''}>${esc(label)}</button>`
+  const submit = (label: string): string => `<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${off ? ' disabled' : ''}><i class="ki-filled ki-check" aria-hidden="true"></i>${esc(label)}</button>`
   // Without authority the same layout renders with no live form, so nothing can submit.
   const form = (hook: string, body: string, label: string): string => c.editable ? `<form class="v2-panel-settings__groups" ${hook}>${body}${actions(submit(label))}</form>` : `<div class="v2-panel-settings__groups" ${hook.replace(/-form$/, '-layout')}>${body}${actions(submit(label))}</div>`
   const names = (id: string) => field(id, t(msgid('Names')), area(id, 'names', ' class="v2-mono" dir="ltr" rows="3" spellcheck="false" autocomplete="off" required', off), t(msgid('One host name per line. The first name is the common name.')))

@@ -129,7 +129,6 @@ export const MAIL_WORKSPACES_CSS = `.v2-mail-workspace{max-inline-size:75rem}
 .v2-mail-workspace .v2-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem}
 .v2-mail-workspace .v2-mail-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13.75rem),1fr));gap:1.25rem;max-inline-size:45rem;min-inline-size:0}
 .v2-mail-workspace #v2-mail-lists-admin .v2-card__body>div{display:grid;gap:1.25rem;min-inline-size:0}
-.v2-mail-workspace .v2-security__form{max-inline-size:35rem}
 .v2-mail-workspace .v2-table-wrap{border:1px solid var(--line);border-radius:var(--radius-notice);overflow-x:auto}
 .v2-mail-workspace__table{max-inline-size:100%;min-inline-size:0;font-variant-numeric:tabular-nums}
 .v2-mail-workspace #v2-mail-forwarder-table th:last-child{inline-size:1%;white-space:nowrap}
@@ -154,11 +153,7 @@ export const MAIL_WORKSPACES_CSS = `.v2-mail-workspace{max-inline-size:75rem}
 .v2-mail-workspace .v2-card :is(p,ol,[data-forwarders-count]):not(.kt-alert,.kt-badge,[data-state=failed],[data-state=error]){font-size:.875rem;line-height:1.5;color:var(--text-2);overflow-wrap:anywhere}
 .v2-mail-workspace :is([data-forwarders-count],[data-contact-count],[data-contact-capacity],[data-calendar-capacity],[data-filter-count],[data-mail-track-page-label]){font-variant-numeric:tabular-nums}
 .v2-mail-workspace .v2-card p:not([role],[data-state],.kt-alert){max-inline-size:88ch}
-${LIVE}{position:relative;padding-inline-start:1rem;font-size:.8125rem;color:var(--text-2)}
-${LIVE}::before{content:"";position:absolute;inset-inline-start:0;inset-block-start:.5em;inline-size:.375rem;block-size:.375rem;border-radius:50%;background:var(--line-strong)}
-${STATUS}:is([data-state=read],[data-state=saved],[data-state=ready],[data-state=sent])::before{background:var(--ok)}
-${STATUS}:is([data-state=reading],[data-state=saving],[data-state=busy])::before{background:var(--accent)}
-${STATUS}:is([data-state=uncertain],[data-state=stale],[data-state=conflict])::before{background:var(--warn)}
+${LIVE}{font-size:.8125rem;color:var(--text-2)}
 ${STATUS}:empty{display:none}
 .v2-mail-workspace .v2-card .v2-mail-workspace__note{color:var(--text)}
 .v2-mail-workspace__note::before{content:"\\eb5e";flex:none;font:normal 1.125rem/1.25rem 'keenicons-filled';color:var(--accent)}

@@ -33,7 +33,9 @@ const ACTION_CLASS = {
   danger: 'v2-btn v2-btn--danger kt-btn kt-btn-outline kt-btn-destructive',
 } as const
 // the leading glyph Metronic shows on an action of that kind
-const ACTION_GLYPH: Readonly<Record<string, MailIcon>> = { read: 'refresh', rebuild: 'refresh', check: 'shield', add: 'plus', create: 'plus', import: 'upload', upload: 'upload', review: 'eye' }
+// (a card-specific entry, card id and action key, wins over the generic one of the key)
+const ACTION_GLYPH: Readonly<Record<string, MailIcon>> = { read: 'refresh', rebuild: 'refresh', check: 'shield', add: 'plus', create: 'plus', import: 'upload', upload: 'upload', review: 'eye', save: 'check', run: 'tools', 'reset-advanced': 'restore', 'reset-full': 'restore', 'mail-trace.run': 'route', 'track-delivery.read': 'search', 'mta-backups.create': 'download' }
+const glyph = (card: MailCard, key: string): string => { const name = ACTION_GLYPH[`${card.id}.${key}`] ?? ACTION_GLYPH[key]; return name ? mailIcon(name, 16) : '' }
 const CHECK = 'v2-mail-card__check kt-label items-start font-normal leading-snug'
 
 const control = (card: MailCard, field: MailCardField): string => {
@@ -51,17 +53,21 @@ export function renderV2MailCards(cards: readonly MailCard[], locale: Locale): s
   if (!cards.length) return ''
   return `<div class="v2-mail-cards flex flex-col gap-5 lg:gap-7.5" lang="${locale}" dir="${localeDirection(locale)}">${cards.map(card => {
     const interactive = card.fields.length + card.tables.length + card.actions.length > 0
-    const body = `<div class="v2-mail-card flex flex-col gap-5"${interactive ? ` data-mail-card="${card.id}" data-mail-card-can-read="${card.canRead}" data-mail-card-can-act="${card.canAct}"` : ''}>
+    // The whole card is the controller root, so a card without settings carries its actions in the header toolbar;
+    // a card with settings keeps them at the end of its form, beside what they act on.
+    const buttons = card.actions.map(action => `<button type="button" class="${ACTION_CLASS[action.tone ?? 'plain']}" data-mail-card-action="${action.key}"${action.write ? ' data-mail-card-write' : ''} disabled>${glyph(card, action.key)}${escapeHtml(action.label)}</button>`).join('')
+    const inHeader = card.actions.length > 0 && card.fields.length === 0
+    const body = `<div class="v2-mail-card flex flex-col gap-5">
 <p class="text-sm font-normal leading-relaxed text-secondary-foreground">${escapeHtml(card.lede)}</p>
 ${card.fields.length ? `<div class="v2-mail-card__fields grid gap-5 min-w-0">${card.fields.map(field => control(card, field)).join('')}</div>` : ''}
 ${card.list ? `<div class="v2-mail-card__list grid gap-2.5" role="group" aria-label="${escapeHtml(card.list.label)}" data-mail-card-list="${card.list.key}"></div>` : ''}
-${card.actions.length ? `<div class="v2-mail-card__actions flex flex-wrap items-center justify-end gap-2.5">${card.actions.map(action => `<button type="button" class="${ACTION_CLASS[action.tone ?? 'plain']}" data-mail-card-action="${action.key}"${action.write ? ' data-mail-card-write' : ''} disabled>${ACTION_GLYPH[action.key] ? mailIcon(ACTION_GLYPH[action.key]!, 16) : ''}${escapeHtml(action.label)}</button>`).join('')}</div>` : ''}
+${card.actions.length && !inHeader ? `<div class="v2-mail-card__actions flex flex-wrap items-center justify-end gap-2.5">${buttons}</div>` : ''}
 ${interactive ? `<p data-mail-card-status data-state="unread" role="status">${escapeHtml(card.unread)}</p>` : ''}
 ${card.facts.length ? `<dl class="v2-mail-card__facts">${card.facts.map(([key, label]) => `<div><dt class="text-sm font-normal text-secondary-foreground">${escapeHtml(label)}</dt><dd class="text-sm font-normal text-mono" data-mail-card-fact="${key}"></dd></div>`).join('')}</dl>` : ''}
 ${card.tables.map(table => `<div class="v2-mail-card__scroll kt-scrollable-x-auto overflow-x-auto rounded-lg border border-border" role="region" tabindex="0" aria-label="${escapeHtml(table.caption)}"><table class="v2-table kt-table text-start"><caption class="v2-sr">${escapeHtml(table.caption)}</caption><thead><tr>${table.columns.map(label => `<th class="text-start font-medium" scope="col">${escapeHtml(label)}</th>`).join('')}</tr></thead><tbody data-mail-card-rows="${table.key}"><tr><td data-table-empty colspan="${table.columns.length}">${escapeHtml(card.unread)}</td></tr></tbody></table></div>${xpTemplate(`mail-card-${table.key}`, `<tr>${table.slots.map(slot => `<td data-xp-slot="${slot}"></td>`).join('')}</tr>`)}`).join('')}
 ${card.notes.map(note => `<p class="text-xs font-normal leading-relaxed text-muted-foreground">${escapeHtml(note)}</p>`).join('')}
 ${interactive ? xpTemplate('mail-card-button', '<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-xp-slot="content" disabled></button>') + xpTemplate('mail-card-link', '<a class="kt-link" data-xp-slot="content"></a>') + xpTemplate('mail-card-select', '<select class="kt-select" data-xp-slot="content" disabled></select>') + xpTemplate('mail-card-check', `<label class="${CHECK}"><input class="kt-checkbox kt-checkbox-sm" type="checkbox" data-xp-slot="control" disabled><span data-xp-slot="label"></span></label>`) : ''}
 </div>`
-    return surface({ title: card.title, titleId: `v2-mail-card-${card.id}`, bodyHtml: body })
+    return surface({ title: card.title, titleId: `v2-mail-card-${card.id}`, bodyHtml: body, ...(inHeader ? { actionsHtml: buttons } : {}), ...(interactive ? { hooks: { 'data-mail-card': card.id, 'data-mail-card-can-read': String(card.canRead), 'data-mail-card-can-act': String(card.canAct) } } : {}) })
   }).join('')}</div>`
 }

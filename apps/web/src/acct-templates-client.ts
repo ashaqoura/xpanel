@@ -84,7 +84,7 @@ function bindWhmAccountTemplates(askDialog: ((options: Record<string, unknown>) 
       editing = ''
       for (const control of Object.values(inputs)) { control.value = ''; control.removeAttribute('aria-invalid') }
       paintPlans([]); paintPreview(null)
-      heading.textContent = t('New template'); save.textContent = t('Create template'); cancel.hidden = true
+      heading.textContent = t('New template'); (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Create template'); cancel.hidden = true
       lock(busy)
     }
     const edit = (template: WhmAccountTemplate): void => {
@@ -93,7 +93,7 @@ function bindWhmAccountTemplates(askDialog: ((options: Record<string, unknown>) 
       inputs['defaultPage.title']!.value = template.defaultPage.title; inputs['defaultPage.body']!.value = template.defaultPage.body
       inputs['suspendedPage.title']!.value = template.suspendedPage.title; inputs['suspendedPage.body']!.value = template.suspendedPage.body
       paintPlans(template.planIds); paintPreview(template)
-      heading.textContent = t('Edit template: {name}', { name: template.name }); save.textContent = t('Save changes'); cancel.hidden = false; saveStatus.hidden = true
+      heading.textContent = t('Edit template: {name}', { name: template.name }); (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Save changes'); cancel.hidden = false; saveStatus.hidden = true
       lock(busy); inputs.name!.focus()
     }
     const paint = (next: WhmAccountTemplatesView): void => {

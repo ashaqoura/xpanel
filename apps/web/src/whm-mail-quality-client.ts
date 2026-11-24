@@ -164,7 +164,7 @@ function bindWhmMailQuality(): void {
       rows.textContent = ''
       for (const item of current?.domains ?? []) {
         const row = document.createElement('tr'), cell = (content: (string | Node)[]): HTMLTableCellElement => { const td = document.createElement('td'); td.append(...content); row.append(td); return td }
-        const box = document.createElement('input'); box.type = 'checkbox'; box.dataset.whmMailQualitySelect = item.domain; box.setAttribute('aria-label', t('Select {domain}', { domain: item.domain }))
+        const box = document.createElement('input'); box.type = 'checkbox'; if (document.documentElement.dataset.uiTheme === 'v2') box.className = 'kt-checkbox kt-checkbox-sm'; box.dataset.whmMailQualitySelect = item.domain; box.setAttribute('aria-label', t('Select {domain}', { domain: item.domain }))
         cell([box]); cell([technical(item.domain)]); cell([item.account ? technical(item.account) : t('None')])
         const result = results[item.domain]
         for (const key of checks) {

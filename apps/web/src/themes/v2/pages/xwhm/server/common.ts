@@ -54,6 +54,7 @@ const KEENICONS = {
   flow: 'ki-filled ki-arrow-mix', category: 'ki-filled ki-category', services: 'ki-filled ki-element-11', memory: 'ki-filled ki-simcard',
   cpu: 'ki-filled ki-technology-1', note: 'ki-filled ki-note', list: 'ki-filled ki-search-list', next: 'ki-filled ki-right v2-flip',
   previous: 'ki-filled ki-left v2-flip', certificate: 'ki-filled ki-badge', devices: 'ki-filled ki-devices', notify: 'ki-filled ki-notification-status',
+  run: 'ki-filled ki-to-right v2-flip', move: 'ki-filled ki-arrow-right-left', route: 'ki-filled ki-route', toggle: 'ki-filled ki-toggle-on', send: 'ki-filled ki-paper-plane',
 } as const
 export type Keenicon = keyof typeof KEENICONS
 type KeeniconSize = 'text-xs' | 'text-sm' | 'text-base' | 'text-lg' | 'text-xl' | 'text-2xl'
@@ -69,6 +70,9 @@ const BUTTON_VERBS: readonly (readonly [RegExp, Keenicon])[] = [
   [/^copy\b/i, 'copy'], [/^(?:download|export)\b/i, 'download'], [/^(?:upload|import)\b/i, 'upload'], [/^(?:edit|rename)\b/i, 'edit'],
   [/^(?:review|preview|view|show|details)\b/i, 'view'], [/^(?:search|find)\b/i, 'search'], [/^(?:reset|restore|roll back|discard)\b/i, 'reset'],
   [/^(?:close|cancel|clear)\b/i, 'close'], [/^stage\b/i, 'add'], [/^(?:deploy|publish)\b/i, 'rocket'], [/^load preview\b/i, 'view'],
+  [/^(?:run|start|execute)\b/i, 'run'], [/^(?:move|migrate|transfer|switch)\b/i, 'move'], [/^trace\b/i, 'route'], [/^(?:install|pull)\b/i, 'cloudDown'],
+  [/^(?:repair|fix)\b/i, 'tools'], [/^turn on\b/i, 'toggle'], [/^change\b.*\bpassword\b/i, 'key'],
+  [/^(?:check|verify|test|prove)\b/i, 'verify'], [/^send\b/i, 'send'],
 ]
 const BUTTON_HOOKS: readonly (readonly [RegExp, Keenicon])[] = [
   [/refresh|reload|rebuild|[-=]read\b/, 'refresh'], [/[-=](?:save|apply)\b/, 'save'], [/[-=](?:add|create|import|upload|invite)\b/, 'add'],

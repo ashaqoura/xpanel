@@ -2,6 +2,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from 'vitest'
 import { WORKSPACE_RUNTIME_SCRIPT } from './workspace-runtime-client.ts'
+import { V2_SIDEBAR_STATE_SCRIPT } from './themes/v2/shell/sidebar-state.ts'
 
 function bootRuntime(): void {
   const win = window as unknown as Record<string, unknown>
@@ -184,12 +185,47 @@ describe('workspace runtime client', () => {
     win.__xpanelApplyTimeZone('UTC')
     expect(document.getElementById('ts')!.textContent).toBe('2026-11-20 12:00 UTC')
 
+    const collapseButton = document.querySelector('[data-action="toggle-sidebar-collapse"]')!
     win.__xpanelToggleSidebar()
     expect(document.querySelector('.v2-shell')!.getAttribute('data-sidebar-collapsed')).toBe('true')
+    // The root attribute the v2 head script restores before the first paint follows the toggle.
+    expect(document.documentElement.getAttribute('data-sidebar-collapsed')).toBe('true')
+    expect(collapseButton.getAttribute('aria-expanded')).toBe('false')
+    expect(window.localStorage.getItem('xpanel.sidebar.collapsed')).toBe('1')
     win.__xpanelToggleSidebar()
     expect(document.querySelector('.v2-shell')!.hasAttribute('data-sidebar-collapsed')).toBe(false)
+    expect(document.documentElement.hasAttribute('data-sidebar-collapsed')).toBe(false)
+    expect(collapseButton.getAttribute('aria-expanded')).toBe('true')
+    expect(window.localStorage.getItem('xpanel.sidebar.collapsed')).toBe('0')
     window.localStorage.clear()
     document.documentElement.removeAttribute('data-user-timezone')
+  })
+
+  it('restores a saved collapsed sidebar on the root before the shell exists, then marks the shell and its toggle', () => {
+    window.localStorage.setItem('xpanel.sidebar.collapsed', '1')
+    new Function(V2_SIDEBAR_STATE_SCRIPT.body)()
+    expect(document.documentElement.getAttribute('data-sidebar-collapsed')).toBe('true')
+    document.body.innerHTML = `<div class="v2-shell"><aside class="v2-side"><button type="button" data-action="toggle-sidebar-collapse" aria-expanded="true"></button></aside></div>`
+    bootRuntime()
+    expect(document.querySelector('.v2-shell')!.getAttribute('data-sidebar-collapsed')).toBe('true')
+    expect(document.querySelector('[data-action="toggle-sidebar-collapse"]')!.getAttribute('aria-expanded')).toBe('false')
+    document.querySelector<HTMLButtonElement>('[data-action="toggle-sidebar-collapse"]')!.click()
+    expect(document.documentElement.hasAttribute('data-sidebar-collapsed')).toBe(false)
+    expect(document.querySelector('.v2-shell')!.hasAttribute('data-sidebar-collapsed')).toBe(false)
+
+    // An expanded or missing preference leaves the root alone, and blocked storage never throws.
+    window.localStorage.setItem('xpanel.sidebar.collapsed', '0')
+    new Function(V2_SIDEBAR_STATE_SCRIPT.body)()
+    expect(document.documentElement.hasAttribute('data-sidebar-collapsed')).toBe(false)
+    const storage = Object.getOwnPropertyDescriptor(window, 'localStorage')!
+    Object.defineProperty(window, 'localStorage', { configurable: true, get() { throw new Error('blocked') } })
+    try {
+      expect(() => new Function(V2_SIDEBAR_STATE_SCRIPT.body)()).not.toThrow()
+      expect(document.documentElement.hasAttribute('data-sidebar-collapsed')).toBe(false)
+    } finally {
+      Object.defineProperty(window, 'localStorage', storage)
+    }
+    window.localStorage.clear()
   })
 
   it('scopes operations dock storage per authenticated principal, scrubs foreign entries, and clears on logout', () => {

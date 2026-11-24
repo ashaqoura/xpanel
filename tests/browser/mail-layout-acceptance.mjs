@@ -412,8 +412,10 @@ export async function runMailLayoutAcceptance({ output, filter } = {}) {
         outcome.geometry = await geometry(page)
         const observed = outcome.geometry
         assert.ok(observed.scroll_width <= state.width + 1, 'The document must not overflow horizontally')
-        const expectedHeaderWidth = observed.is_v2 && state.width >= 960 ? state.width - observed.folder.width : state.width
-        assert.ok(Math.abs(observed.header.width - expectedHeaderWidth) < 1, 'The mail header spans the full workspace')
+        // Metronic demo3 shell: the fixed header spans the full viewport and the 280px menu sits below it (the previous
+        // shell put the header beside the sidebar). Keep the header full-width and never overlapping the menu column.
+        assert.ok(Math.abs(observed.header.width - state.width) < 1, 'The mail header spans the full workspace')
+        if (observed.is_v2 && state.width >= 960 && observed.folder.visible) assert.ok(observed.folder.y >= observed.header.y + observed.header.height - 1, 'The vertical menu starts below the fixed header')
         assert.equal(observed.ascii_digits, true)
         assert.ok(observed.targets.length > 0 && observed.targets.every(target => target.width >= 43.9 && target.height >= 43.9), 'Rendered interactive controls meet the approved 44px target')
         assert.ok(observed.fields.length >= (observed.is_v2 && state.screen === 'inbox' ? 1 : 3), 'Actual labeled fields are measured non-vacuously')
@@ -431,7 +433,7 @@ export async function runMailLayoutAcceptance({ output, filter } = {}) {
             assert.equal(await page.locator('[data-mail-detail-from]').isVisible(), true)
             assert.equal(await page.locator('[data-mail-detail-date]').isVisible(), true)
           }
-          if (state.width >= 960) { assert.equal(observed.folder.visible, true); assert.ok(Math.abs(observed.folder.width - (observed.is_v2 ? 264 : 200)) < 1); assert.ok(observed.list.height >= (observed.is_v2 ? 560 : 700), 'The continuous inbox fills the desktop workspace') }
+          if (state.width >= 960) { assert.equal(observed.folder.visible, true); assert.ok(Math.abs(observed.folder.width - (observed.is_v2 ? 280 : 200)) < 1) /* Metronic demo3 vertical menu: 280px (was 264px) */; assert.ok(observed.list.height >= (observed.is_v2 ? 560 : 700), 'The continuous inbox fills the desktop workspace') }
           else {
             // Below 960px the folder navigation is a drawer behind the visible Menu toggle (checked as a modal by mobileGate); otherwise it is inline.
             const drawer = await page.locator('[data-action="toggle-mobile-nav"]:visible').count() > 0

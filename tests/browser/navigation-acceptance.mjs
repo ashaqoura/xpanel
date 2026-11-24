@@ -166,8 +166,9 @@ async function fontGate(page, locale) {
   if (result.family === 'sans-serif') assert.equal(result.body_family, 'sans-serif', 'Arabic UI must select the literal generic sans-serif family')
   else assert.ok(result.body_family.includes(result.family), 'The locale body must select its intended family')
   assert.deepEqual(result.faces.filter(face => face.status === 'error'), [])
-  assert.deepEqual(result.sources.filter(source => source.origin !== result.page_origin || !/^\/assets\/fonts\/IBMPlex(?:Sans(?:Arabic)?|Mono)-[A-Za-z]+\.woff2$/.test(source.pathname)), [], 'Every web font must load from the panel origin')
-  if (locale === 'en') assert.ok(result.sources.some(source => source.pathname.startsWith('/assets/fonts/IBMPlexSans-')), 'The English locale must load its Plex Sans face from the panel origin')
+  // v2 (Metronic) serves its vendored Inter variable faces from /assets/metronic/ on the same origin.
+  assert.deepEqual(result.sources.filter(source => source.origin !== result.page_origin || !(/^\/assets\/fonts\/IBMPlex(?:Sans(?:Arabic)?|Mono)-[A-Za-z]+\.woff2$/.test(source.pathname) || (result.isV2 && /^\/assets\/metronic\/inter-latin(?:-ext)?-wght-normal\.woff2$/.test(source.pathname)))), [], 'Every web font must load from the panel origin')
+  if (locale === 'en') assert.ok(result.sources.some(source => source.pathname.startsWith(result.isV2 ? '/assets/metronic/inter-latin-' : '/assets/fonts/IBMPlexSans-')), 'The English locale must load its Latin UI face (Inter on v2, Plex Sans otherwise) from the panel origin')
   if (locale === 'ar' && result.isV2) assert.ok(result.sources.some(source => source.pathname.startsWith('/assets/fonts/IBMPlexSansArabic-')), 'The v2 Arabic locale must load its Plex Sans Arabic face from the panel origin')
   // Home on a phone shows its level-1 heading as role=heading; the desktop h1 is then hidden.
   result.applied_ui = await assertAppliedFont(page, await page.locator('h1').first().isVisible() ? 'h1' : '[role="heading"][aria-level="1"]', result.family)

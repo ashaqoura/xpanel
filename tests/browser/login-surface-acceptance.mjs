@@ -31,7 +31,7 @@ async function createLoginFixture(audience) {
       }))
       const html = response.headers.get('content-type')?.startsWith('text/html')
       let body = html ? await response.text() : Buffer.from(await response.arrayBuffer())
-      if (html) body = body.replace('<html ', '<html data-login-visual-fixture="synthetic" ').replace('<body>', '<body><div data-synthetic-watermark role="note" style="padding:6px 12px;background:#f1f3f5;color:#25313f;text-align:center;font:12px/1.5 sans-serif" dir="ltr">Synthetic login visual fixture</div>')
+      if (html) body = body.replace('<html ', '<html data-login-visual-fixture="synthetic" ').replace(/<body(?:\s[^>]*)?>/, match => match + '<div data-synthetic-watermark role="note" style="padding:6px 12px;background:#f1f3f5;color:#25313f;text-align:center;font:12px/1.5 sans-serif" dir="ltr">Synthetic login visual fixture</div>')
       outgoing.writeHead(response.status, { ...Object.fromEntries(response.headers), 'cache-control': 'no-store', 'x-visual-fixture': 'synthetic' })
       outgoing.end(incoming.method === 'HEAD' ? undefined : body)
     } catch { outgoing.writeHead(500); outgoing.end('Synthetic login fixture failed.'); }

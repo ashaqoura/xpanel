@@ -66,7 +66,7 @@ ${W} :where(a:not([class])){font-weight:500}
 ${W} :where(a:not([class]):hover){text-decoration:underline;text-underline-offset:4px}
 ${W} :is(code,kbd,pre,samp){font-family:var(--font-mono);font-size:.93em}
 ${W} kbd{flex:none;display:inline-flex;align-items:center;justify-content:center;height:1.5rem;min-inline-size:1.5rem;padding:0 .25rem;border-radius:var(--radius-control);border:1px solid var(--line);background:var(--kt-accent);font-size:.75rem;line-height:.75rem;color:var(--kt-accent-foreground)}
-${W} :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+${W} :focus-visible{outline:2px solid var(--focus)!important;outline-offset:2px}
 ${W} :is(button,input,select,textarea){font:inherit;color:inherit}
 ${W} ::placeholder{color:var(--muted);opacity:1}
 ${W} .v2-sr{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
@@ -96,7 +96,7 @@ ${W} ${BTN}:disabled{pointer-events:none}
 ${W} ${FIELD}{max-width:100%;text-align:match-parent;text-align:-webkit-match-parent}
 ${W} ${BARE}{min-height:var(--target);padding:0 .75rem;border-radius:var(--radius-control);border:1px solid var(--line-strong);background-color:var(--bg);box-shadow:var(--shadow);color:var(--text);font-size:.8125rem;line-height:${LH_SM};transition:color ${EASE},box-shadow ${EASE}}
 ${W} :is(${CONTROL},textarea)[readonly]:not(:disabled){background-color:var(--subtle)}
-${W} ${BARE}:focus-visible{outline:0;border-color:var(--ring);box-shadow:${RING}}
+${W} ${BARE}:focus-visible{border-color:var(--ring);box-shadow:${RING}}
 ${W} textarea:not(.kt-textarea){min-height:5rem;padding:.75rem;resize:vertical}
 ${W} ${BARE}[aria-invalid="true"]{border-color:color-mix(in oklab,var(--destructive) 60%,transparent)}
 ${W} ${BARE}[aria-invalid="true"]:focus-visible{box-shadow:0 0 0 3px color-mix(in oklab,var(--destructive) 10%,transparent)}
@@ -132,7 +132,7 @@ ${W} ::-webkit-meter-even-less-good-value{background:var(--bad)}
 ${W} ::-moz-meter-bar,${W} ::-moz-progress-bar{background:var(--accent-fill)}
 ${W} :where(input[type=file]){max-inline-size:100%}
 ${W} :where(input[type=file]:not(.kt-input)){display:block;inline-size:100%;block-size:var(--target);padding:0 .75rem;border:1px solid var(--line-strong);border-radius:var(--radius-control);background:var(--bg);box-shadow:0 1px 2px rgba(0,0,0,.05);color:var(--text);font-size:.8125rem}
-${W} :where(input[type=file]:not(.kt-input)):focus-visible{outline:none;border-color:var(--ring);box-shadow:${RING}}
+${W} :where(input[type=file]:not(.kt-input)):focus-visible{border-color:var(--ring);box-shadow:${RING}}
 ${W} :where(input[type=file]:disabled){cursor:not-allowed;opacity:.6}
 ${W} :where(input[type=file])::file-selector-button{block-size:100%;margin:0;margin-inline-end:.75rem;padding:0;padding-inline-end:.75rem;border:0;border-inline-end:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--text);font:inherit;font-weight:500;cursor:pointer}
 ${W} table{width:100%;border-collapse:collapse;color:var(--text);font-size:.875rem;line-height:${LH_SM};text-align:start}
@@ -158,7 +158,7 @@ ${W} .v2-table-scroll:focus-visible{outline-offset:-2px}
 @keyframes v2-pulse{0%,100%{opacity:1}50%{opacity:.55}}
 @keyframes v2-spin{to{transform:rotate(360deg)}}
 @keyframes v2-drain{from{inline-size:100%}to{inline-size:0}}
-@media(max-width:959px){${W} :is(${CONTROL},select,textarea,[contenteditable="true"]){font-size:16px}}
+@media(max-width:959px){${W} :is(${CONTROL},select,textarea,[contenteditable="true"]){font-size:16px!important}}
 @media(forced-colors:active){${W} select{appearance:auto!important;padding-inline:12px!important;background-image:none!important}${W} ${BOX},${W} ${SWITCH}{appearance:auto}${W} ${SWITCH}::before{display:none}}
 @media (prefers-reduced-motion:reduce){${R} *,${R} *::before,${R} *::after{animation:none!important;transition:none!important}}
 `

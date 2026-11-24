@@ -11,7 +11,7 @@ export const SUBGROUP_TITLE = 'text-sm font-medium text-mono'
 export const switchSetting = (props: { titleHtml: string; descriptionHtml?: string; labelHtml?: string; hook: string }): string => {
   const input = `<input type="checkbox" class="kt-switch kt-switch-sm" ${props.hook} disabled>`
   return props.labelHtml
-    ? `<div class="v2-panel-toggle flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-5"><div class="flex flex-col gap-1 min-w-0 sm:flex-1">${props.titleHtml}${props.descriptionHtml ? `<p class="text-sm font-normal text-secondary-foreground">${props.descriptionHtml}</p>` : ''}</div><label class="kt-label shrink-0 self-start sm:self-auto font-normal text-secondary-foreground cursor-pointer">${props.labelHtml}${input}</label></div>`
+    ? `<div class="v2-panel-toggle flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-5"><div class="flex flex-col gap-1 min-w-0 sm:flex-1">${props.titleHtml}${props.descriptionHtml ? `<p class="text-sm font-normal text-secondary-foreground">${props.descriptionHtml}</p>` : ''}</div><label class="kt-label flex items-center gap-2.5 shrink-0 self-start sm:self-auto cursor-pointer"><span class="text-xs font-normal text-muted-foreground">${props.labelHtml}</span>${input}</label></div>`
     : `<label class="v2-panel-toggle flex items-center justify-between gap-5 cursor-pointer"><span class="flex flex-col gap-1 min-w-0">${props.titleHtml}${props.descriptionHtml ? `<span class="text-sm font-normal text-secondary-foreground">${props.descriptionHtml}</span>` : ''}</span>${input}</label>`
 }
 

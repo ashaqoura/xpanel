@@ -153,22 +153,25 @@ function detailAside(t: Translate, props: WhmSurfaceProps, accounts: readonly Ac
 }
 
 const handoff = (t: Translate, props: WhmSurfaceProps, account: Account, canManage: boolean, place: 'panel' | 'menu'): string => canManage && allowed(props, 'edit-account') && account.status === 'active'
-  ? `<span class="v2-whm-accounts__handoff" data-handoff-control><button type="button" ${place === 'menu' ? 'role="menuitem" class="v2-menu__item kt-dropdown-menu-link"' : 'class="v2-btn v2-btn--primary kt-btn kt-btn-primary"'} data-handoff="xpanel" data-handoff-account="${escapeHtml(account.id)}" data-handoff-state="idle">${place === 'menu' ? '' : keenicon('entrance-left')}${escapeHtml(t('Log in to xPanel'))}</button><span data-handoff-status role="status" aria-live="polite" hidden></span></span>` : ''
+  ? `<span class="v2-whm-accounts__handoff" data-handoff-control><button type="button" ${place === 'menu' ? 'role="menuitem" class="v2-menu__item kt-dropdown-menu-link"' : 'class="v2-btn v2-btn--primary kt-btn kt-btn-primary"'} data-handoff="xpanel" data-handoff-account="${escapeHtml(account.id)}" data-handoff-state="idle">${place === 'menu' ? MENU_GLYPHS.login : keenicon('entrance-left')}${escapeHtml(t('Log in to xPanel'))}</button><span data-handoff-status role="status" aria-live="polite" hidden></span></span>` : ''
+
+/** Leading Keenicons of the hand-written row-menu items, sized as the kit's menu icons. */
+const MENU_GLYPHS = { login: '<i class="v2-icon ki-filled ki-entrance-left text-base leading-none" aria-hidden="true"></i>', modify: '<i class="v2-icon ki-filled ki-pencil text-base leading-none" aria-hidden="true"></i>', password: '<i class="v2-icon ki-filled ki-key text-base leading-none" aria-hidden="true"></i>', plan: '<i class="v2-icon ki-filled ki-cube-2 text-base leading-none" aria-hidden="true"></i>', owner: '<i class="v2-icon ki-filled ki-user-edit text-base leading-none" aria-hidden="true"></i>' } as const
 
 /** Suspend / Unsuspend and Delete carry the account they act on; the core action client opens its dialog from either place. */
 function stateItems(t: Translate, props: WhmSurfaceProps, account: Account, canManage: boolean): RowMenuItem[] {
   if (!canManage || account.status === 'terminating') return []
   const attrs = { 'data-account-id': account.id, 'data-username': account.username, 'data-domain': account.primaryDomain } as const
   return [
-    ...(allowed(props, 'suspend-account') ? [{ label: t(account.status === 'suspended' ? 'Unsuspend' : 'Suspend'), hooks: { 'data-action': account.status === 'suspended' ? 'unsuspend-account' : 'suspend-account', ...attrs } }] : []),
-    ...(allowed(props, 'terminate-account') ? [{ label: t('Delete'), danger: true, hooks: { 'data-action': 'terminate-account', ...attrs } }] : []),
+    ...(allowed(props, 'suspend-account') ? [{ label: t(account.status === 'suspended' ? 'Unsuspend' : 'Suspend'), icon: account.status === 'suspended' ? 'okCircle' as const : 'xCircle' as const, hooks: { 'data-action': account.status === 'suspended' ? 'unsuspend-account' : 'suspend-account', ...attrs } }] : []),
+    ...(allowed(props, 'terminate-account') ? [{ label: t('Delete'), icon: 'trash' as const, danger: true, hooks: { 'data-action': 'terminate-account', ...attrs } }] : []),
   ]
 }
 
 // The drawer closes with its account actions at the inline end: the soft-danger delete carries the Metronic trash icon.
 const stateActions = (t: Translate, props: WhmSurfaceProps, account: Account, canManage: boolean): string => {
   const items = stateItems(t, props, account, canManage)
-  return items.length ? `<div class="v2-whm-accounts__state-actions v2-whm-accounts__fold flex flex-wrap items-center justify-end gap-2.5 py-4">${items.map(item => `<button type="button" class="${item.danger ? 'v2-btn v2-btn--danger kt-btn kt-btn-outline kt-btn-destructive' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(item.hooks)}>${item.danger ? keenicon('trash') : ''}${escapeHtml(item.label)}</button>`).join('')}</div>` : ''
+  return items.length ? `<div class="v2-whm-accounts__state-actions v2-whm-accounts__fold flex flex-wrap items-center justify-end gap-2.5 py-4">${items.map(item => `<button type="button" class="${item.danger ? 'v2-btn v2-btn--danger kt-btn kt-btn-outline kt-btn-destructive' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(item.hooks)}>${item.danger ? keenicon('trash') : item.icon ? icon(item.icon, 16) : ''}${escapeHtml(item.label)}</button>`).join('')}</div>` : ''
 }
 
 /** The parts of the details panel a row-menu item opens; only parts the panel renders are offered. */
@@ -188,7 +191,7 @@ function actions(t: Translate, props: WhmSurfaceProps, account: Account, canMana
   // Log in sits first in the row menu, as on the board; its status line stays inside the open menu.
   const login = handoff(t, props, account, canManage, 'menu')
   // Section openers open this account's details at that part; popovertargetaction closes the menu on the way.
-  const openers = sectionOpeners(t, props, account, canManage).map(([section, label]) => `<li role="none"><button type="button" role="menuitem" class="v2-menu__item kt-dropdown-menu-link" data-account-detail-open="${escapeHtml(account.username)}" data-account-detail-section="${section}" aria-controls="v2-account-detail" aria-expanded="false" popovertarget="${escapeHtml(id)}" popovertargetaction="hide">${escapeHtml(label)}</button></li>`).join('')
+  const openers = sectionOpeners(t, props, account, canManage).map(([section, label]) => `<li role="none"><button type="button" role="menuitem" class="v2-menu__item kt-dropdown-menu-link" data-account-detail-open="${escapeHtml(account.username)}" data-account-detail-section="${section}" aria-controls="v2-account-detail" aria-expanded="false" popovertarget="${escapeHtml(id)}" popovertargetaction="hide">${MENU_GLYPHS[section as keyof typeof MENU_GLYPHS] ?? ''}${escapeHtml(label)}</button></li>`).join('')
   if (!items.length && !login && !openers) return `<span class="v2-muted text-xs font-normal">${escapeHtml(t('Read only'))}</span>`
   return rowMenu({
     id,
@@ -330,6 +333,7 @@ export const WHM_ACCOUNTS_CSS = `${stateTones('.v2-whm-accounts [data-account-st
 .v2-whm-accounts__identity>div{display:flex;flex-direction:column;gap:.375rem;text-align:start}
 .v2-whm-accounts__identity dd{overflow-wrap:anywhere;font-family:var(--font-mono);font-size:.875rem;line-height:1.25rem;font-weight:500;color:var(--mono,var(--text))}
 .v2-whm-accounts__identity dt{font-size:.75rem;line-height:1rem;font-weight:400;color:var(--text-2)}
-.v2-whm-accounts__dialog:has([data-account-confirm-field]:not([hidden])) [data-account-action-submit]:not(:disabled){border-color:var(--destructive,var(--bad))!important;background:var(--destructive,var(--bad))!important;color:var(--destructive-foreground,var(--surface))!important}
+.v2-whm-accounts__dialog:has([data-account-confirm-field]:not([hidden])) [data-account-action-submit]{border-color:var(--destructive,var(--bad))!important;background:var(--destructive,var(--bad))!important;color:var(--destructive-foreground,var(--surface))!important}
+.v2-whm-accounts__dialog:has([data-account-reason-field]:not([hidden])) [data-account-action-submit]{border:1px solid color-mix(in oklab,var(--destructive,var(--bad)) 40%,transparent)!important;background:var(--surface)!important;color:var(--destructive,var(--bad))!important}
 @media(max-width:600px){.v2-whm-accounts__filter-control,.v2-whm-accounts__filter-search{flex:1 1 100%}.v2-whm-accounts__bulk-choices,.v2-whm-account-limit-grid,.v2-whm-accounts__usage{grid-template-columns:1fr}.v2-whm-accounts__detail-body .v2-facts--rows dt{inline-size:6.25rem}}
 `

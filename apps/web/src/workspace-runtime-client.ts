@@ -683,8 +683,11 @@ export const WORKSPACE_RUNTIME_SCRIPT = /* js */ String.raw`(function () {
   function setSidebarCollapsed(collapsed, persist) {
     var shell = document.querySelector('.v2-shell');
     if (!shell) return;
-    if (collapsed) shell.setAttribute('data-sidebar-collapsed', 'true');
-    else shell.removeAttribute('data-sidebar-collapsed');
+    // The v2 head script marks the root before the first paint; keep it in step with the shell.
+    [shell, document.documentElement].forEach(function (el) {
+      if (collapsed) el.setAttribute('data-sidebar-collapsed', 'true');
+      else el.removeAttribute('data-sidebar-collapsed');
+    });
     document.querySelectorAll('[data-action="toggle-sidebar-collapse"]').forEach(function (btn) {
       btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
     });
@@ -701,11 +704,11 @@ export const WORKSPACE_RUNTIME_SCRIPT = /* js */ String.raw`(function () {
   function bindSidebarCollapse(root) {
     var shell = document.querySelector('.v2-shell');
     if (!shell) return;
+    var restored = document.documentElement.getAttribute('data-sidebar-collapsed') === 'true';
     try {
-      if (window.localStorage && localStorage.getItem(SIDEBAR_STORAGE_KEY) === '1') {
-        setSidebarCollapsed(true, false);
-      }
+      if (window.localStorage && localStorage.getItem(SIDEBAR_STORAGE_KEY) === '1') restored = true;
     } catch (_error) {}
+    if (restored) setSidebarCollapsed(true, false);
     root.querySelectorAll('.v2-side .v2-nav summary, .v2-side .v2-nav a').forEach(function (el) {
       if (!el.getAttribute('title')) {
         var label = (el.textContent || '').trim();

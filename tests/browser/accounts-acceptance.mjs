@@ -173,7 +173,8 @@ async function createAccountGate(page, host, state, result, destination, expect)
   assert.ok(planChoice && planChoice.id === 'new-acc-plan-0' && planChoice.name === 'planId' && planChoice.type === 'radio' && planChoice.required && planChoice.checked && planChoice.width >= 44 && planChoice.height >= 44)
   const fields = await form.evaluate(form => {
     const rtl = document.dir === 'rtl'
-    return [...form.querySelectorAll('.v2-field')].map(field => {
+    // Metronic settings rows (`.v2-whm-create__row`) carry the identity fields; the address fields keep `.v2-field`.
+    return [...form.querySelectorAll('.v2-field, .v2-whm-create__row')].map(field => {
       const label = field.querySelector(':scope > label'), value = document.getElementById(label.htmlFor)
       const lr = document.createRange(); lr.selectNodeContents(label)
       const lg = lr.getBoundingClientRect(), b = value.getBoundingClientRect(), s = getComputedStyle(value)

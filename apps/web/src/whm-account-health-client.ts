@@ -261,7 +261,7 @@ function bindWhmAccountHealth(): void {
           note('reading', t('Checked {done} of {total} accounts…', { done: rows.size, total: first.accounts.length + first.pending.length }))
           paintRows((await read(first.pending.slice(index, index + 50))).accounts)
         }
-        run.textContent = t('Check again'); outcome()
+        ;(run.querySelector('[data-xp-slot="label"]') ?? run).textContent = t('Check again'); outcome()
       } catch { failed() }
       busy = false; lock()
     }

@@ -27,12 +27,29 @@ const GROUPS = 'v2-whm-network__groups flex flex-col gap-5 min-w-0'
  * CSR at once, or install a certificate from root's store for the services that take one.
  */
 export function v2WhmSslStore(t: Translate, mode: 'storage' | 'generate' | 'service', accounts: readonly { username: string }[], canManage: boolean, server = false): string {
+  const parts = v2WhmSslStoreParts(t, mode, accounts, canManage, server)
+  return `<div class="${GROUPS}"${hookAttrs(parts.hooks)}>${parts.bodyHtml.replace('<!--ssl-store-toolbar-->', `<div class="${TLS_ACTIONS}">${parts.toolbarHtml}</div>`)}</div>`
+}
+
+/**
+ * The same store split for a card: `hooks` make the card itself the controller root, so the "Read SSL storage" button
+ * can stand in the card header toolbar (Metronic account/api-keys) and still be found inside the root.
+ */
+export function v2WhmSslStoreCardParts(t: Translate, mode: 'storage' | 'service', accounts: readonly { username: string }[], canManage: boolean, server = false): { hooks: HookAttributes; toolbarHtml: string; bodyHtml: string } {
+  const parts = v2WhmSslStoreParts(t, mode, accounts, canManage, server)
+  return { ...parts, toolbarHtml: parts.toolbarHtml.replace('class="v2-btn kt-btn kt-btn-outline"', 'class="v2-btn kt-btn kt-btn-outline kt-btn-sm"').replace('text-base', 'text-sm'), bodyHtml: parts.bodyHtml.replace('<!--ssl-store-toolbar-->', '') }
+}
+
+function v2WhmSslStoreParts(t: Translate, mode: 'storage' | 'generate' | 'service', accounts: readonly { username: string }[], canManage: boolean, server: boolean): { hooks: HookAttributes; toolbarHtml: string; bodyHtml: string } {
   const id = 'ssl-store-' + mode, unread = t(msgid('SSL storage has not been read.'))
   const options = [...server ? [{ value: '', label: t(msgid('Server store (root)')) }] : [], ...accounts.map(item => ({ value: item.username, label: item.username }))]
   const account = mode === 'service' ? '' : `<div class="${ROWS}">${tlsField(id + '-account', t(msgid('Account')), { kind: 'select', dir: 'ltr', disabled: !canManage, hooks: { 'data-ssl-store-account': true }, options }, undefined, 'row')}</div>`
-  const head = `${account}<p role="status" data-ssl-store-status data-state="unread">${escapeHtml(unread)}</p><div class="${TLS_ACTIONS}">${tlsButton(t(msgid('Read SSL storage')), { 'data-ssl-store-refresh': true })}</div>`
+  const toolbarHtml = tlsButton(t(msgid('Read SSL storage')), { 'data-ssl-store-refresh': true })
+  const head = `${account}<p role="status" data-ssl-store-status data-state="unread">${escapeHtml(unread)}</p><!--ssl-store-toolbar-->`
   const template = `<template data-xp-template="ssl-store-action"><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-xp-slot="label" disabled></button></template>`
-  const root = (body: string) => `<div class="${GROUPS}" data-ssl-store data-ssl-store-mode="${mode}"${mode === 'service' ? ' data-ssl-store-scope="server"' : ''}${server ? ' data-ssl-store-server="true"' : ''} data-ssl-store-username="" data-ssl-store-can-read="${canManage}" data-ssl-store-can-manage="${canManage}">${body}${template}</div>`
+  const hooks: HookAttributes = { 'data-ssl-store': true, 'data-ssl-store-mode': mode, ...(mode === 'service' ? { 'data-ssl-store-scope': 'server' } : {}), ...(server ? { 'data-ssl-store-server': 'true' } : {}), 'data-ssl-store-username': '', 'data-ssl-store-can-read': String(canManage), 'data-ssl-store-can-manage': String(canManage) }
+  const result = (body: string) => ({ hooks, toolbarHtml, bodyHtml: body + template })
+  const root = result
   const table = (key: string, hook: string, caption: string, columns: string[]) => netTable(t, id + '-' + key, caption, columns, [], unread, { [hook]: true })
   const certificates = table('certificates', 'data-ssl-store-certificates', t(msgid('Certificates')), [t(msgid('ID')), t(msgid('Names')), t(msgid('Issuer')), t(msgid('Expires (UTC)')), t(msgid('Private key')), t(msgid('Public key')), t(msgid('Actions'))])
   const viewer = `<section class="${GROUPS}" data-ssl-store-viewer hidden aria-labelledby="v2-whm-${id}-viewer"><h3 class="${TLS_HEADING}" id="v2-whm-${id}-viewer" data-ssl-store-viewer-title></h3><pre class="v2-mono v2-whm-network__pem" dir="ltr" data-ssl-store-pem></pre><div class="${TLS_ACTIONS}">${tlsButton(t(msgid('Close')), { 'data-ssl-store-viewer-close': true })}</div></section>`

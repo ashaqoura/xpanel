@@ -1,6 +1,6 @@
 import { backupFilesClientTemplates } from './backup-files-client-templates.ts'
 import type { WhmSurfaceProps } from '../../../../contract.ts'
-import { actions, button, context, esc, facts, field, page, status, table, toolCard, type WhmAccountToolAuthority } from '../account-tools/common.ts'
+import { actions, button, context, esc, facts, page, row, status, table, toolCard, type WhmAccountToolAuthority } from '../account-tools/common.ts'
 import { phoneTable, recoveryRules, recoverySteps, restoreMoreTemplates } from './common.ts'
 import type { PhoneRow } from '../lifecycle/shared.ts'
 
@@ -12,7 +12,7 @@ export function renderV2WhmRestoreComponentsPage(props: WhmSurfaceProps, authori
   const fact = (rows: readonly (readonly [string, string])[]) => facts(rows.map(([key, label]) => ({ label: t(label), hooks: { [`data-restore-more-${key}`]: true } })), unread)
   const rows = (caption: string, headers: readonly string[], marker: string, empty: string, phone: PhoneRow = {}): string => phoneTable(table(t(caption), headers.map(label => t(label)), { [`data-restore-more-${marker}`]: true }, t(empty)), phone)
   const steps = recoverySteps(t, 'restore-more', [['account', msgid('Account')], ['backup', msgid('Backup')], ['components', msgid('Components')], ['review', msgid('Review')], ['result', msgid('Result')]])
-  const source = toolCard('restore-more-source', t(msgid('Account and backup')), field('v2-restore-more-account', t(msgid('Account')), `<select class="kt-select" id="v2-restore-more-account" data-restore-more-account disabled><option value="">${esc(t(msgid('Accounts have not been read')))}</option></select>`)
+  const source = toolCard('restore-more-source', t(msgid('Account and backup')), row('v2-restore-more-account', t(msgid('Account')), `<select class="kt-select" id="v2-restore-more-account" data-restore-more-account disabled><option value="">${esc(t(msgid('Accounts have not been read')))}</option></select>`)
     + `<p>${esc(t(msgid('Backups are listed from the server backup store. Opening one inspects every member and lists what it contains for each component.')))}</p>`
     + rows(msgid('Backups of the selected account'), [msgid('Created (UTC)'), msgid('Archive'), msgid('Size'), msgid('Integrity'), msgid('Action')], 'archives', msgid('No account is selected.'), { name: 2, value: 4 }))
   const components = toolCard('restore-more-components', t(msgid('Components in the backup')), fact([['archive', msgid('Archive')], ['sha256', msgid('Archive SHA-256')]])
@@ -43,7 +43,7 @@ export function renderV2WhmRestoreFilesPage(props: WhmSurfaceProps, authority: W
   const fact = (rows: readonly (readonly [string, string])[]) => facts(rows.map(([key, label]) => ({ label: t(label), hooks: { [`data-backup-files-${key}`]: true } })), unread)
   const rows = (caption: string, headers: readonly string[], marker: string, empty: string, phone: PhoneRow = {}): string => phoneTable(table(t(caption), headers.map(label => t(label)), { [`data-backup-files-${marker}`]: true }, t(empty)), phone)
   const steps = recoverySteps(t, 'backup-files', [['account', msgid('Account')], ['backup', msgid('Backup')], ['files', msgid('Files')], ['review', msgid('Review')], ['result', msgid('Result')]])
-  const source = toolCard('backup-files-source', t(msgid('Account and backup')), field('v2-backup-files-account', t(msgid('Account')), `<select class="kt-select" id="v2-backup-files-account" data-backup-files-account disabled><option value="">${esc(t(msgid('Accounts have not been read')))}</option></select>`)
+  const source = toolCard('backup-files-source', t(msgid('Account and backup')), row('v2-backup-files-account', t(msgid('Account')), `<select class="kt-select" id="v2-backup-files-account" data-backup-files-account disabled><option value="">${esc(t(msgid('Accounts have not been read')))}</option></select>`)
     + `<p>${esc(t(msgid('Backups are listed from the server backup store. Each archive is fully inspected when you open it: every member must be a regular file or folder inside the account home.')))}</p>`
     + rows(msgid('Backups of the selected account'), [msgid('Created (UTC)'), msgid('Archive'), msgid('Size'), msgid('Integrity'), msgid('Action')], 'archives', msgid('No account is selected.'), { name: 2, value: 4 }))
   const files = toolCard('backup-files-files', t(msgid('Files in the backup')), fact([['archive', msgid('Archive')], ['integrity', msgid('Integrity')], ['sha256', msgid('Archive SHA-256')]])

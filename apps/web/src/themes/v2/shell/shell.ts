@@ -289,7 +289,10 @@ ${props.activity ? activityDrawer(t, props.activity) : ''}
 const WIDE = '@media(min-width:960px)'
 const PHONE = '@media(max-width:959px)'
 const SR = 'position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap'
-const COLLAPSED = '.v2-shell[data-sidebar-collapsed="true"]'
+// The head script (sidebar-state.ts) restores the saved state onto the root before the first paint and the runtime
+// keeps it in step with the toggle, so the collapsed rail keys off the root and never jumps while a page loads.
+const ROOT_COLLAPSED = '[data-ui-theme="v2"][data-sidebar-collapsed="true"]'
+const COLLAPSED = `${ROOT_COLLAPSED} .v2-shell`
 // The slide runs only right after the toggle was pressed, never while a page loads with the menu already hidden.
 const TOGGLING = '.v2-shell:has(.v2-side__collapse:focus)'
 
@@ -313,8 +316,8 @@ export const SHELL_CSS = `[data-ui-theme="v2"] body:has(>.v2-shell){display:flex
 .v2-ctx__fill{display:block;block-size:100%;background:var(--accent-fill)}
 .v2-ctx__fill--warn{background:var(--warn)}.v2-ctx__fill--bad{background:var(--bad)}.v2-ctx__fill--ok{background:var(--ok)}
 .v2-side__body{display:flex;flex-direction:column;gap:12px;min-block-size:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
-.v2-nav ul{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
-.v2-nav summary,.v2-nav details a,.v2-nav--favorites a{display:flex;align-items:center;gap:10px;min-block-size:var(--target);padding:6px 10px;border:1px solid transparent;border-radius:var(--radius-control);color:var(--text);font-size:13px;font-weight:500;line-height:1.25;text-decoration:none}
+.v2-nav ul{display:flex;flex-direction:column;gap:2px}
+.v2-nav summary,.v2-nav details a,.v2-nav--favorites a{display:flex;align-items:center;gap:10px;min-block-size:var(--target);padding:6px 10px;border:1px solid transparent;border-radius:var(--radius-control);color:var(--text);font-size:13px;font-weight:500;line-height:1.25}
 .v2-nav summary{font-size:14px}
 .v2-nav summary .v2-icon{color:var(--muted)}
 .v2-nav summary:hover,.v2-nav summary:hover .v2-icon,.v2-nav details a:hover,.v2-nav--favorites a:hover,.v2-nav details:has([aria-current="page"])>summary .kt-menu-icon>.v2-icon{color:var(--accent)}
@@ -373,10 +376,10 @@ ${WIDE}{
 .v2-navbar{grid-column:2;grid-row:2;position:sticky;inset-block-start:var(--v2-header);z-index:20;margin-inline:0 var(--v2-gutter)}
 .v2-content{grid-column:2;grid-row:3;margin:0;margin-inline-end:var(--v2-gutter);margin-block-end:var(--v2-gutter)}
 .v2-page,.v2-foot{padding-inline:var(--space-3)}
-.v2-shell:not([data-sidebar-collapsed="true"]) .v2-navbar{display:none}
-.v2-shell:not([data-sidebar-collapsed="true"]) .v2-content{border-block-start-width:1px;border-radius:var(--radius-card)}
+[data-ui-theme="v2"]:not([data-sidebar-collapsed="true"]) .v2-navbar{display:none}
+[data-ui-theme="v2"]:not([data-sidebar-collapsed="true"]) .v2-content{border-block-start-width:1px;border-radius:var(--radius-card)}
 ${COLLAPSED}{--v2-col:var(--v2-gutter)}
-[data-ui-theme="v2"]:has(${COLLAPSED} .v2-navbar){scroll-padding-block-start:var(--v2-navbar,56px)}
+${ROOT_COLLAPSED}:has(.v2-navbar){scroll-padding-block-start:var(--v2-navbar,56px)}
 ${COLLAPSED}>.v2-side{pointer-events:none}
 ${COLLAPSED}>.v2-side>.v2-side__top{pointer-events:auto}
 ${COLLAPSED}>.v2-side>.v2-side__body{margin-inline-start:calc(-1*var(--v2-rail));opacity:0;visibility:hidden}

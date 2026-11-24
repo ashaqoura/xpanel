@@ -55,6 +55,7 @@ const GLYPHS = {
   flag: 'ki-flag',
   tools: 'ki-wrench',
   delivery: 'ki-parcel-tracking',
+  route: 'ki-route',
   info: 'ki-information-2',
 } as const
 

@@ -1,6 +1,6 @@
 import { renderV2ServerOps } from '../server/server-ops.ts'
 import { actions, button, check, context, esc, facts, field, fields, filters, link, note, page, section, smallButton, status, table, type WhmDataPageInput } from '../software/common.ts'
-import { v2WhmSslStore } from '../tls/store.ts'
+import { v2WhmSslStoreCardParts } from '../tls/store.ts'
 
 type DetailKind = 'dns' | 'ftp' | 'certificates'
 export function renderV2WhmServiceDetail(input: WhmDataPageInput, kind: DetailKind): string {
@@ -22,7 +22,7 @@ export function renderV2WhmServiceDetail(input: WhmDataPageInput, kind: DetailKi
     detail = section('service-ftp-settings', t(msgctxt('theme:v2', 'Daemon settings')), table(t, t(msgctxt('theme:v2', 'pure-ftpd settings')), [msgctxt('theme:v2', 'Setting'), msgctxt('theme:v2', 'xPanel policy'), msgctxt('theme:v2', 'Host file'), msgid('Result')], { 'data-whm-service-detail-rows': true }) + note(t(msgctxt('theme:v2', 'Policy is rendered desired configuration. Host files are read separately; running daemon flags are not observed here.'))))
   } else {
     detail = section('service-certificates', t(msgctxt('theme:v2', 'Service endpoints')), table(t, t(msgctxt('theme:v2', 'Service certificates')), [msgid('Service'), msgctxt('theme:v2', 'Ports'), msgctxt('theme:v2', 'Certificate file'), msgid('Names'), msgctxt('theme:v2', 'Issuer'), msgctxt('theme:v2', 'Valid until (UTC)'), msgctxt('theme:v2', 'Days left'), msgctxt('theme:v2', 'Hostname covered'), msgctxt('theme:v2', 'Private key'), msgctxt('theme:v2', 'Warnings')], { 'data-whm-service-detail-rows': true }) + note(t(msgctxt('theme:v2', 'Only configured certificate files are read. Private keys are checked for presence and never opened. Distribution mail and FTP TLS settings remain independent.'))) + actions(link(t(msgctxt('theme:v2', 'Replace or renew in SSL/TLS')), '/whm/ssl', undefined, 'certificate')))
-      + section('service-certificate-install', t(msgid('Install from the server SSL storage')), v2WhmSslStore(t, 'service', [], canManage))
+      + (store => section('service-certificate-install', t(msgid('Install from the server SSL storage')), store.bodyHtml, store.hooks, false, { actionsHtml: store.toolbarHtml }))(v2WhmSslStoreCardParts(t, 'service', [], canManage))
   }
   return page(input, `/whm/services/${kind}`, title, t(msgctxt('theme:v2', 'Read service state and rendered policy independently.')), summaryHtml + detail + (kind === 'ftp' ? ftpServerSettings(input) : '') + renderV2ServerOps(t, [kind === 'dns' ? 'dns-server' : kind === 'ftp' ? 'ftp-server' : 'panel-tls'], canManage) + (kind === 'dns' ? `<template data-xp-template="whm-service-check-zone">${smallButton(t(msgid('Check zone')), { 'data-xp-slot': 'content' }, true, false)}</template>` : ''), { 'data-whm-service-detail-workspace': kind, 'data-service-detail-can-read': String(canRead), 'data-service-detail-can-restart': String(canManage && kind !== 'certificates') })
 }

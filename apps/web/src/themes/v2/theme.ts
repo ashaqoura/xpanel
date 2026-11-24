@@ -33,7 +33,7 @@ export const v2Theme: UiTheme = Object.freeze<UiTheme>({
     radii: ['--radius-card', '--radius-control'],
     contrast: [['--text', '--surface'], ['--text', '--bg']],
     defaults: {
-      light: { '--accent': '#2b7fff', '--bg': '#ffffff', '--surface': '#ffffff', '--text': '#09090b' },
+      light: { '--accent': '#155dfc', '--bg': '#ffffff', '--surface': '#ffffff', '--text': '#09090b' },
       dark: { '--accent': '#51a2ff', '--bg': '#09090b', '--surface': '#09090b', '--text': '#fafafa' },
     },
   }),

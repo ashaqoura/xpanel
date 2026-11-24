@@ -124,12 +124,12 @@ function bindAccountDav(askDialog: ((options: Record<string, unknown>) => Promis
     }
     const reset = (): void => {
       editing = null; local.value = ''; password.value = ''; directory.value = 'public_html'; readOnly.checked = false
-      title.textContent = t('Add a Web Disk login'); save.textContent = t('Add login')
+      title.textContent = t('Add a Web Disk login'); (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Add login')
     }
     const edit = (login: WebDiskClientLogin): void => {
       editing = login; local.value = login.login.slice(0, login.login.indexOf('@')); password.value = ''; directory.value = login.directory; readOnly.checked = login.access === 'read-only'
       domain.value = login.login.slice(login.login.indexOf('@') + 1)
-      title.textContent = t('Change {login}', { login: login.login }); save.textContent = t('Save changes')
+      title.textContent = t('Change {login}', { login: login.login }); (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Save changes')
       lock(); directory.focus()
     }
     const action = (label: string, target: string, run: () => void): HTMLElement => {

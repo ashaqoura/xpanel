@@ -114,7 +114,7 @@ export const PANEL_OBSERVATIONS_CSS = `.v2-panel-extra{display:flex;flex-directi
 @media(max-width:1000px){.v2-panel-obs-pair,.v2-panel-obs-pair--even{grid-template-columns:minmax(0,1fr)}}
 @media(min-width:1100px){.v2-panel-obs-kpis--five{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(max-width:640px){.v2-panel-extra{--v2-panel-padding:var(--space-2)}}
-@media(max-width:600px){.v2-panel-extra__facts,.v2-panel-operation-facts,.v2-panel-extra__fields{grid-template-columns:minmax(0,1fr)}.v2-panel-obs-seg{display:flex;inline-size:100%}.v2-panel-obs-select>.v2-field:first-child{max-inline-size:none}.v2-panel-extra td[colspan]{text-align:start;padding-block:var(--space-2)}}
+@media(max-width:600px){.v2-panel-extra__facts,.v2-panel-operation-facts,.v2-panel-extra__fields{grid-template-columns:minmax(0,1fr)}.v2-panel-obs-seg{display:flex;inline-size:100%;overflow-x:auto}.v2-panel-obs-select>.v2-field:first-child{max-inline-size:none}.v2-panel-extra td[colspan]{text-align:start;padding-block:var(--space-2)}}
 ${phoneLabelCss('.v2-panel-extra')}
 @media(max-width:600px){.v2-panel-extra table:not(:has(td)) thead{position:static;inline-size:auto;block-size:auto;clip-path:none}.v2-panel-extra table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:.25rem var(--space-2);padding:var(--space-1) 0}.v2-panel-extra table:not(:has(td)) th{padding:0;background:none}}
 @media(min-width:440px) and (max-width:600px){.v2-panel-extra .v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-panel-extra .v2-kpi-row>.v2-kpi:last-child:nth-child(odd){grid-column:1/-1}}

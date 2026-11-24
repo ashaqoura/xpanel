@@ -118,7 +118,7 @@ function bindAccountEdge(askDialog: unknown, parse: typeof readAccountEdgeView):
     const paint = (): void => {
       const ready = !busy && !review && admitted() && view !== null && view.enabled !== null
       purge.disabled = !ready || view?.enabled !== true; toggle.disabled = !ready
-      toggle.textContent = view?.enabled === false ? t('Turn the cache on') : t('Turn the cache off')
+      ;(toggle.querySelector('[data-xp-slot="label"]') ?? toggle).textContent = view?.enabled === false ? t('Turn the cache on') : t('Turn the cache off')
       state.textContent = !view ? t('Not read') : view.enabled === null ? t('Needs review') : view.enabled ? t('On for your sites') : t('Off for your sites')
       purged.textContent = !view ? t('Not read') : view.purgedAt ? stamp(view.purgedAt) : t('Never')
     }

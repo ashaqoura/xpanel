@@ -112,7 +112,7 @@ function bindAccountLogs(_askDialog: unknown): void {
           const row = document.createElement('tr')
           for (const value of [item.name, item.day, size(item.sizeBytes)]) { const td = document.createElement('td'), bdi = document.createElement('bdi'); bdi.dir = 'ltr'; bdi.textContent = value; td.append(bdi); row.append(td) }
           const cell = document.createElement('td'), link = document.createElement('a')
-          link.href = '/api/account/logs/archives/' + encodeURIComponent(item.name); link.setAttribute('download', item.name); link.textContent = t('Download'); link.className = 'xp-btn v2-btn'
+          link.href = '/api/account/logs/archives/' + encodeURIComponent(item.name); link.setAttribute('download', item.name); link.textContent = t('Download'); link.className = root.closest('[data-ui-theme="v2"]') ? 'xp-btn v2-btn kt-btn kt-btn-sm kt-btn-outline' : 'xp-btn v2-btn'
           cell.append(link); row.append(cell); rows.append(row)
         }
         say(listStatus, 'read', t('{count, plural, one {# archive in ~/logs.} other {# archives in ~/logs.}}', { count: archives?.length ?? 0 }))
