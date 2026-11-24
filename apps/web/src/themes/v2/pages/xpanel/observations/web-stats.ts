@@ -93,7 +93,7 @@ export function renderV2PanelWebStatistics(props: PanelSurfaceProps, authority?:
   ]))
   const geoip = section('v2-web-stats-geoip', t(msgid('Visitor countries')), facts([
     { label: t(msgid('Location database')), valueHtml: view ? view.geoip.installed ? `${esc(view.geoip.source)} ${technical(view.geoip.month ?? '')}` : esc(t(msgid('Not installed; countries are not resolved'))) : esc(t(msgid('Not read'))) },
-  ]) + `<p><a class="kt-link kt-link-underlined kt-link-dashed text-xs" href="https://db-ip.com" rel="noopener noreferrer" target="_blank">${esc(t(msgid('IP Geolocation by DB-IP')))}</a></p>`)
+  ]) + `<p><a class="kt-link kt-link-underlined kt-link-dashed inline-flex items-center min-h-11 text-[0.8125rem] leading-(--lh-cap)" href="https://db-ip.com" rel="noopener noreferrer" target="_blank">${esc(t(msgid('IP Geolocation by DB-IP')))}</a></p>`)
   const sites = tableCard('v2-web-stats-site', t(msgid('Sites')), [t(msgid('Domain')), t(msgid('Entry')), 'AWStats', 'Webalizer'],
     view?.sites.length ? view.sites.flatMap(row => WEB_STATS_SCHEMES.map(entry => {
       const query = new URLSearchParams(params); query.set('site', row.site); query.set('scheme', entry); if (selection) query.set('month', selection.month)

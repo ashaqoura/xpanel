@@ -9,7 +9,7 @@ export function renderV2WebDiskPage(props: PanelSurfaceProps, authority: PanelSe
   const notRead = t(msgctxt('theme:v2', 'Web Disk logins have not been read.')), heading = t(msgctxt('theme:v2', 'Web Disk accounts'))
   const logins = section('v2-webdisk-users', heading, table('v2-webdisk-table', heading, [t(msgid('Login')), t(msgid('Access'))], unreadRow(2, notRead), { 'data-web-disk-rows': true })
     + status(notRead, { 'data-web-disk-status': true }), actions(button(t(msgid('Read logins')), { 'data-web-disk-refresh': true }, !c.editable)))
-  const create = section('v2-webdisk-create', t(msgctxt('theme:v2', 'Create Web Disk account')), `<h3 class="text-sm font-semibold text-mono" data-web-disk-form-title>${esc(t(msgid('Add a Web Disk login')))}</h3>`
+  const create = section('v2-webdisk-create', t(msgctxt('theme:v2', 'Create Web Disk account')), `<h3 class="text-base font-semibold text-mono" data-web-disk-form-title>${esc(t(msgid('Add a Web Disk login')))}</h3>`
     + fields(field('v2-webdisk-login', t(msgid('Username')), input('v2-webdisk-login', '', 'text', ' dir="ltr" autocomplete="off" spellcheck="false" maxlength="64" data-web-disk-local'))
       + field('v2-webdisk-domain', t(msgid('Domain')), select('v2-webdisk-domain', '', [], ' dir="ltr" data-web-disk-domain'))
       + field('v2-webdisk-password', t(msgid('Password')), input('v2-webdisk-password', '', 'password', ' dir="ltr" autocomplete="new-password" data-web-disk-password'), t(msgid('At least 8 characters. Leave it empty while changing a login to keep the current password.')))
@@ -17,13 +17,13 @@ export function renderV2WebDiskPage(props: PanelSurfaceProps, authority: PanelSe
     + check('v2-webdisk-readonly', t(msgid('Read only')), { 'data-web-disk-read-only': true }),
     actions(button(t(msgid('Add login')), { 'data-web-disk-save': true }, true, true) + `<button type="button" class="v2-btn kt-btn kt-btn-outline" data-web-disk-cancel hidden disabled>${esc(t(msgid('Cancel')))}</button>`))
   const connection = section('v2-webdisk-connect', t(msgctxt('theme:v2', 'Connect a client')), facts([
-    { label: t(msgid('Web Disk address')), valueHtml: `<ul class="grid gap-1.5" data-web-disk-addresses></ul><span class="v2-panel-settings__blank text-secondary-foreground">${esc(t(msgid('Not read')))}</span>` },
+    { label: t(msgid('Web Disk address')), valueHtml: `<ul class="grid gap-2" data-web-disk-addresses></ul><span class="v2-panel-settings__blank text-secondary-foreground">${esc(t(msgid('Not read')))}</span>` },
     { label: t(msgid('Sign-in')), valueHtml: esc(t(msgid('The login and its password. The main login uses the account password.'))) },
     { label: t(msgid('Encryption')), valueHtml: esc(t(msgid('HTTPS only. Plain HTTP is not offered.'))) },
     { label: t(msgid('Storage')), valueHtml: esc(t(msgid('Files count toward the account disk quota.'))) },
-  ]) + '<p class="v2-muted text-xs text-muted-foreground" data-web-disk-unsecured hidden></p>', actions(button(t(msgid('Download connection settings')), { 'data-web-disk-download': true })))
+  ]) + '<p class="v2-muted text-[0.8125rem] leading-[var(--lh-cap)] text-muted-foreground" data-web-disk-unsecured hidden></p>', actions(button(t(msgid('Download connection settings')), { 'data-web-disk-download': true })))
   const clients = section('v2-webdisk-clients', t(msgid('Set up a client')), v2DavGuide(t, WEB_DISK_CLIENT_GUIDES, 'v2-panel-settings__facts'))
-  const users = section('v2-webdisk-service-users', t(msgid('How service users work')), `<p class="text-sm text-secondary-foreground">${esc(t(msgid('Email, FTP and Web Disk credentials are separate from account control-panel access.')))}</p>`, actions(link(t(msgid('Open email and users')), '/email/accounts')))
+  const users = section('v2-webdisk-service-users', t(msgid('How service users work')), `<p class="text-secondary-foreground">${esc(t(msgid('Email, FTP and Web Disk credentials are separate from account control-panel access.')))}</p>`, actions(link(t(msgid('Open email and users')), '/email/accounts')))
   return page(props, authority, '/files/web-disk', title, description,
     `<div class="v2-panel-settings__groups" data-account-web-disk data-account="${esc(c.account?.id ?? '')}" data-web-disk-manage="${c.editable}" data-web-disk-home="${esc(c.account?.home ?? '')}">${V2_WEB_DISK_TEMPLATES}${split(logins + create, connection + users)}${clients}</div>`)
 }

@@ -150,14 +150,14 @@ describe('v2 component kit', () => {
     expect(kit.pagination(t, { summary: '1-25 of 44', pageSize: { id: 'rows', options: [25, 50], selected: 50 }, previous: {}, next: {} })).toMatch(/<label for="rows">Rows<\/label><span class="v2-select"><select id="rows" class="kt-select [^"]*"><option value="25">25<\/option><option value="50" selected>50<\/option><\/select><\/span>/)
 
     const field = kit.formField({ id: 'dom', label: 'Primary domain', help: 'Lowercase.', error: 'Two dots.', control: { kind: 'input', name: 'domain', mono: true, required: true } })
-    expect(field).toMatch(/<label for="dom" class="kt-form-label leading-tight">Primary domain<\/label><input id="dom" name="domain" required class="v2-mono kt-input max-\[959px\]:text-base" aria-describedby="dom-error dom-help" aria-invalid="true"/)
+    expect(field).toMatch(/<label for="dom" class="kt-form-label">Primary domain<\/label><input id="dom" name="domain" required class="v2-mono kt-input max-\[959px\]:text-base" aria-describedby="dom-error dom-help" aria-invalid="true"/)
     expect(field.startsWith('<div class="v2-field kt-form-item">')).toBe(true)
     expect(field).toContain('id="dom-error"')
     expect(field).toContain('id="dom-help"')
     expect(kit.formField({ id: 'p', label: 'Plan', control: { kind: 'select', options: [{ value: 'b', label: 'Business', selected: true }] } })).toContain('<option value="b" selected>Business</option></select></span></div>')
-    // The Metronic settings row keeps the same children: the label takes the first grid column, the rest the second.
+    // The withdrawn settings row option still compiles and renders the stacked field: the label above its control.
     const rowField = kit.formField({ id: 'dom', label: 'Primary domain', help: 'Lowercase.', layout: 'row', control: { kind: 'input' } })
-    expect(rowField).toMatch(/^<div class="v2-field v2-field--row kt-form-item lg:grid [^"]*"><label for="dom" class="kt-form-label leading-tight max-w-56">Primary domain<\/label><input id="dom" class="kt-input [^"]*" aria-describedby="dom-help" type="text"><span class="v2-field__help kt-form-description block" id="dom-help">Lowercase.<\/span><\/div>$/)
+    expect(rowField).toMatch(/^<div class="v2-field kt-form-item"><label for="dom" class="kt-form-label">Primary domain<\/label><input id="dom" class="kt-input [^"]*" aria-describedby="dom-help" type="text"><span class="v2-field__help kt-form-description block" id="dom-help">Lowercase.<\/span><\/div>$/)
     // A switch row: label and description at the start, the switch at the end.
     expect(kit.switchRow({ id: 'ssl', label: 'AutoSSL', help: 'Renews itself.', checked: true })).toMatch(/^<label class="v2-switch-row flex items-center justify-between [^"]*" for="ssl"><span class="v2-switch-row__text [^"]*"><span class="text-sm font-medium text-mono">AutoSSL<\/span><span class="text-sm font-normal text-secondary-foreground" id="ssl-help">Renews itself.<\/span><\/span><input type="checkbox" role="switch" id="ssl" checked aria-describedby="ssl-help" class="kt-switch"><\/label>$/)
 
@@ -200,7 +200,7 @@ describe('v2 component kit', () => {
     const bar = kit.filterBar({ search: { id: 'q', label: 'Contains text' }, selects: [{ id: 'acct', label: 'Mentions account', options: [{ value: '', label: 'Any' }] }],
       segments: { label: 'Level', options: [{ label: 'All', pressed: true }] }, clear: { label: 'Clear filters' } })
     // The Metronic search input: the magnifier Keenicon inside the kt-input wrapper, directly before the input.
-    expect(bar).toMatch(/<div class="v2-filter v2-filter--fields"><div class="v2-filter__field v2-filter__search"><label class="v2-filter__label kt-form-label" for="q">Contains text<\/label><span class="v2-filter__input kt-input max-\[959px\]:text-base"><i class="v2-icon ki-filled ki-magnifier [^"]*" aria-hidden="true"><\/i><input id="q" type="search" autocomplete="off" spellcheck="false"><\/span><\/div>/)
+    expect(bar).toMatch(/<div class="v2-filter v2-filter--fields"><div class="v2-filter__field v2-filter__search"><label class="v2-filter__label kt-form-label" for="q">Contains text<\/label><span class="v2-filter__input kt-input max-\[959px\]:text-base"><input id="q" type="search" autocomplete="off" spellcheck="false"><i class="v2-icon ki-filled ki-magnifier [^"]*" aria-hidden="true"><\/i><\/span><\/div>/)
     // kt-select draws its own arrow: the wrapper holds the select alone, with no second chevron.
     expect(bar).toContain('<div class="v2-filter__field v2-filter__select"><label class="v2-filter__label kt-form-label" for="acct">Mentions account</label><span class="v2-select"><select id="acct" class="kt-select max-[959px]:text-base"><option value="">Any</option></select></span></div>')
     expect(bar).toContain('<div class="v2-filter__field v2-filter__group"><span class="v2-filter__label kt-form-label" aria-hidden="true">Level</span><div class="v2-segmented kt-toggle-group" role="group" aria-label="Level"><button type="button" class="kt-btn kt-btn-outline aria-pressed:bg-accent aria-pressed:text-accent-foreground" aria-pressed="true">All</button></div></div>')
@@ -209,7 +209,7 @@ describe('v2 component kit', () => {
     expect(kit.filterBar({ segments: { label: 'Show', options: [] } })).toBe('<div class="v2-filter"><div class="v2-segmented kt-toggle-group" role="group" aria-label="Show"></div></div>')
     // 10px from label to control (kt-form-item); a bare control takes the 34px target from the base styles, a
     // kt-input, kt-select or kt-textarea keeps its own KTUI size.
-    expect(FILTER_BAR_CSS).toContain('.v2-filter__field{display:flex;flex-direction:column;gap:.625rem;')
+    expect(FILTER_BAR_CSS).toContain('.v2-filter__field{display:flex;flex-direction:column;gap:var(--space-1);')
     expect(V2_BASE_CSS).toMatch(/:is\([^)]*\),select,textarea\):where\(:not\(\.kt-input,\.kt-select,\.kt-textarea,\.kt-input>\*\)\)\{min-height:var\(--target\)/)
     // A bare .v2-btn equals kt-btn (34px high); one that also names kt-btn takes nothing from the fallback, so
     // kt-btn-sm stays 28px and kt-btn-ghost has no border. Unchecked radio groups are not painted as selected.

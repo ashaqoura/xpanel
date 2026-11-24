@@ -18,8 +18,8 @@ const BUTTON = {
   ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive',
 } as const
 const BUTTON_SMALL = {
-  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-sm kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-sm kt-btn-outline',
-  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-sm kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive',
+  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-outline',
+  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive',
 } as const
 export interface ActivityControlLook {
   readonly kind?: keyof typeof BUTTON
@@ -37,7 +37,7 @@ export const activityLink = (t: Translate, label: string, href: string, hooks: H
   `<a class="${controlClass(look)}" href="${escapeHtml(href)}"${hookAttrs(hooks)}>${look.icon ? glyphHtml(look.icon) : ''}${escapeHtml(t(label))}</a>`
 
 /** A group of actions; `end` puts the closing actions of a form or a card at its end. */
-export const activityActions = (body: string, end = false): string => `<div class="${end ? 'v2-observation__actions flex flex-wrap items-center justify-end gap-2.5' : 'v2-observation__actions flex flex-wrap items-center gap-2.5'}">${body}</div>`
+export const activityActions = (body: string, end = false): string => `<div class="${end ? 'v2-observation__actions flex flex-wrap items-center justify-end gap-4' : 'v2-observation__actions flex flex-wrap items-center gap-4'}">${body}</div>`
 
 export interface ActivityPanel {
   readonly id: string
@@ -62,9 +62,9 @@ export const activityPanel = (t: Translate, panel: ActivityPanel): string => car
   ...(panel.hooks ? { hooks: panel.hooks } : {}), ...(panel.elementId ? { id: panel.elementId } : {}),
 })
 
-/** Label and value rows of a fact table; `valueHtml` is a value this page already knows, else the controller fills the hook. */
+/** Facts: each label 8px above its value; `valueHtml` is a value this page already knows, else the controller fills the hook. */
 export const activityFacts = (rows: readonly (readonly [label: string, valueHtml: string])[]): string =>
-  `<dl class="v2-activity__facts">${rows.map(([label, valueHtml]) => `<div><dt class="text-sm text-secondary-foreground">${escapeHtml(label)}</dt><dd class="text-sm text-mono">${valueHtml}</dd></div>`).join('')}</dl>`
+  `<dl class="v2-activity__facts">${rows.map(([label, valueHtml]) => `<div><dt class="text-sm leading-(--lh-label) text-secondary-foreground">${escapeHtml(label)}</dt><dd class="text-base leading-(--lh-text) text-mono">${valueHtml}</dd></div>`).join('')}</dl>`
 
 /** Facts a controller fills by key, unread until then. */
 export const activityFactTable = (t: Translate, items: readonly (readonly [key: string, label: string])[], attribute: `data-${string}`): string =>
@@ -87,8 +87,7 @@ const TABLES: readonly (readonly [table: string, phone: PhoneRow])[] = [
 // labelled line, and the name and its value keep the first line without a label.
 const AUDIT = `${page}[data-whm-detail-route="/whm/audit"] .v2-observation__scroll table`, AUDIT_CELL = `${AUDIT}>tbody>tr:nth-child(n)>td`
 const auditLead = (table: string, name: number, value?: number): string => `${AUDIT}${table}>tbody>tr:nth-child(n)>td:nth-child(${name}):not([colspan]){grid-area:1/1;display:block;text-align:start}
-${value ? `${AUDIT}${table}>tbody>tr:nth-child(n)>td:nth-child(${value}):not([colspan]){grid-area:1/2;display:block;justify-self:end;text-align:end}` : `${AUDIT}${table}>tbody>tr:nth-child(n)>td:nth-child(${name}):not([colspan]){grid-column:1/-1}`}
-${AUDIT}${table}>tbody>tr:nth-child(n)>td:is(:nth-child(${name})${value ? `,:nth-child(${value})` : ''}):not([colspan])::before{content:none}`
+${value ? `${AUDIT}${table}>tbody>tr:nth-child(n)>td:nth-child(${value}):not([colspan]){grid-area:1/2;display:block;justify-self:end;text-align:end}` : `${AUDIT}${table}>tbody>tr:nth-child(n)>td:nth-child(${name}):not([colspan]){grid-column:1/-1}`}`
 
 /** Page rules of the activity pages (jobs, audit log, support), loaded beside the observation stylesheet on those routes. */
 export const WHM_ACTIVITY_CSS = `${page} :is(th,td){overflow-wrap:break-word}
@@ -99,21 +98,21 @@ ${page} .v2-observation__log:empty{display:none}
 ${page} .v2-observation__job-progress>bdi{flex:none;min-inline-size:4ch;text-align:end}
 ${page} .v2-card--flush>.v2-card__body{gap:0}
 ${page} .v2-card--flush .v2-observation__scroll{border:0;border-radius:0;background:none}
-${page} .v2-activity__facts{display:grid;grid-template-columns:minmax(0,1fr);column-gap:1.875rem;min-inline-size:0}
-${page} .v2-activity__facts>div{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:.625rem;align-items:baseline;min-inline-size:0;padding-block:.5rem}
+${page} .v2-activity__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:1rem 1.5rem;min-inline-size:0}
+${page} .v2-activity__facts>div{display:flex;flex-direction:column;gap:.5rem;min-inline-size:0}
+${page} .v2-activity__facts dt{text-box:trim-end text}
 ${page} .v2-activity__facts dd{min-inline-size:0;overflow-wrap:anywhere;unicode-bidi:plaintext;text-align:var(--v2-control-align,match-parent)}
-@media(min-width:640px){${page} .v2-activity__facts>div{grid-template-columns:minmax(0,14rem) minmax(0,1fr)}}
-@media(min-width:1024px){${page} .v2-activity__facts:has(>:nth-child(5)){grid-template-columns:repeat(2,minmax(0,1fr))}${page} .v2-activity__facts:has(>:nth-child(5))>div{grid-template-columns:minmax(0,11rem) minmax(0,1fr)}}
+
 ${page} .v2-activity__timeline{display:flex;flex-direction:column;min-inline-size:0}
-${page} details[data-audit-entry-detail]{position:relative;min-inline-size:0;padding-block-end:1.25rem}
+${page} details[data-audit-entry-detail]{position:relative;min-inline-size:0;padding-block-end:1.5rem}
 ${page} details[data-audit-entry-detail]:last-child{padding-block-end:0}
 ${page} details[data-audit-entry-detail]:not(:last-child)::before{content:"";position:absolute;inset-block:2.25rem 0;inset-inline-start:1.125rem;border-inline-start:1px solid var(--line-strong)}
-${page} details[data-audit-entry-detail]>summary{display:flex;align-items:center;gap:.625rem;min-block-size:2.25rem;padding:0;border:0;list-style:none;font-weight:400;cursor:pointer}
+${page} details[data-audit-entry-detail]>summary{display:flex;align-items:center;gap:.5rem;min-block-size:var(--target);padding:0;border:0;list-style:none;font-weight:400;cursor:pointer}
 ${page} details[data-audit-entry-detail]>summary::-webkit-details-marker{display:none}
 ${page} details[data-audit-entry-detail]>summary>i{transition:transform .14s ease-out}
 ${page} details[data-audit-entry-detail][open]>summary>i{transform:rotate(180deg)}
-${page} details[data-audit-entry-detail][open]>:not(summary){margin-block-start:.625rem;margin-inline-start:2.875rem}
-${page} [data-generation-step]{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.375rem;font-variant-numeric:tabular-nums}
+${page} details[data-audit-entry-detail][open]>:not(summary){margin-block-start:.5rem;margin-inline-start:2.75rem}
+${page} [data-generation-step]{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.5rem;font-variant-numeric:tabular-nums}
 ${page} [data-generation-step]::before{content:"";inline-size:.375rem;block-size:.375rem;flex:none;border-radius:50%;background:var(--muted)}
 ${page} [data-generation-step][data-step-status=done]::before{background:var(--color-green-500,var(--ok))}
 ${page} [data-generation-step][data-step-status=failed]::before{background:var(--destructive)}
@@ -123,7 +122,7 @@ ${page} .v2-activity__manifest>li::before{content:"";flex:none;inline-size:.375r
 ${page} .v2-activity__manifest[data-whm-support-included]>li::before{background:var(--color-green-500,var(--ok))}
 ${page} .v2-activity__manifest[data-whm-support-excluded]>li::before{background:var(--destructive)}
 ${page} .v2-activity__manifest[data-whm-support-redaction]>li::before{background:var(--accent-fill)}
-${page} [data-whm-support-contact] p{font-size:.875rem;line-height:1.375rem;color:var(--text)}
+${page} [data-whm-support-contact] p{font-size:1rem;line-height:var(--lh-text);color:var(--text)}
 ${page} .v2-audit__generations td>span[title]::after{content:"…"}
 ${page} [data-whm-jobs-rows]>tr>:is(:first-child,:nth-child(n+6):nth-child(-n+8)){white-space:nowrap}
 ${page} [data-whm-jobs-rows]>tr>:nth-child(3){min-inline-size:11rem}
@@ -143,11 +142,11 @@ ${JOB}>:nth-child(4){grid-area:1/2}
 ${TABLES.map(([table, phone]) => phoneRows(`${page} ${table}`, phone)).join('\n')}
 ${page} .v2-audit__generations>tbody>tr>*{min-inline-size:0;white-space:normal}
 ${page} table.kt-table>tbody>tr>td:not([colspan]){padding:0!important}
-${AUDIT_CELL}:not([colspan]){grid-column:1/-1;display:flex;justify-content:space-between;gap:1rem;text-align:end}
-${AUDIT_CELL}:not([colspan])::before{flex:none;margin:0;font-size:.75rem;color:var(--muted);text-align:start}
+${AUDIT_CELL}:not([colspan]){grid-column:1/-1;display:flex;flex-direction:column;gap:.5rem;text-align:start}
+${AUDIT_CELL}:not([colspan])::before{flex:none;margin:0;font-size:.875rem;line-height:var(--lh-label);color:var(--text-2);text-align:start}
 ${[1, 2].map(n => `${AUDIT_CELL}:nth-child(${n}):not([colspan])::before{content:var(--v2-col-${n})}`).join('')}
 ${auditLead('.v2-audit__entries', 5, 7)}
 ${auditLead('.v2-audit__generations', 1, 8)}
 ${auditLead(':has(>[data-v2-audit-safe-changes])', 1)}
-${page} .v2-card--flush .v2-observation__scroll>table>tbody>tr:nth-child(n){padding-inline:1.25rem}
+${page} .v2-card--flush .v2-observation__scroll>table>tbody>tr:nth-child(n){padding-inline:var(--v2-panel-padding)}
 ${page} [data-whm-jobs-rows] .v2-btn{min-block-size:2.75rem}}`

@@ -102,10 +102,10 @@ export function barChart(props: BarChartProps): string {
 
 export const CHART_CSS = `.v2-chart{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
 .v2-chart__plot{display:flex;gap:var(--space-1)}
-.v2-chart__y{display:flex;flex-direction:column;justify-content:space-between;font-size:.6875rem;color:var(--muted);text-align:end}
+.v2-chart__y{display:flex;flex-direction:column;justify-content:space-between;font-size:.8125rem;color:var(--muted);text-align:end}
 .v2-chart__area{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--space-1)}
 .v2-chart svg[role=img]{display:block;inline-size:100%}
-.v2-chart__x{display:flex;justify-content:space-between;gap:4px;font-size:.6875rem;color:var(--muted)}
+.v2-chart__x{display:flex;justify-content:space-between;gap:4px;font-size:.8125rem;color:var(--muted)}
 .v2-chart--bars .v2-chart__x>span{flex:1 1 0;text-align:center}
 .v2-chart__legend{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-3);font-size:.8125rem;color:var(--text-2)}
 .v2-chart__legend li{display:inline-flex;align-items:center;gap:.375rem}

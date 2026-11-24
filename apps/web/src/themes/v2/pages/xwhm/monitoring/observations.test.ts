@@ -172,11 +172,12 @@ describe('v2 WHM diagnostic, security and activity bodies', () => {
   })
 
   it('keeps RTL field and table alignment local to the diagnostic bodies', () => {
-    // Spacing follows the Metronic scale: 30px between columns on a desktop, 20px in stacks, 10px in groups, 8px in chips.
-    expect(WHM_OBSERVATION_CSS).toContain('gap:1.875rem')
-    expect(WHM_OBSERVATION_CSS).toContain('gap:1.25rem')
-    expect(WHM_OBSERVATION_CSS).toContain('gap:.625rem')
-    expect(WHM_OBSERVATION_CSS).toContain('gap:.5rem')
+    // Spacing follows the standard's rhythm: 32px between sections and columns, 24px between groups, 16px between fields, 8px from a label to its value.
+    expect(WHM_OBSERVATION_CSS).toContain('gap:32px')
+    expect(WHM_OBSERVATION_CSS).toContain('gap:24px')
+    expect(WHM_OBSERVATION_CSS).toContain('gap:16px')
+    expect(WHM_OBSERVATION_CSS).toContain('gap:8px')
+    expect(WHM_OBSERVATION_CSS).not.toMatch(/gap:(?:1\.875rem|1\.25rem|\.625rem)/)
     expect(WHM_OBSERVATION_CSS).toContain('text-align:var(--v2-control-align,start)')
     expect(WHM_OBSERVATION_CSS).not.toMatch(/text-align\s*:\s*(?:left|right)|var\(--xp-/)
     for (const route of routes) {

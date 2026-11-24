@@ -129,7 +129,7 @@ ${stateTones('.v2-status-item', 'data-state', { ok: 'ok', warn: 'warn', bad: 'ba
 .v2-status-item__metric{flex-basis:100%;display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;padding:.625rem .75rem;border-radius:var(--radius-control);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);font-size:.8125rem;color:var(--text-2)}
 .v2-status-item__metric>.v2-num{font-weight:500;color:var(--mono,var(--text))}
 .v2-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1.25rem 1.875rem}
-.v2-legend{display:flex;flex-wrap:wrap;gap:.5rem 1rem;font-size:.75rem;color:var(--text-2)}
+.v2-legend{display:flex;flex-wrap:wrap;gap:.5rem 1rem;font-size:.8125rem;color:var(--text-2)}
 .v2-legend>li{display:inline-flex;align-items:center;gap:.375rem}
 .v2-legend__fill{width:1rem;height:.25rem;border-radius:var(--radius-pill);background:var(--color-green-500,var(--ok))}
 .v2-legend__tick{width:2px;height:.875rem;border-radius:1px}

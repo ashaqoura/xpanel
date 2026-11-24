@@ -53,7 +53,7 @@ export const STATE_BLOCK_CSS = `.v2-state--empty{display:flex;flex-direction:col
 .v2-state--error{line-height:1.5}
 .v2-state--error>.v2-icon{margin-block-start:.125rem;color:var(--destructive)}
 .v2-state--error strong{color:var(--destructive);font-weight:600}
-.v2-state--error code{inline-size:100%;padding:.5rem .75rem;border-radius:var(--radius-control);background:var(--surface);border:1px solid var(--line);font-size:.75rem;color:var(--text-2);overflow-wrap:anywhere}
+.v2-state--error code{inline-size:100%;padding:.5rem .75rem;border-radius:var(--radius-control);background:var(--surface);border:1px solid var(--line);font-size:.8125rem;color:var(--text-2);overflow-wrap:anywhere}
 .v2-skeleton-row{display:flex;align-items:center;gap:.75rem;animation:v2-pulse 1.6s ease-in-out infinite}
 .v2-skeleton-lines{flex:1 1 auto;display:flex;flex-direction:column;gap:.375rem}
 .v2-skeleton{display:block;height:.625rem;border-radius:var(--radius-control);background:var(--kt-accent)}

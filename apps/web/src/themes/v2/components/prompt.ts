@@ -7,10 +7,9 @@ export const V2_PROMPT_TEMPLATE = `<template data-xp-template="prompt-dialog"><d
 export const V2_PROMPT_CSS = `.v2-prompt{position:fixed;inset:0;margin:auto;inline-size:min(500px,calc(100% - 32px));max-block-size:calc(100dvh - 32px);padding:0;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--popover,var(--surface));color:var(--popover-foreground,var(--text));box-shadow:var(--v2-elev);overflow:auto}
 .v2-prompt:not([open]){display:none}
 .v2-prompt::backdrop{background:var(--scrim);backdrop-filter:blur(4px)}
-.v2-prompt>form{display:flex;flex-direction:column;min-inline-size:0}
-.v2-prompt__head{display:flex;flex-direction:column;gap:.5rem;min-inline-size:0;padding:1rem 1.25rem;overflow-wrap:anywhere}
+.v2-prompt>form{display:flex;flex-direction:column;gap:var(--space-3);min-inline-size:0;padding:var(--space-3)}
+.v2-prompt__head{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0;overflow-wrap:anywhere}
 .v2-prompt__head>p{font-size:.875rem;line-height:1.5;color:var(--text-2)}
 .v2-prompt__head code{padding:.125rem .375rem;border-radius:var(--radius-chip);background:var(--sunken);color:var(--text)}
-.v2-prompt__field{padding:0 1.25rem 1rem}
-.v2-prompt__foot{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.625rem;padding:1rem 1.25rem;border-block-start:1px solid var(--line)}
+.v2-prompt__foot{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2)}
 .v2-prompt[data-prompt-tone="danger"] [data-xp-prompt-confirm]{background:var(--destructive);border-color:transparent;color:var(--destructive-foreground)}`

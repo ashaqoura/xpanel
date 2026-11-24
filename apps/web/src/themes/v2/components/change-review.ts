@@ -143,7 +143,7 @@ export const CHANGE_REVIEW_CSS = `.v2-review:has(.v2-review__rows>li,.v2-review_
 .v2-review__rows:not(:empty)+.v2-review__empty,.v2-review__detail[data-empty]{display:none}
 .v2-review__row[data-state=invalid] .v2-review__box--proposed>:last-child{color:var(--destructive)}
 .v2-review__tests ol{padding-inline-start:1.25rem;list-style:decimal;display:flex;flex-direction:column;gap:.375rem;font-size:.8125rem;line-height:1.55;color:var(--text-2)}
-.v2-review__tests code{font-size:.75rem;color:var(--text)}
+.v2-review__tests code{font-size:.8125rem;color:var(--text)}
 .v2-review__steps .v2-icon{margin-block-start:.125rem;color:var(--accent)}
 .v2-apply__text strong{color:var(--mono,var(--text));font-weight:600}
 .v2-apply__dot{flex:none;width:.5rem;height:.5rem;border-radius:50%;background:var(--muted)}

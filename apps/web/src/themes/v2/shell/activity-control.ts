@@ -11,7 +11,7 @@ export function activityControl(t: Translate, props: { available: boolean; unrea
   const admission = props.available
     ? ' data-action="open-activity-drawer" aria-controls="xp-activity-drawer"'
     : ` disabled aria-disabled="true" title="${escapeHtml(t('Unavailable'))}"`
-  return `<button type="button" class="v2-top__activity kt-btn kt-btn-ghost kt-btn-icon size-9 rounded-full hover:[&_i]:text-primary" data-xp-activity-control="${props.available ? 'available' : 'unavailable'}"${admission} aria-label="${escapeHtml(label)}">${icon('activity')}${unread !== undefined && unread > 0 ? `<span class="v2-top__badge v2-num kt-badge kt-badge-destructive kt-badge-xs rounded-full" aria-hidden="true">${unread > 99 ? '99+' : unread}</span>` : ''}</button>`
+  return `<button type="button" class="v2-top__activity kt-btn kt-btn-ghost kt-btn-icon size-11 rounded-full hover:[&_i]:text-primary" data-xp-activity-control="${props.available ? 'available' : 'unavailable'}"${admission} aria-label="${escapeHtml(label)}">${icon('activity')}${unread !== undefined && unread > 0 ? `<span class="v2-top__badge v2-num kt-badge kt-badge-destructive kt-badge-xs rounded-full" aria-hidden="true">${unread > 99 ? '99+' : unread}</span>` : ''}</button>`
 }
 
 export function assembleActivityControl(t: Translate, documentHtml: string, activityHtml: string): string {

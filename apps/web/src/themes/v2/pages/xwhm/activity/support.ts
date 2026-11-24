@@ -12,7 +12,7 @@ const MANIFEST: Readonly<Record<string, readonly [glyph: IconName, tile: string]
 
 export function renderV2WhmSupport(input: WhmObservationInput): string {
   const { t, canRead } = context(input)
-  const list = (key: keyof typeof MANIFEST & string, label: string) => `<div class="v2-observation__groups gap-3.5 rounded-xl border border-border p-5"><div class="flex items-center gap-2.5"><span class="${MANIFEST[key]![1]}" aria-hidden="true">${icon(MANIFEST[key]![0], 16)}</span><h3 class="text-sm font-semibold text-mono">${esc(t(label))}</h3></div><ul class="v2-observation__list v2-activity__manifest text-sm text-secondary-foreground gap-2.5" data-whm-support-${key}><li>${esc(t(msgid('The manifest has not been read.')))}</li></ul></div>`
+  const list = (key: keyof typeof MANIFEST & string, label: string) => `<div class="v2-observation__groups gap-4 rounded-xl border border-border p-4"><div class="flex items-center gap-2"><span class="${MANIFEST[key]![1]}" aria-hidden="true">${icon(MANIFEST[key]![0], 16)}</span><h3 class="text-base font-semibold text-mono">${esc(t(label))}</h3></div><ul class="v2-observation__list v2-activity__manifest text-base text-secondary-foreground gap-2" data-whm-support-${key}><li>${esc(t(msgid('The manifest has not been read.')))}</li></ul></div>`
   const footerLink = (label: string, href: string, glyph: IconName): string => activityLink(t, label, href, {}, { icon: glyph })
   const body = activityPanel(t, {
     id: 'support-summary', title: msgid('Support summary'),
@@ -36,11 +36,11 @@ export function renderV2WhmSupport(input: WhmObservationInput): string {
       id: 'support-bundle', title: msgid('Support bundle'),
       bodyHtml: help(t, msgid('The bundle is one JSON document generated on demand. It contains only the items below, after the redaction rules below. Review the manifest, confirm, then download. Nothing is sent anywhere; you decide whom to share the file with.'))
       + activityFactTable(t, [['manifest-id', msgid('Manifest')]], 'data-whm-support-fact') + `<div class="v2-observation__charts">${list('included', msgid('Included')) + list('excluded', msgid('Never included')) + list('redaction', msgid('Redaction rules'))}</div>`
-      + `<p class="v2-muted text-xs text-muted-foreground" data-whm-support-hashing>${esc(t(msgid('Hashing is described after the manifest is read.')))}</p>`
+      + `<p class="v2-muted text-[13px] leading-(--lh-cap) font-normal text-secondary-foreground" data-whm-support-hashing>${esc(t(msgid('Hashing is described after the manifest is read.')))}</p>`
       + check(t, msgid('I reviewed this manifest. The download contains only the items it lists.'), { 'data-whm-support-confirm': true })
       + status(t, canRead ? msgid('Read the manifest before downloading.') : msgid('The support bundle is unavailable here. Nothing was generated.'), { 'data-whm-support-bundle-status': true }),
       footerHtml: activityActions(activityButton(t, msgid('Download support bundle'), { 'data-whm-support-download': true }, { kind: 'primary', icon: 'download' })),
     })
-    + activityPanel(t, { id: 'support-contact', title: msgid('Contact'), bodyHtml: `<div class="v2-observation__groups gap-2.5" data-whm-support-contact>${help(t, msgid('The support contact has not been read.'))}</div>` })
+    + activityPanel(t, { id: 'support-contact', title: msgid('Contact'), bodyHtml: `<div class="v2-observation__groups gap-2" data-whm-support-contact>${help(t, msgid('The support contact has not been read.'))}</div>` })
   return page(input, '/whm/support', msgid('Support'), msgid('Observed support facts, a redacted diagnostics bundle you review before downloading, and the support contact the server owner configured.'), v2WhmClientTemplates('support') + body, { 'data-whm-support-workspace': true, 'data-support-can-read': String(canRead) })
 }

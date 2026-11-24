@@ -34,15 +34,13 @@ export interface FormFieldProps {
   /** Validation message; marks the control aria-invalid and is read with it. */
   error?: string
   control: FieldControl
-  /** `row` is the Metronic settings row: from the large breakpoint the label (up to 14rem) sits at the start and
-   *  the control, its hint and its error grow beside it; narrower, and by default, the label sits above. */
+  /** Accepted for existing callers; both render stacked. The project standard puts every label above its control
+   *  (8px apart, on the control's text edge), so the Metronic settings row with a label column is withdrawn. */
   layout?: 'stacked' | 'row'
   hooks?: HookAttributes
 }
 
 const FIELD = 'v2-field kt-form-item'
-// One grid of two columns: the label keeps the first, every other child (control, error, hint, change) the second.
-const FIELD_ROW = 'v2-field v2-field--row kt-form-item lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-baseline lg:[&>:not(label)]:col-start-2'
 
 export function formField(props: FormFieldProps): string {
   const { id, control } = props
@@ -62,8 +60,7 @@ export function formField(props: FormFieldProps): string {
     const input = `<input ${common('kt-input max-[959px]:text-base')} type="${control.type ?? 'text'}"${attr('value', control.value)}${attr('placeholder', control.placeholder)}${attr('autocomplete', control.autocomplete)}${attr('inputmode', control.inputmode)}${attr('min', control.min)}${attr('max', control.max)}${attr('step', control.step)}${textConstraints(control)}${control.readonly ? ' readonly' : ''}>`
     field = control.unit ? `<span class="v2-field__unit kt-input-group">${input}<span class="kt-input-addon">${escapeHtml(control.unit)}</span></span>` : input
   }
-  const row = props.layout === 'row'
-  return `<div class="${row ? FIELD_ROW : FIELD}"${hookAttrs(props.hooks)}><label for="${escapeHtml(id)}" class="${row ? 'kt-form-label leading-tight max-w-56' : 'kt-form-label leading-tight'}">${escapeHtml(props.label)}</label>${field}${props.error ? `<span class="v2-field__error kt-form-message flex items-center gap-1.5" id="${escapeHtml(errorId!)}">${icon('alert', 14)}${escapeHtml(props.error)}</span>` : ''}${props.help ? `<span class="v2-field__help kt-form-description block" id="${escapeHtml(helpId!)}">${escapeHtml(props.help)}</span>` : ''}${props.change ? `<span class="v2-field__change text-xs font-medium text-primary" id="${escapeHtml(changeId!)}">${escapeHtml(props.change)}</span>` : ''}</div>`
+  return `<div class="${FIELD}"${hookAttrs(props.hooks)}><label for="${escapeHtml(id)}" class="kt-form-label">${escapeHtml(props.label)}</label>${field}${props.error ? `<span class="v2-field__error kt-form-message flex items-center gap-1.5" id="${escapeHtml(errorId!)}">${icon('alert', 14)}${escapeHtml(props.error)}</span>` : ''}${props.help ? `<span class="v2-field__help kt-form-description block" id="${escapeHtml(helpId!)}">${escapeHtml(props.help)}</span>` : ''}${props.change ? `<span class="v2-field__change font-medium text-primary" id="${escapeHtml(changeId!)}">${escapeHtml(props.change)}</span>` : ''}</div>`
 }
 
 export interface SwitchRowProps {
@@ -83,10 +80,13 @@ export const switchRow = (props: SwitchRowProps): string =>
   `<label class="v2-switch-row flex items-center justify-between gap-5 cursor-pointer" for="${escapeHtml(props.id)}"><span class="v2-switch-row__text flex flex-col gap-1"><span class="${props.change ? 'v2-switch-row__label flex flex-wrap items-center gap-2 text-sm font-medium text-mono' : 'text-sm font-medium text-mono'}">${escapeHtml(props.label)}${props.change ? `<span class="v2-switch-row__change kt-badge kt-badge-sm kt-badge-outline kt-badge-primary" id="${escapeHtml(props.id)}-change">${escapeHtml(props.change)}</span>` : ''}</span>${props.help ? `<span class="text-sm font-normal text-secondary-foreground" id="${escapeHtml(props.id)}-help">${escapeHtml(props.help)}</span>` : ''}</span><input type="checkbox" role="switch" id="${escapeHtml(props.id)}"${attr('name', props.name)}${props.checked ? ' checked' : ''}${props.disabled ? ' disabled' : ''}${props.help || props.change ? ` aria-describedby="${[props.help ? `${escapeHtml(props.id)}-help` : '', props.change ? `${escapeHtml(props.id)}-change` : ''].filter(Boolean).join(' ')}"` : ''} class="kt-switch"${hookAttrs(props.hooks)}></label>`
 
 // A field written with the v2 classes alone (no kt-form-item, kt-form-label, kt-form-description) keeps the same look.
-export const FORM_FIELD_CSS = `.v2-form{display:flex;flex-direction:column;gap:var(--space-3)}
-.v2-field{display:flex;flex-direction:column;gap:.625rem;min-width:0}
-.v2-field>label:not(:has(>input)),.v2-field>.v2-field__label{display:flex;align-items:center;gap:.5rem;font-size:.875rem;line-height:1.25;font-weight:500;color:var(--text)}
+// The label (14/22) sits 8px above its control: the box ends at its glyphs (text-box trim) and its text is inset by
+// the control's border and padding, so label glyphs and the control's text share one start edge. Fields are 16px apart.
+export const FORM_FIELD_CSS = `.v2-form{display:flex;flex-direction:column;gap:var(--space-2)}
+.v2-field{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
+.v2-field>label:not(:has(>input)),.v2-field>.v2-field__label{display:block;padding-inline:calc(.75rem + 1px);font-size:.875rem;line-height:var(--lh-label);font-weight:500;color:var(--text);text-box:trim-end text}
 .v2-field :is(input,select,textarea):not([type=checkbox],[type=radio]){inline-size:100%}
-.v2-field__help,.v2-field__error{margin-block-start:-.25rem;font-size:.75rem;line-height:1.4;font-weight:400;color:var(--text-2)}
+.v2-field__help,.v2-field__error,.v2-field__change{font-size:.8125rem;line-height:var(--lh-cap);font-weight:400;color:var(--text-2)}
 .v2-field__error{display:inline-flex;align-items:center;gap:.375rem;color:var(--destructive)}
+.v2-field__change{color:var(--accent)}
 `

@@ -100,9 +100,9 @@ const NO_NAVIGATION: RenderedNavigation = { sections: '', navbar: '' }
 // Complete literal class lists: the stylesheet build only keeps utilities it can read as whole tokens.
 const TAB = 'kt-menu-item border-b-2 border-b-transparent'
 const TAB_HERE = 'kt-menu-item border-b-2 border-b-mono'
-const TAB_TITLE = 'kt-menu-title text-nowrap text-sm text-foreground hover:text-mono'
-const TAB_TITLE_HERE = 'kt-menu-title text-nowrap text-sm text-mono font-medium'
-const ICON_BUTTON = 'kt-btn kt-btn-ghost kt-btn-icon size-9 rounded-full hover:[&_i]:text-primary'
+const TAB_TITLE = 'kt-menu-title text-nowrap text-base text-foreground hover:text-mono'
+const TAB_TITLE_HERE = 'kt-menu-title text-nowrap text-base text-mono font-medium'
+const ICON_BUTTON = 'kt-btn kt-btn-ghost kt-btn-icon size-11 rounded-full hover:[&_i]:text-primary'
 const BRAND_MARK = 'v2-brand__mark flex items-center justify-center shrink-0 size-[30px] rounded-md bg-primary text-primary-foreground font-mono text-base font-bold leading-none'
 const BRAND_NAME = 'v2-brand__name text-base font-medium truncate'
 const CTX_MARK = 'flex items-center justify-center shrink-0 size-7 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase'
@@ -121,7 +121,7 @@ function sectionTabs(locale: Translate['locale'], surface: V2Surface, section: N
     const label = catalogText(locale, `nav.page.${surface}.${page.id}.name`, page.name)
     return `<li class="${here ? TAB_HERE : TAB}"><a class="kt-menu-link" href="${escapeHtml(page.route)}"${here ? ' aria-current="page"' : ''}><span class="${here ? TAB_TITLE_HERE : TAB_TITLE}">${escapeHtml(label)}</span></a></li>`
   }).join('')
-  return `<nav class="v2-navbar bg-muted" aria-label="${escapeHtml(name)}"><div class="v2-navbar__frame rounded-t-xl border border-input bg-background flex items-stretch grow"><div class="kt-container-fluid flex items-stretch"><div class="grid items-stretch"><div class="kt-scrollable-x-auto flex items-stretch"><ul class="kt-menu gap-5 lg:gap-7.5">${tabs}</ul></div></div></div></div></nav>`
+  return `<nav class="v2-navbar bg-muted" aria-label="${escapeHtml(name)}"><div class="v2-navbar__frame rounded-t-xl border border-border bg-background flex items-stretch grow"><div class="kt-container-fluid flex items-stretch"><div class="grid items-stretch"><div class="kt-scrollable-x-auto flex items-stretch"><ul class="kt-menu gap-5 lg:gap-7.5">${tabs}</ul></div></div></div></div></nav>`
 }
 
 function sidebarSectionsHtml(locale: Translate['locale'], surface: V2Surface, sectionsList: NavigationSections, current: string): RenderedNavigation {
@@ -204,7 +204,7 @@ function sidebar(t: Translate, props: V2ShellProps, navigationHtml: string): str
   const context = props.context ? `<span class="v2-side__sep shrink-0 px-2.5 font-medium text-muted-foreground" aria-hidden="true">/</span>${contextCard(props.context)}` : ''
   const controls = props.contextControlHtml ? `<div class="v2-ctx__controls">${props.contextControlHtml}</div>` : ''
   return `<aside class="v2-side" id="xp-sidebar" data-xp-sidebar tabindex="-1" aria-label="${escapeHtml(`${product} ${t('navigation')}`)}">
-<div class="v2-side__top"><a class="v2-brand flex items-center shrink-0 min-w-0 max-w-full text-secondary-foreground hover:text-mono" href="${escapeHtml(props.homeHref)}"><span class="${BRAND_MARK} ms-5 me-3" aria-hidden="true">x</span><span class="v2-brand__text flex flex-col min-w-0 leading-tight"><span class="${BRAND_NAME}">${escapeHtml(product)}</span>${subtitle}</span></a><button type="button" class="v2-side__collapse kt-btn kt-btn-ghost kt-btn-icon kt-btn-sm" data-action="toggle-sidebar-collapse" aria-controls="xp-sidebar" aria-expanded="true" aria-label="${toggle}" title="${toggle}"><i class="v2-icon ki-filled ki-black-left-line text-base leading-none v2-flip" aria-hidden="true"></i></button>${context}${controls}<button type="button" class="v2-side__close kt-btn kt-btn-ghost kt-btn-icon kt-btn-sm" data-action="close-mobile-nav" aria-controls="xp-sidebar" aria-label="${escapeHtml(t(msgctxt('shell', 'Close navigation')))}">${icon('x', 16)}</button></div>
+<div class="v2-side__top"><a class="v2-brand flex items-center shrink-0 min-w-0 max-w-full min-h-11 text-secondary-foreground hover:text-mono" href="${escapeHtml(props.homeHref)}"><span class="${BRAND_MARK} ms-5 me-3" aria-hidden="true">x</span><span class="v2-brand__text flex flex-col min-w-0 leading-tight"><span class="${BRAND_NAME}">${escapeHtml(product)}</span>${subtitle}</span></a><button type="button" class="v2-side__collapse kt-btn kt-btn-ghost kt-btn-icon size-11" data-action="toggle-sidebar-collapse" aria-controls="xp-sidebar" aria-expanded="true" aria-label="${toggle}" title="${toggle}"><i class="v2-icon ki-filled ki-black-left-line text-base leading-none v2-flip" aria-hidden="true"></i></button>${context}${controls}<button type="button" class="v2-side__close kt-btn kt-btn-ghost kt-btn-icon size-11" data-action="close-mobile-nav" aria-controls="xp-sidebar" aria-label="${escapeHtml(t(msgctxt('shell', 'Close navigation')))}">${icon('x', 16)}</button></div>
 <div class="v2-side__body">${navigationHtml}</div>
 </aside>`
 }
@@ -222,17 +222,17 @@ function accountMenu(t: Translate, props: V2ShellProps): string {
   const avatar = `<span class="${AVATAR}" data-initial="${escapeHtml(initial)}" aria-hidden="true"></span>`
   const who = `<span${account.username ? ' dir="ltr"' : ''}>${escapeHtml(name)}</span>${account.roleLabel ? ` <span>${escapeHtml(account.roleLabel)}</span>` : ''}`
   const links = [
-    ...(account.securityHref ? [`<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(account.securityHref)}" data-security-link="true">${icon('shield', 16)}${escapeHtml(t('Security'))}</a>`] : []),
-    ...(account.links ?? []).map(link => `<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(link.href)}"${hookAttrs(link.hooks)}>${icon('gear', 16)}${escapeHtml(link.label)}</a>`),
+    ...(account.securityHref ? [`<a class="v2-menu__item kt-dropdown-menu-link min-h-11" href="${escapeHtml(account.securityHref)}" data-security-link="true">${icon('shield', 16)}${escapeHtml(t('Security'))}</a>`] : []),
+    ...(account.links ?? []).map(link => `<a class="v2-menu__item kt-dropdown-menu-link min-h-11" href="${escapeHtml(link.href)}"${hookAttrs(link.hooks)}>${icon('gear', 16)}${escapeHtml(link.label)}</a>`),
   ].join('')
   const session = account.signedIn
-    ? `<div class="v2-account__signout px-2.5 pt-1.5 pb-1"><button type="button" class="v2-menu__item v2-menu__item--danger kt-btn kt-btn-outline justify-center w-full" data-action="logout">${escapeHtml(t('Sign out'))}</button></div>`
-    : account.signInHref ? `<a class="v2-menu__item kt-dropdown-menu-link" href="${escapeHtml(account.signInHref)}">${escapeHtml(t('Sign in'))}</a>` : ''
+    ? `<div class="v2-account__signout px-2.5 pt-1.5 pb-1"><button type="button" class="v2-menu__item v2-menu__item--danger kt-btn kt-btn-outline justify-center w-full h-11" data-action="logout">${escapeHtml(t('Sign out'))}</button></div>`
+    : account.signInHref ? `<a class="v2-menu__item kt-dropdown-menu-link min-h-11" href="${escapeHtml(account.signInHref)}">${escapeHtml(t('Sign in'))}</a>` : ''
   const timezoneOptions = [['UTC', t('Server time (UTC)')], ['local', t('Browser local time')], ['Africa/Cairo', 'Africa/Cairo'], ['Asia/Amman', 'Asia/Amman'], ['Asia/Gaza', 'Asia/Gaza'], ['Asia/Riyadh', 'Asia/Riyadh'], ['Asia/Dubai', 'Asia/Dubai'], ['Europe/London', 'Europe/London'], ['Europe/Berlin', 'Europe/Berlin'], ['America/New_York', 'America/New_York'], ['America/Chicago', 'America/Chicago'], ['America/Los_Angeles', 'America/Los_Angeles'], ['Asia/Tokyo', 'Asia/Tokyo'], ['Australia/Sydney', 'Australia/Sydney']] as const
-  const timezoneChoice = !account.signedIn ? '' : `<div class="v2-tz flex flex-col gap-1.5 px-2.5 py-1.5"><label class="kt-form-label" for="v2-user-tz">${escapeHtml(t('Time zone'))}</label><select class="kt-select kt-select-sm" id="v2-user-tz" data-user-timezone-select>${timezoneOptions.map(([value, label]) => `<option value="${value}">${escapeHtml(label)}</option>`).join('')}</select></div>`
-  const interfaceChoice = !account.signedIn ? '' : `<section class="v2-ui-theme flex flex-col gap-2 px-2.5 py-1.5 break-words" data-ui-theme-preferences data-ui-theme-can-read="true" hidden><form class="flex flex-col gap-2" data-ui-theme-form hidden><label class="flex flex-col gap-1.5" for="v2-ui-theme-choice"><span class="kt-form-label">${escapeHtml(t(msgctxt('theme:v2', 'Interface theme')))}</span><select class="kt-select kt-select-sm" id="v2-ui-theme-choice" name="uiTheme" data-ui-theme-choice disabled><option value="classic">${escapeHtml(t('Classic'))}</option><option value="v2">V2</option></select></label><button class="kt-btn kt-btn-primary kt-btn-sm" type="submit" data-ui-theme-save disabled>${escapeHtml(t('Save'))}</button></form><p data-ui-theme-status role="status" aria-live="polite" hidden></p><button class="kt-btn kt-btn-outline kt-btn-sm" type="button" data-ui-theme-reload disabled hidden>${escapeHtml(t('Reload'))}</button></section>`
+  const timezoneChoice = !account.signedIn ? '' : `<div class="v2-tz flex flex-col gap-2 px-2.5 py-1.5"><label class="kt-form-label ps-3.25" for="v2-user-tz">${escapeHtml(t('Time zone'))}</label><select class="kt-select h-11" id="v2-user-tz" data-user-timezone-select>${timezoneOptions.map(([value, label]) => `<option value="${value}">${escapeHtml(label)}</option>`).join('')}</select></div>`
+  const interfaceChoice = !account.signedIn ? '' : `<section class="v2-ui-theme flex flex-col gap-2 px-2.5 py-1.5 break-words" data-ui-theme-preferences data-ui-theme-can-read="true" hidden><form class="flex flex-col gap-2" data-ui-theme-form hidden><label class="flex flex-col gap-2" for="v2-ui-theme-choice"><span class="kt-form-label ps-3.25">${escapeHtml(t(msgctxt('theme:v2', 'Interface theme')))}</span><select class="kt-select h-11" id="v2-ui-theme-choice" name="uiTheme" data-ui-theme-choice disabled><option value="classic">${escapeHtml(t('Classic'))}</option><option value="v2">V2</option></select></label><button class="kt-btn kt-btn-primary h-11" type="submit" data-ui-theme-save disabled>${escapeHtml(t('Save'))}</button></form><p data-ui-theme-status role="status" aria-live="polite" hidden></p><button class="kt-btn kt-btn-outline h-11" type="button" data-ui-theme-reload disabled hidden>${escapeHtml(t('Reload'))}</button></section>`
   const identity = `<div class="v2-account__head flex items-center gap-2.5 px-2.5 py-1.5">${avatar}<span class="v2-account__who flex flex-col min-w-0 leading-tight">${who}</span></div><div class="kt-dropdown-menu-separator"></div>`
-  return `<details class="v2-account" data-user-menu><summary class="v2-account__summary kt-btn kt-btn-ghost kt-btn-icon size-9 rounded-full" aria-label="${escapeHtml(`${t('User menu for')} ${name}${account.roleLabel ? ` ${account.roleLabel}` : ''}`)}">${avatar}<span class="v2-account__id v2-sr">${who}</span></summary><div class="v2-account__panel kt-dropdown-menu open">${identity}${links}${timezoneChoice}${interfaceChoice}${session}</div></details>`
+  return `<details class="v2-account" data-user-menu><summary class="v2-account__summary kt-btn kt-btn-ghost kt-btn-icon size-11 rounded-full" aria-label="${escapeHtml(`${t('User menu for')} ${name}${account.roleLabel ? ` ${account.roleLabel}` : ''}`)}">${avatar}<span class="v2-account__id v2-sr">${who}</span></summary><div class="v2-account__panel kt-dropdown-menu open">${identity}${links}${timezoneChoice}${interfaceChoice}${session}</div></details>`
 }
 
 function topbar(t: Translate, props: V2ShellProps): string {
@@ -240,16 +240,16 @@ function topbar(t: Translate, props: V2ShellProps): string {
   const product = escapeHtml(brandingProductName(props.branding, PRODUCT[props.surface]))
   const server = props.server
     ? `<span class="v2-server v2-num kt-badge kt-badge-stroke rounded-full" title="${escapeHtml(props.server.name)}"${attr('data-generation-chip', props.server.generationId)}><span class="v2-server__dot v2-server__dot--${props.server.tone ?? 'ok'}" aria-hidden="true"></span><span class="v2-mono">${escapeHtml(props.server.name)}</span>${props.server.generationId === undefined ? '' : `<span class="v2-muted">${escapeHtml(t(msgctxt('theme:v2', 'gen {generation}'), { generation: props.server.generationId }))}</span>`}</span>` : ''
-  const languages = props.languages.map(language => `<a class="v2-top__lang kt-btn kt-btn-ghost" href="${escapeHtml(language.href)}" lang="${language.tag}" hreflang="${language.tag}" data-lang-switch="${language.tag}">${icon('language', 16)}<span>${escapeHtml(localeInfo(language.tag).nativeName)}</span></a>`).join('')
+  const languages = props.languages.map(language => `<a class="v2-top__lang kt-btn kt-btn-ghost h-11 min-w-11" href="${escapeHtml(language.href)}" lang="${language.tag}" hreflang="${language.tag}" data-lang-switch="${language.tag}">${icon('language', 16)}<span>${escapeHtml(localeInfo(language.tag).nativeName)}</span></a>`).join('')
   const next = props.scheme.current === 'dark' ? 'light' : 'dark'
   const schemeLabel = next === 'dark' ? t('Dark theme') : t('Light theme')
   const scheme = `<a class="v2-top__scheme ${ICON_BUTTON}" href="${escapeHtml(props.scheme.toggleHref)}" data-theme-toggle="${next}" aria-label="${escapeHtml(schemeLabel)}" title="${escapeHtml(schemeLabel)}">${icon(next === 'dark' ? 'moon' : 'sun')}</a>`
   const bell = activityControl(t, { available: false })
   const whmBell = props.surface === 'xwhm' ? `<a class="v2-top__bell ${ICON_BUTTON}" href="/whm#whm-inbox-heading" data-whm-bell data-unread="false" aria-label="${escapeHtml(t('Notifications'))}">${icon('bell')}<span class="v2-top__count v2-num kt-badge kt-badge-destructive kt-badge-xs rounded-full" data-whm-bell-count aria-hidden="true" hidden></span></a>` : ''
   return `<header class="v2-top bg-muted" role="banner">
-<button type="button" class="v2-top__menu kt-btn kt-btn-ghost kt-btn-icon" data-action="toggle-mobile-nav" aria-controls="xp-sidebar" aria-expanded="false" aria-label="${escapeHtml(t('Menu'))}">${icon('menu')}</button>
-<a class="v2-top__brand flex items-center shrink-0 min-w-0 text-secondary-foreground hover:text-mono" href="${escapeHtml(props.homeHref)}"><span class="${BRAND_MARK} ms-1 me-2.5" aria-hidden="true">x</span><span class="${BRAND_NAME}">${product}</span></a>
-<details class="v2-tools" open data-xp-toolbar-options><summary class="v2-tools__toggle kt-btn kt-btn-outline kt-btn-sm">${escapeHtml(t('Search & account'))}</summary><div class="v2-tools__content">
+<button type="button" class="v2-top__menu kt-btn kt-btn-ghost kt-btn-icon size-11" data-action="toggle-mobile-nav" aria-controls="xp-sidebar" aria-expanded="false" aria-label="${escapeHtml(t('Menu'))}">${icon('menu')}</button>
+<a class="v2-top__brand flex items-center shrink min-w-0 min-h-11 text-secondary-foreground hover:text-mono" href="${escapeHtml(props.homeHref)}"><span class="${BRAND_MARK} ms-1 me-2.5" aria-hidden="true">x</span><span class="${BRAND_NAME}">${product}</span></a>
+<details class="v2-tools" open data-xp-toolbar-options><summary class="v2-tools__toggle kt-btn kt-btn-outline h-11">${escapeHtml(t('Search & account'))}</summary><div class="v2-tools__content">
 ${props.searchHtml ?? `<button type="button" class="v2-search" data-action="open-cmdk" aria-keyshortcuts="Control+K Meta+K">${icon('search', 16)}<span>${escapeHtml(searchLabel)}</span> <kbd class="kt-kbd kt-kbd-sm">Ctrl K</kbd></button>`}
 ${liveIndicator(t, props.realtimeEnabled)}${server}${languages}${scheme}${bell}${whmBell}${accountMenu(t, props)}
 </div></details>
@@ -265,9 +265,9 @@ export function renderV2Shell(t: Translate, props: V2ShellProps): string {
   // A surface with its own navigation (mailbox folders) fills the same sidebar and has no section tab row.
   const navigation: RenderedNavigation = props.sidebarHtml === undefined ? catalogNavigation(t, props) : { sections: props.sidebarHtml, navbar: '' }
   const footer = props.footerLinks?.length
-    ? `<footer class="v2-foot py-3"><nav class="v2-foot__links flex flex-wrap justify-center md:justify-end gap-4 py-2 text-sm text-secondary-foreground">${props.footerLinks.map(link => `<a class="inline-flex items-center gap-1.5 hover:text-primary" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}${link.external ? icon('external', 14) : ''}</a>`).join('')}</nav></footer>` : ''
+    ? `<footer class="v2-foot py-2"><nav class="v2-foot__links flex flex-wrap justify-center md:justify-end gap-x-4 text-sm text-secondary-foreground">${props.footerLinks.map(link => `<a class="inline-flex items-center gap-1.5 min-h-11 hover:text-primary" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}${link.external ? icon('external', 14) : ''}</a>`).join('')}</nav></footer>` : ''
   return `<div class="v2-shell" data-xp-activity-shell data-surface="${props.surface}" data-shell-nav="${props.sidebarHtml === undefined ? 'catalog' : 'surface'}"${actorScope ? ` data-session-actor="${escapeHtml(actorScope)}"` : ''}${hookAttrs(props.hooks)}>
-<a class="v2-skip kt-btn kt-btn-primary" href="#main-content">${escapeHtml(t('Skip to content'))}</a>
+<a class="v2-skip kt-btn kt-btn-primary h-11" href="#main-content">${escapeHtml(t('Skip to content'))}</a>
 ${sidebar(t, props, navigation.sections)}
 <button type="button" class="v2-backdrop" data-action="close-mobile-nav" data-xp-nav-backdrop hidden tabindex="-1" aria-label="${escapeHtml(t(msgctxt('shell', 'Close navigation')))}"></button>
 <div class="v2-work" data-xp-shell-content>
@@ -298,41 +298,40 @@ const TOGGLING = '.v2-shell:has(.v2-side__collapse:focus)'
 
 export const SHELL_CSS = `[data-ui-theme="v2"] body:has(>.v2-shell){display:flex;flex-direction:column;min-block-size:100dvh}
 [data-ui-theme="v2"] body:has(>.v2-shell)>.v2-shell{min-block-size:0}
-.v2-shell{--v2-header:58px;--v2-rail:280px;--v2-col:var(--v2-rail);--v2-navbar:56px;--v2-gutter:20px;--v2-strip:min(42vw,640px);flex:1 0 auto;display:flex;flex-direction:column;min-inline-size:0;min-block-size:100dvh}
+.v2-shell{--v2-header:64px;--v2-rail:280px;--v2-col:var(--v2-rail);--v2-navbar:56px;--v2-gutter:20px;--v2-strip:min(42vw,640px);flex:1 0 auto;display:flex;flex-direction:column;min-inline-size:0;min-block-size:100dvh}
 .v2-shell summary{list-style:none;cursor:pointer}
 .v2-shell summary::-webkit-details-marker{display:none}
 .v2-work{display:contents}
 .v2-skip{position:fixed;inset-inline-start:var(--space-1);inset-block-start:-100px;z-index:100}
-.v2-skip:focus{inset-block-start:var(--space-1)}
+.v2-skip:focus{inset-block-start:var(--space-1);outline:2px solid var(--accent);outline-offset:2px}
 .v2-side{outline:none}
 .v2-ctx,.v2-ctx__text{display:flex;min-inline-size:0}
 .v2-ctx__detail{flex:0 4 auto}
 .v2-ctx__status{color:var(--ok)}
 .v2-ctx__status>span{inline-size:6px;block-size:6px;border-radius:50%;background:currentColor}
 .v2-ctx__status--warn{color:var(--warn)}.v2-ctx__status--bad{color:var(--bad)}.v2-ctx__status--info{color:var(--accent)}.v2-ctx__status--neutral{color:var(--text-2)}
-.v2-ctx__meter{flex:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-2);white-space:nowrap}
+.v2-ctx__meter{flex:none;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:20px;color:var(--text-2);white-space:nowrap}
 .v2-ctx__meter>div:first-child{display:flex;justify-content:space-between;gap:var(--space-1)}
 .v2-ctx__bar{block-size:4px;border-radius:var(--radius-pill);background:var(--sunken);overflow:hidden}
 .v2-ctx__fill{display:block;block-size:100%;background:var(--accent-fill)}
 .v2-ctx__fill--warn{background:var(--warn)}.v2-ctx__fill--bad{background:var(--bad)}.v2-ctx__fill--ok{background:var(--ok)}
-.v2-side__body{display:flex;flex-direction:column;gap:12px;min-block-size:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+.v2-side__body{display:flex;flex-direction:column;gap:12px;min-block-size:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .v2-nav ul{display:flex;flex-direction:column;gap:2px}
-.v2-nav summary,.v2-nav details a,.v2-nav--favorites a{display:flex;align-items:center;gap:10px;min-block-size:var(--target);padding:6px 10px;border:1px solid transparent;border-radius:var(--radius-control);color:var(--text);font-size:13px;font-weight:500;line-height:1.25}
-.v2-nav summary{font-size:14px}
+.v2-nav summary,.v2-nav details a,.v2-nav--favorites a{display:flex;align-items:center;gap:10px;min-block-size:2.75rem;padding:.5rem 10px;border:1px solid transparent;border-radius:var(--radius-control);color:var(--text);font-size:1rem;font-weight:500;line-height:1.5rem}
 .v2-nav summary .v2-icon{color:var(--muted)}
 .v2-nav summary:hover,.v2-nav summary:hover .v2-icon,.v2-nav details a:hover,.v2-nav--favorites a:hover,.v2-nav details:has([aria-current="page"])>summary .kt-menu-icon>.v2-icon{color:var(--accent)}
 .v2-nav details[open]>summary{color:var(--nav-strong)}
 .v2-nav details[open]>summary .v2-nav__chev{transform:rotate(90deg)}
 .v2-nav details[open]>summary .v2-nav__chev:dir(rtl){transform:scaleX(-1) rotate(90deg)}
-.v2-nav details>ul{margin-inline-start:18px;padding-block:2px 6px;padding-inline-start:12px;border-inline-start:1px solid var(--line-strong)}
-.v2-nav details a[aria-current="page"]{background:var(--bg);border-color:var(--line-strong);color:var(--accent);font-weight:600}
-.v2-nav__label,.v2-nav__empty{display:flex;align-items:center;gap:var(--space-1);padding:6px 10px;font-size:12px;font-weight:500;color:var(--muted)}
+.v2-nav details>ul{margin-inline-start:18px;padding-block:2px 6px;padding-inline-start:12px;border-inline-start:1px solid var(--line)}
+.v2-nav details a[aria-current="page"]{background:var(--bg);border-color:var(--line);color:var(--accent);font-weight:600}
+.v2-nav__label,.v2-nav__empty{display:flex;align-items:center;gap:var(--space-1);padding:6px 10px;font-size:13px;font-weight:500;line-height:20px;color:var(--muted)}
 .v2-nav__empty{align-items:flex-start}
 .v2-backdrop{position:fixed;inset:0;z-index:60;border:0;background:var(--scrim);backdrop-filter:blur(4px)}
 .v2-top{flex:none;position:sticky;inset-block-start:0;z-index:30;display:flex;align-items:center;gap:var(--space-1);block-size:var(--v2-header);padding-inline:var(--space-2)}
 .v2-tools{flex:1 1 auto;min-inline-size:0}
 .v2-tools__content{display:flex;align-items:center;justify-content:flex-end;gap:var(--space-1)}
-.v2-search{flex:0 1 240px;min-width:0;display:flex;align-items:center;gap:var(--space-1);block-size:var(--target);padding-inline:10px 6px;border:1px solid var(--line-strong);border-radius:var(--radius-control);background:var(--bg);color:var(--muted);font-size:13px;text-align:start;cursor:pointer}
+.v2-search{flex:0 1 240px;min-width:0;display:flex;align-items:center;gap:var(--space-1);block-size:2.75rem;padding-inline:12px 8px;border:1px solid var(--line-strong);border-radius:var(--radius-control);background:var(--bg);color:var(--muted);font-size:1rem;text-align:start;cursor:pointer}
 .v2-search:hover:not(:disabled){color:var(--text)}
 .v2-search:disabled{opacity:.6;cursor:not-allowed}
 .v2-search>span{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -350,11 +349,11 @@ export const SHELL_CSS = `[data-ui-theme="v2"] body:has(>.v2-shell){display:flex
 .v2-top__badge,.v2-top__count{position:absolute;inset-block-start:-2px;inset-inline-end:-2px}
 .v2-account__avatar::before{content:attr(data-initial)}
 .v2-account__panel{position:absolute;z-index:40;inset-inline-end:0;inset-block-start:calc(100% + var(--space-1));inline-size:max-content;min-inline-size:240px;max-inline-size:min(320px,calc(100vw - 2*var(--space-2)))}
-.v2-account__who>:first-child{overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:600;color:var(--nav-strong)}
-.v2-account__who>:nth-child(2){font-size:12px;color:var(--muted)}
+.v2-account__who>:first-child{overflow:hidden;text-overflow:ellipsis;font-size:14px;line-height:22px;font-weight:600;color:var(--nav-strong)}
+.v2-account__who>:nth-child(2){font-size:13px;line-height:20px;color:var(--muted)}
 .v2-navbar{flex:none;display:flex;align-items:stretch;block-size:var(--v2-navbar);margin-inline:var(--space-1)}
-.v2-navbar a{outline-offset:-2px}
-.v2-content{margin:0 var(--space-1) var(--space-1);border:1px solid var(--line-strong);border-radius:var(--radius-card)}
+.v2-navbar a{justify-content:center;min-block-size:2.75rem;min-inline-size:2.75rem;outline-offset:-2px}
+.v2-content{margin:0 var(--space-1) var(--space-1);border:1px solid var(--line);border-radius:var(--radius-card)}
 .v2-navbar+.v2-content{border-block-start-width:0;border-start-start-radius:0;border-start-end-radius:0}
 .v2-main{flex:1 1 auto;min-inline-size:0;outline:none}
 .v2-page{display:flex;flex-direction:column;gap:var(--space-3);inline-size:100%;padding:var(--space-3) var(--space-2) var(--space-4)}
@@ -394,13 +393,13 @@ ${TOGGLING}[data-sidebar-collapsed="true"] .v2-side__body{transition-delay:0s,0s
 @media(min-width:960px) and (max-width:1679px){.v2-server>.v2-mono{display:none}}
 @media(min-width:1280px){.v2-page,.v2-foot{padding-inline:var(--space-4)}}
 ${PHONE}{
-.v2-side{position:fixed;inset-block:0;inset-inline-start:0;z-index:70;display:flex;flex-direction:column;inline-size:min(300px,88vw);block-size:100dvh;background:var(--sunken);border-inline-end:1px solid var(--line-strong);box-shadow:var(--v2-elev);visibility:hidden;pointer-events:none;overscroll-behavior:contain}
+.v2-side{position:fixed;inset-block:0;inset-inline-start:0;z-index:70;display:flex;flex-direction:column;inline-size:min(300px,88vw);block-size:100dvh;background:var(--sunken);border-inline-end:1px solid var(--line);box-shadow:var(--v2-elev);visibility:hidden;pointer-events:none;overscroll-behavior:contain}
 .v2-shell[data-mobile-nav="open"]>.v2-side,.v2-side[aria-modal="true"]{visibility:visible;pointer-events:auto}
-.v2-side__top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:10px 0;padding-block:12px;padding-inline-end:12px;border-block-end:1px solid var(--line-strong)}
+.v2-side__top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:10px 0;padding-block:12px;padding-inline-end:12px;border-block-end:1px solid var(--line)}
 .v2-side__top>.v2-brand{flex:1 1 0}
 .v2-side__sep,.v2-side__collapse{display:none!important}
 .v2-side__close{order:2}
-.v2-ctx{order:3;flex:1 1 100%;flex-direction:column;gap:10px;margin-inline-start:12px;padding:12px;border:1px solid var(--line-strong);border-radius:var(--radius-notice);background:var(--bg)}
+.v2-ctx{order:3;flex:1 1 100%;flex-direction:column;gap:10px;margin-inline-start:12px;padding:12px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--bg)}
 .v2-ctx__text{flex:1 1 auto;flex-direction:column;gap:2px}
 .v2-ctx__title{flex-wrap:wrap}
 .v2-ctx__controls{order:4;flex:1 1 100%;margin-inline-start:12px}

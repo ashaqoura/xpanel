@@ -10,19 +10,19 @@ export function renderV2BackupDestinationsPage(props: V2BackupDestinationsPagePr
   const t = v2Messages.translator(props.locale)
   const manage = props.canRead && props.canManage
   const actions = (body: string): string => `<div class="v2-lifecycle__actions justify-end">${body}</div>`
-  const runsTable = (key: string, title: string, labels: readonly string[], empty: string, value: number): string => `${lifecycleTable(t, title, labels, { 'data-backup-runs-rows': key }, msgid('Not read'), { value })}<p class="text-sm text-secondary-foreground" data-backup-runs-empty="${key}" hidden>${text(t, empty)}</p>`
+  const runsTable = (key: string, title: string, labels: readonly string[], empty: string, value: number): string => `${lifecycleTable(t, title, labels, { 'data-backup-runs-rows': key }, msgid('Not read'), { value })}<p class="text-base text-secondary-foreground" data-backup-runs-empty="${key}" hidden>${text(t, empty)}</p>`
   const runsButton = (key: string, label: string, primary = false, look?: LifecycleButtonLook): string => lifecycleButton(t, label, { [`data-backup-${key}`]: true }, primary, look)
   // The run controller refuses to read without its four row templates inside this section.
   const technical = (slot: string): string => `<td><bdi dir="ltr" class="v2-mono" data-xp-slot="${slot}"></bdi></td>`, plain = (slot: string): string => `<td data-xp-slot="${slot}"></td>`
   const runTemplate = (kind: string, cells: string): string => `<template data-xp-template="whm-backup-${kind}-row"><tr>${cells}</tr></template>`
   const runTemplates = runTemplate('runs', technical('started') + plain('trigger') + plain('state') + plain('copies') + plain('mail') + plain('retention'))
-    + runTemplate('copies', technical('account') + plain('destination') + technical('archive') + technical('size') + technical('started') + '<td><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-xp-slot="action" disabled></button></td>')
+    + runTemplate('copies', technical('account') + plain('destination') + technical('archive') + technical('size') + technical('started') + '<td><button type="button" class="v2-btn kt-btn kt-btn-outline" data-xp-slot="action" disabled></button></td>')
     + runTemplate('recoveries', technical('started') + technical('account') + technical('archive') + plain('state'))
     + runTemplate('retention', technical('archive') + technical('account') + technical('created') + technical('size') + plain('plan'))
   const history = lifecycleCard(t, 'destination-runs', msgid('Scheduled runs'), `
 ${lifecycleNote(t, msgctxt('theme:v2', 'A run counts copies only after their bytes and SHA-256 have been verified. Read the returned parts and failure details before treating a run as complete.'))}
 ${lifecycleStatus(t, msgid('Backup runs have not been read.'), { 'data-backup-runs-status': true, 'data-state': 'unread' })}
-<div class="v2-lifecycle__group" data-backup-runs-loading aria-busy="true" aria-label="${text(t, msgid('Loading backup runs'))}" hidden><p class="text-sm text-secondary-foreground">${text(t, msgid('Loading backup runs'))}</p><span class="v2-skeleton kt-skeleton h-2.5 w-2/3 rounded-md" aria-hidden="true"></span><span class="v2-skeleton kt-skeleton h-2.5 w-1/2 rounded-md" aria-hidden="true"></span></div>
+<div class="v2-lifecycle__group" data-backup-runs-loading aria-busy="true" aria-label="${text(t, msgid('Loading backup runs'))}" hidden><p class="text-base text-secondary-foreground">${text(t, msgid('Loading backup runs'))}</p><span class="v2-skeleton kt-skeleton h-2.5 w-2/3 rounded-md" aria-hidden="true"></span><span class="v2-skeleton kt-skeleton h-2.5 w-1/2 rounded-md" aria-hidden="true"></span></div>
 ${lifecycleFacts(t, [
     { key: 'schedule', label: msgid('Schedule') }, { key: 'next', label: msgid('Next scheduled start (UTC)') }, { key: 'last', label: msgid('Last scheduled start (UTC)') },
   ], 'data-backup-runs-fact', 'tiles')}

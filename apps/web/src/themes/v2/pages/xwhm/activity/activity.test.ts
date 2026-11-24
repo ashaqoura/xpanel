@@ -89,7 +89,7 @@ describe('v2 WHM activity board regions', () => {
 
   it('counts the entries of the supplied page and stays silent without a read', () => {
     const page = (ids: string[]): string => render('/whm/audit', { ...admitted, auditEntries: ids.map(id => entry(id, 'ok')) as WhmObservationInput['auditEntries'] })
-    expect(page(['a', 'b'])).toContain('<p class="v2-muted text-sm text-muted-foreground" data-audit-count>2 entries on this page</p>')
+    expect(page(['a', 'b'])).toContain('<p class="text-[13px] leading-(--lh-cap) text-secondary-foreground" data-audit-count>2 entries on this page</p>')
     expect(page(['a'])).toContain('data-audit-count>1 entry on this page</p>')
     expect(render('/whm/audit')).not.toContain('data-audit-count')
   })

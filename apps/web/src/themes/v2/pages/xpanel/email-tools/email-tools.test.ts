@@ -199,11 +199,11 @@ describe('v2 account email tool family', () => {
     expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;')
     expect(html).not.toContain('<img')
     expect(renderV2PanelEmailEncryption({ ...props, locale: 'ar' }, authority)).toContain('value="365"')
-    // Spacing follows the Metronic scale: 1.25rem between cards (1.875rem from the large breakpoint), no pixel gaps.
-    expect(PANEL_ADDITIONAL_CSS).toContain('--v2-extra-gap:1.25rem')
-    expect(PANEL_ADDITIONAL_CSS).toContain('--v2-extra-gap:1.875rem')
-    expect(PANEL_ADDITIONAL_CSS).toContain('gap:.625rem')
-    expect(PANEL_ADDITIONAL_CSS).toContain('gap:1.25rem')
+    // Spacing follows the standard rhythm: 32px between sections, 24px groups, 16px fields, 8px label gaps; no pixel gaps.
+    expect(PANEL_ADDITIONAL_CSS).toContain('--v2-extra-gap:2rem')
+    expect(PANEL_ADDITIONAL_CSS).toContain('gap:1.5rem')
+    expect(PANEL_ADDITIONAL_CSS).toContain('gap:1rem')
+    expect(PANEL_ADDITIONAL_CSS).not.toContain('14rem')
     expect(PANEL_ADDITIONAL_CSS).not.toMatch(/gap:[0-9.]+px/)
     expect(PANEL_ADDITIONAL_CSS).not.toMatch(/text-align:\s*(?:left|right)|margin-(?:left|right)|padding-(?:left|right)/)
   })

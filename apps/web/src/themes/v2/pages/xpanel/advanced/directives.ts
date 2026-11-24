@@ -37,7 +37,7 @@ export function renderV2WebDirectivePage(props: PanelSurfaceProps, kind: Directi
     + '<div class="v2-panel-settings__preview" data-wd-notice role="note" hidden></div>', actions(button(t(msgid('Read saved rules')), { 'data-wd-refresh': true })))
   const controls = spec.fields.map(item => {
     const controlId = `${id}-${item.key}`, extra = ` data-wd-field="${esc(item.key)}" aria-describedby="${controlId}-error${item.help ? ` ${controlId}-help` : ''}"${item.technical ? ' dir="ltr" class="v2-mono"' : ''}`
-    const control = item.kind === 'checkbox' ? `<label class="v2-panel-settings__check justify-between text-sm font-medium text-mono" for="${controlId}"><span>${esc(t(item.label))}</span><input class="kt-switch kt-switch-sm" id="${controlId}" type="checkbox" data-wd-field="${esc(item.key)}" aria-describedby="${controlId}-error" disabled></label>`
+    const control = item.kind === 'checkbox' ? `<label class="v2-panel-settings__check justify-between text-sm font-medium text-mono" for="${controlId}"><span>${esc(t(item.label))}</span><input class="kt-switch " id="${controlId}" type="checkbox" data-wd-field="${esc(item.key)}" aria-describedby="${controlId}-error" disabled></label>`
       : item.kind === 'select' ? select(controlId, '', (item.options ?? []).map(([value, label]) => [value, t(label)]), extra)
       : item.kind === 'textarea' ? area(controlId, '', `${extra} rows="5" maxlength="${item.maxlength ?? 4096}" spellcheck="false" autocomplete="off"`)
       : input(controlId, '', 'text', `${extra} maxlength="${item.maxlength ?? 255}" spellcheck="false" autocomplete="off"`)

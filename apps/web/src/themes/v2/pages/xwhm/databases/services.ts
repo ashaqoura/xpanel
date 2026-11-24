@@ -14,7 +14,7 @@ export const toggleRow = (id: string, label: string, hooks?: HookAttributes): st
 
 /** A Metronic table card: title and toolbar in the header, the table edge to edge, hints in the footer. */
 export const tableCard = (key: string, title: string, tableHtml: string, options: { toolbarHtml?: string; leadHtml?: string; footerHtml?: string } = {}): string =>
-  card({ title, titleId: `v2-whm-data-${key}`, flush: true, bodyHtml: (options.leadHtml ? `<div class="border-b border-border px-5 py-1.5">${options.leadHtml}</div>` : '') + tableHtml,
+  card({ title, titleId: `v2-whm-data-${key}`, flush: true, bodyHtml: (options.leadHtml ? `<div class="border-b border-border px-6 py-1.5">${options.leadHtml}</div>` : '') + tableHtml,
     ...(options.toolbarHtml ? { actionsHtml: options.toolbarHtml } : {}), ...(options.footerHtml ? { footerHtml: options.footerHtml } : {}) })
 
 const hook = (name: string, value?: string): HookAttributes => ({ [name]: value ?? true })
@@ -34,8 +34,8 @@ function part(t: Translate, row: DbSectionPart, key: string): string {
     case 'note': return note(t(row.text))
     case 'status': return status(t(row.text), hook(row.hook))
     case 'editor': return `<div class="v2-whm-data__stack" data-dbs-file="${esc(row.file)}">${field(`v2-db-file-${key}`, t(row.label), { kind: 'textarea', rows: 14, disabled: true, dir: 'ltr', spellcheck: false, hooks: { 'data-dbs-file-text': true } })}${actions(button(t(msgid('Load file')), { 'data-dbs-file-load': true }, true, false, 'download') + button(t(msgid('Save file')), { 'data-dbs-file-save': true }, true, true))}</div>`
-    case 'upload': return fields(`<div class="v2-field v2-field--row kt-form-item lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-baseline lg:[&>:not(label)]:col-start-2"><label class="kt-form-label leading-tight max-w-56" for="${esc(row.id)}">${esc(t(row.label))}</label><input class="kt-input" id="${esc(row.id)}" type="file" accept=".gz" ${row.hook} disabled></div>`)
-    case 'log': return actions(button(t(msgid('Read log')), { 'data-dbs-log-read': true })) + `<pre class="v2-mono rounded-lg text-xs" dir="ltr" tabindex="0" data-dbs-log></pre>`
+    case 'upload': return fields(`<div class="v2-field kt-form-item"><label class="kt-form-label" for="${esc(row.id)}">${esc(t(row.label))}</label><input class="kt-input" id="${esc(row.id)}" type="file" accept=".gz" ${row.hook} disabled></div>`)
+    case 'log': return actions(button(t(msgid('Read log')), { 'data-dbs-log-read': true })) + `<pre class="v2-mono rounded-lg text-2sm" dir="ltr" tabindex="0" data-dbs-log></pre>`
   }
 }
 const draw = (t: Translate, item: DbSection, hooks?: HookAttributes): string => section(`db-${item.key}`, t(item.title), item.parts.map(row => part(t, row, item.key)).join(''), hooks)

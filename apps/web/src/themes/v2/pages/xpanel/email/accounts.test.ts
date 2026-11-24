@@ -85,7 +85,7 @@ describe('v2 email accounts', () => {
       account: { username: 'alice', primaryDomain: 'example.test' }, domains: { state: 'read', items: [] },
       users: { state: 'read', items: [user] }, canManage: false,
     })
-    expect(html).toContain('<dd class="text-sm text-mono"><bdi class="v2-mono v2-num" dir="ltr">alice</bdi></dd>')
+    expect(html).toContain('<dd class="text-mono"><bdi class="v2-mono v2-num" dir="ltr">alice</bdi></dd>')
     expect(html).not.toMatch(/[\u0660-\u0669\u06f0-\u06f9]/)
     expect(html).not.toContain('<dd dir="ltr">')
   })

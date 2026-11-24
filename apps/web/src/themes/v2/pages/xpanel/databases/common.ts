@@ -78,12 +78,12 @@ export interface DbButtonOptions {
   /** Leading glyph markup: `icon(...)` of the v2 set or a {@link dbGlyph}. */
   icon?: string
   kind?: 'outline' | 'ghost' | 'danger'
-  /** Row and toolbar size. */
+  /** Kept for callers; every button keeps the 44px target, so a row button is no smaller. */
   small?: boolean
 }
 
 export const dbButton = (label: string, hooks?: HookAttributes, options: DbButtonOptions = {}): string =>
-  `<button type="${options.submit ? 'submit' : 'button'}" class="${options.primary ? BUTTON.primary : BUTTON[options.kind ?? 'outline']}${options.small ? ' kt-btn-sm' : ''}"${options.ariaControls ? ` aria-controls="${escapeHtml(options.ariaControls)}"` : ''}${options.ariaExpanded !== undefined ? ` aria-expanded="${options.ariaExpanded}"` : ''}${hookAttrs(hooks)}${options.disabled ? ' disabled' : ''}>${options.icon ?? ''}${escapeHtml(label)}</button>`
+  `<button type="${options.submit ? 'submit' : 'button'}" class="${options.primary ? BUTTON.primary : BUTTON[options.kind ?? 'outline']}"${options.ariaControls ? ` aria-controls="${escapeHtml(options.ariaControls)}"` : ''}${options.ariaExpanded !== undefined ? ` aria-expanded="${options.ariaExpanded}"` : ''}${hookAttrs(hooks)}${options.disabled ? ' disabled' : ''}>${options.icon ?? ''}${escapeHtml(label)}</button>`
 
 export const dbSelect = (selectHtml: string): string =>
   `<span class="v2-select">${selectHtml}</span>`
@@ -94,9 +94,9 @@ export const dbField = (id: string, label: string, controlHtml: string, help?: s
 export const dbFacts = (rows: readonly { label: string; valueHtml: string; hooks?: HookAttributes }[], hooks?: HookAttributes): string =>
   {
   // The count strip is a row of KPI tiles (the controller rebuilds its entries, so the tile look is in the page
-  // styles); every other fact list is label and value rows, as in a Metronic "General info" list.
+  // styles); every other fact list puts the label above its value on the same start edge.
   const counts = hooks?.['data-db-counts'] !== undefined
-  return `<dl class="v2-db-facts"${hookAttrs(hooks)}>${rows.map(row => `<div><dt class="text-sm text-secondary-foreground">${escapeHtml(row.label)}</dt><dd class="${counts ? 'font-semibold text-mono' : 'text-sm text-mono'}"${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
+  return `<dl class="v2-db-facts"${hookAttrs(hooks)}>${rows.map(row => `<div><dt class="text-secondary-foreground">${escapeHtml(row.label)}</dt><dd class="${counts ? 'font-semibold text-mono' : 'text-mono'}"${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
 }
 
 export const dbCard = (key: string, title: string, bodyHtml: string, options: { flush?: boolean; description?: string; actionsHtml?: string } = {}): string =>

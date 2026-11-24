@@ -44,10 +44,10 @@ export const tabPanel = (props: TabPanelProps): string =>
 // The tab list is kt-tabs kt-tabs-line and each tab a kt-tab-toggle (medium, secondary, primary when selected).
 // A count written with the v2 classes alone keeps the small outline badge look and follows the selected tab.
 export const TABS_CSS = `.v2-tabs{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.75rem;border-bottom:1px solid var(--line)}
-.v2-tabs .v2-count{display:inline-flex;align-items:center;justify-content:center;height:1.25rem;min-inline-size:1.25rem;padding:0 .325rem;border-radius:30px;border:1px solid var(--line);background:var(--sunken);color:var(--text-2);font-size:.6875rem;font-weight:500;line-height:.75rem}
+.v2-tabs .v2-count{display:inline-flex;align-items:center;justify-content:center;height:1.25rem;min-inline-size:1.25rem;padding:0 .325rem;border-radius:30px;border:1px solid var(--line);background:var(--sunken);color:var(--text-2);font-size:.8125rem;font-weight:500;line-height:.75rem}
 .v2-tabs>[aria-selected="true"] .v2-count{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent)}
 .v2-tabs .v2-count:empty{display:none}
 @media(max-width:600px){.v2-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;scroll-padding-inline:var(--space-2);padding-inline-end:32px;mask-image:linear-gradient(to right,#000 calc(100% - 32px),transparent)}.v2-tabs:dir(rtl){mask-image:linear-gradient(to left,#000 calc(100% - 32px),transparent)}.v2-tabs>[role=tab]{flex:none;white-space:nowrap;scroll-snap-align:start}}
-.v2-tabpanel{display:flex;flex-direction:column;gap:1.25rem;padding-top:1.25rem}
+.v2-tabpanel{display:flex;flex-direction:column;gap:var(--space-3);padding-top:var(--space-3)}
 .v2-tabpanel--sections{gap:var(--space-4);padding-top:0}
 `

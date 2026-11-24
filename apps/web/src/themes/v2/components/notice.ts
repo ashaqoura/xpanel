@@ -29,7 +29,7 @@ export function notice(t: Translate, props: NoticeProps): string {
   const action = !props.action ? '' : props.action.kind === 'button'
     ? `<button type="button" class="v2-notice__action kt-link"${props.action.disabled ? ' disabled' : ''}${hookAttrs(props.action.hooks)}>${escapeHtml(props.action.label)}</button>`
     : `<a class="v2-notice__action kt-link" href="${escapeHtml(props.action.href)}"${hookAttrs(props.action.hooks)}>${escapeHtml(props.action.label)}</a>`
-  const dismiss = props.dismiss ? `<button type="button" class="v2-notice__dismiss kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0 -my-1 -me-1.5" aria-label="${escapeHtml(t('Dismiss'))}"${hookAttrs(props.dismiss)}>${icon('x', 14)}</button>` : ''
+  const dismiss = props.dismiss ? `<button type="button" class="v2-notice__dismiss kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0 -my-2.5 -me-2.5" aria-label="${escapeHtml(t('Dismiss'))}"${hookAttrs(props.dismiss)}>${icon('x', 14)}</button>` : ''
   return `<div class="v2-notice v2-notice--${props.tone} ${ALERT[props.tone]}" role="${props.urgent ? 'alert' : 'status'}"${hookAttrs(props.hooks)}>${icon(NOTICE_ICONS[props.tone])}<div class="v2-notice__body kt-alert-title"><p>${props.lead ? `<strong>${escapeHtml(props.lead)}</strong> ` : ''}${escapeHtml(props.text)}</p>${props.extraHtml ?? ''}${action}</div>${dismiss}</div>`
 }
 

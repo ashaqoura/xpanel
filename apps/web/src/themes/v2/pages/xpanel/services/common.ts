@@ -31,7 +31,7 @@ export const serviceSelect = (selectHtml: string): string => `<span class="v2-se
 export function serviceField(id: string, label: string, control: string, help?: string): string {
   const helpId = `${id}-help`
   const described = help ? control.replace(/<(input|select|textarea)\b/, `<$1 aria-describedby="${escapeHtml(helpId)}"`) : control
-  return `<div class="v2-field"><label class="kt-form-label leading-tight" for="${escapeHtml(id)}">${escapeHtml(label)}</label>${described}${help ? `<p class="v2-field__help" id="${escapeHtml(helpId)}">${escapeHtml(help)}</p>` : ''}</div>`
+  return `<div class="v2-field"><label class="kt-form-label" for="${escapeHtml(id)}">${escapeHtml(label)}</label>${described}${help ? `<p class="v2-field__help" id="${escapeHtml(helpId)}">${escapeHtml(help)}</p>` : ''}</div>`
 }
 
 export const serviceFacts = (facts: readonly { label: string; valueHtml: string }[], hooks?: HookAttributes): string =>
@@ -41,7 +41,7 @@ export const serviceFacts = (facts: readonly { label: string; valueHtml: string 
  * ancestor; the first option is the empty value (every row). Closed while the list cannot be read. */
 export const listFilter = (t: Translate, input: { id: string; label: string; group: string; key: string; options: readonly (readonly [string, string])[]; open: boolean }): string => {
   const off = input.open ? '' : ' disabled'
-  return `<div class="v2-panel-service__filter"><div class="v2-field"><label class="kt-form-label leading-tight" for="${escapeHtml(input.id)}">${escapeHtml(input.label)}</label><input class="kt-input max-[959px]:text-base" id="${escapeHtml(input.id)}" type="search" autocomplete="off" spellcheck="false" aria-describedby="${escapeHtml(input.id)}-count" data-list-filter-search${off}></div><div class="v2-panel-service__segments kt-toggle-group" role="group" aria-label="${escapeHtml(input.group)}" data-list-filter-key="${escapeHtml(input.key)}">${input.options.map(([value, label], index) => `<button type="button" class="kt-btn kt-btn-outline aria-pressed:bg-accent aria-pressed:text-mono" data-list-filter-value="${escapeHtml(value)}" aria-pressed="${index === 0}"${off}>${escapeHtml(label)}</button>`).join('')}</div><p class="v2-panel-service__filter-note text-xs text-muted-foreground" id="${escapeHtml(input.id)}-count" role="status">${escapeHtml(t('Rows shown'))} <bdi dir="ltr" class="v2-num" data-list-filter-count>0</bdi></p></div>`
+  return `<div class="v2-panel-service__filter"><div class="v2-field"><label class="kt-form-label" for="${escapeHtml(input.id)}">${escapeHtml(input.label)}</label><input class="kt-input max-[959px]:text-base" id="${escapeHtml(input.id)}" type="search" autocomplete="off" spellcheck="false" aria-describedby="${escapeHtml(input.id)}-count" data-list-filter-search${off}></div><div class="v2-panel-service__segments kt-toggle-group" role="group" aria-label="${escapeHtml(input.group)}" data-list-filter-key="${escapeHtml(input.key)}">${input.options.map(([value, label], index) => `<button type="button" class="kt-btn kt-btn-outline aria-pressed:bg-accent aria-pressed:text-mono" data-list-filter-value="${escapeHtml(value)}" aria-pressed="${index === 0}"${off}>${escapeHtml(label)}</button>`).join('')}</div><p class="v2-panel-service__filter-note text-[0.8125rem] leading-(--lh-cap) text-muted-foreground" id="${escapeHtml(input.id)}-count" role="status">${escapeHtml(t('Rows shown'))} <bdi dir="ltr" class="v2-num" data-list-filter-count>0</bdi></p></div>`
 }
 
 /** Shown by the list filter when rows were read but none matches. */
@@ -55,7 +55,7 @@ export function missingServiceAccount(t: Translate, props: PanelSurfaceProps): s
   return props.account ? undefined : errorState(t, { lead: t(msgctxt('theme:v2', 'An authorized account has not been read.')) })
 }
 
-/** Blocks whose direct fields are settings rows: each stretches its children, so a field can measure itself. */
+/** Blocks whose direct fields stack the label 8px above its control or value on the same start edge (no label column). */
 const ROWS = ':is(.v2-card__body,form,fieldset,.v2-stack,.v2-panel-service__fields)'
 
 /** Page-scoped layout; technical isolation does not move values away from their labels. */
@@ -67,33 +67,32 @@ export const PANEL_SERVICES_CSS = `.v2-panel-service{display:grid;gap:var(--spac
 .v2-panel-service__aside>.v2-card:last-child>.v2-card__body>.v2-panel-service__actions:last-child{margin-block-start:auto}
 .v2-panel-service .v2-card__body{gap:var(--space-3)}
 .v2-panel-service .v2-card--flush>.v2-card__body{gap:0}
-.v2-panel-service__fields{container-type:inline-size;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));align-items:start;gap:var(--space-3);min-inline-size:0}
+.v2-panel-service__fields{container-type:inline-size;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));align-items:start;gap:var(--space-2);min-inline-size:0}
 @container (min-width:40rem){.v2-panel-service__fields:not(.v2-panel-service__fields--wide)>.v2-field{grid-column:1/-1}}
-.v2-panel-service__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem}
+.v2-panel-service__actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1)}
 .v2-panel-service :is(.v2-card__body,form,fieldset,.v2-stack)>.v2-panel-service__actions:has(>.kt-btn-primary){justify-content:flex-end}
 .v2-panel-service :is(.v2-card__body,form,fieldset,.v2-stack)>.v2-panel-service__actions:has(>.kt-btn-primary:first-child){flex-direction:row-reverse;justify-content:flex-start}
-.v2-panel-service-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:.875rem var(--space-4)}
-.v2-panel-service-facts>div{display:grid;grid-template-columns:minmax(6.5rem,min(40%,14rem)) minmax(0,1fr);align-items:baseline;gap:.625rem;min-inline-size:0}
-.v2-panel-service-facts :is(dt,dd){text-align:start;overflow-wrap:anywhere;font-size:.875rem;line-height:1.25rem}
-.v2-panel-service-facts dt{font-weight:400;color:var(--text-2)}
-.v2-panel-service-facts dd{font-weight:500;color:var(--mono,var(--text))}
+.v2-panel-service-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:var(--space-2)}
+.v2-panel-service-facts>div{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-1);min-inline-size:0}
+.v2-panel-service-facts :is(dt,dd){text-align:start;overflow-wrap:anywhere;margin:0}
+.v2-panel-service-facts dt{font-size:.875rem;line-height:var(--lh-label);text-box:trim-end text;font-weight:500;color:var(--text-2)}
+.v2-panel-service-facts dd{font-size:1rem;line-height:var(--lh-text);text-box:trim-start text;font-weight:500;color:var(--mono,var(--text))}
 .v2-panel-service :is(input,select,textarea)[dir=ltr]{text-align:var(--v2-control-align,start)}
-.v2-panel-service ${ROWS}>.v2-field{container-type:inline-size;display:grid;grid-template-columns:minmax(0,14rem) minmax(0,1fr);align-items:baseline;gap:.5rem .625rem}
-.v2-panel-service ${ROWS}>.v2-field>*{grid-column:1/-1;min-inline-size:0;margin-block-start:0}
-@container (min-width:36rem){.v2-panel-service .v2-field>label:first-child{grid-column:1}.v2-panel-service .v2-field>label:first-child~*{grid-column:2}}
+.v2-panel-service ${ROWS}>.v2-field{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-1)}
+.v2-panel-service ${ROWS}>.v2-field>*{min-inline-size:0;margin-block:0}
 .v2-panel-service .v2-field>label{text-align:start}
-.v2-panel-service .v2-field__help{font-size:.75rem;line-height:1.125rem;font-weight:400;color:var(--muted)}
+.v2-panel-service .v2-field__help{font-size:.8125rem;line-height:var(--lh-cap);font-weight:400;color:var(--muted)}
 .v2-panel-service__table{max-inline-size:100%;overflow:auto;min-inline-size:0;border:1px solid var(--line);border-radius:var(--radius-card)}
 .v2-panel-service .v2-card--flush .v2-panel-service__table{border:0;border-radius:0}
 .v2-panel-service__table :is(th,td){text-align:start}
 .v2-panel-service__table bdi{unicode-bidi:isolate}
 .v2-panel-service__table .v2-panel-service__actions{gap:var(--space-1)}
-.v2-panel-service__note{display:grid;gap:.625rem;min-inline-size:0}
-.v2-panel-service__note p{font-size:.8125rem;line-height:1.25rem;color:var(--text-2)}
+.v2-panel-service__note{display:grid;gap:var(--space-1);min-inline-size:0}
+.v2-panel-service__note p{font-size:1rem;line-height:var(--lh-text);color:var(--text-2)}
 .v2-panel-service__technical{display:block;white-space:pre-wrap;overflow-wrap:anywhere;min-inline-size:0;max-inline-size:100%;text-align:start;border-radius:var(--radius-card)}
-.v2-panel-service fieldset{display:grid;gap:var(--space-3);min-inline-size:0}
-.v2-panel-service legend{padding:0;margin-block-end:.625rem;font-size:.875rem;line-height:1.25rem;font-weight:600;color:var(--mono,var(--text))}
-.v2-panel-service .v2-check{display:flex;align-items:center;gap:.625rem;min-block-size:var(--target);font-size:.875rem;color:var(--text)}
+.v2-panel-service fieldset{display:grid;gap:var(--space-2);min-inline-size:0}
+.v2-panel-service legend{padding:0;margin-block-end:var(--space-1);font-size:.875rem;line-height:var(--lh-label);font-weight:600;color:var(--mono,var(--text))}
+.v2-panel-service .v2-check{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target);font-size:.875rem;line-height:var(--lh-label);color:var(--text)}
 .v2-panel-service .v2-check>input{flex:none}
 .v2-panel-service [hidden],.v2-panel-service tr[data-list-row][hidden]{display:none}
 .v2-panel-service__pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));align-items:stretch;gap:var(--space-3);min-inline-size:0}
@@ -103,21 +102,21 @@ export const PANEL_SERVICES_CSS = `.v2-panel-service{display:grid;gap:var(--spac
 .v2-panel-service__scroll{overflow-x:auto;white-space:pre;max-inline-size:100%;border-radius:var(--radius-card)}
 .v2-panel-service__fields--wide{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
 .v2-panel-service textarea{inline-size:100%;resize:vertical;min-inline-size:0}
-.v2-panel-service .v2-card__body>[role=status]:not([hidden]){font-size:.8125rem;line-height:1.25rem;color:var(--text-2);padding:.625rem .75rem;border-radius:var(--radius-notice,var(--radius-control));background:var(--sunken)}
+.v2-panel-service .v2-card__body>[role=status]:not([hidden]){font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2);padding:var(--space-1) var(--space-2);border-radius:var(--radius-notice,var(--radius-control));background:var(--sunken)}
 .v2-panel-service__note>.v2-pill{justify-self:start}
 .v2-panel-service__choices{display:flex;flex-wrap:wrap;gap:0 var(--space-3)}
 .v2-panel-service .v2-kpi[data-unread] .v2-kpi__value>:first-child{font-size:1.125rem;line-height:2rem;font-weight:500;color:var(--text-2)}
 .v2-panel-service__columns--drawer{grid-template-columns:minmax(0,1fr) minmax(340px,440px)}
-.v2-panel-service__five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.625rem;min-inline-size:0}
-.v2-panel-service__five>.v2-field{display:flex;flex-direction:column;gap:.375rem;min-inline-size:0}
-.v2-panel-service__five .v2-field>label{font-size:.75rem;line-height:1rem;font-weight:400;color:var(--text-2)}.v2-panel-service__five input{padding-inline:.5rem;min-inline-size:0;inline-size:100%}
-.v2-panel-service__filter{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.625rem var(--space-3);min-inline-size:0}
-.v2-panel-service__filter>.v2-field{flex:0 1 320px;min-inline-size:200px;gap:.5rem}.v2-panel-service__filter input{inline-size:100%}
+.v2-panel-service__five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-2);min-inline-size:0}
+.v2-panel-service__five>.v2-field{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0}
+.v2-panel-service__five .v2-field>label{color:var(--text-2)}.v2-panel-service__five input{padding-inline:.5rem;min-inline-size:0;inline-size:100%}
+.v2-panel-service__filter{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--space-2) var(--space-3);min-inline-size:0}
+.v2-panel-service__filter>.v2-field{flex:0 1 320px;min-inline-size:200px;gap:var(--space-1)}.v2-panel-service__filter input{inline-size:100%}
 .v2-panel-service__segments{max-inline-size:100%}
-.v2-panel-service__filter-note{display:flex;align-items:center;gap:.375rem;min-block-size:var(--target);margin-inline-start:auto}
+.v2-panel-service__filter-note{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target);margin-inline-start:auto}
 .v2-panel-service__filter-empty{padding:var(--space-3);text-align:center;font-size:.8125rem;color:var(--muted)}
-.v2-panel-service__head-field{display:flex;flex-direction:column;gap:.5rem;inline-size:240px;max-inline-size:100%}
-.v2-panel-service__head-field label{font-size:.875rem;line-height:1.25;font-weight:500;color:var(--text)}.v2-panel-service__head-field :is(select,.v2-select){inline-size:100%}
+.v2-panel-service__head-field{display:flex;flex-direction:column;gap:var(--space-1);inline-size:240px;max-inline-size:100%}
+.v2-panel-service__head-field label{color:var(--text)}.v2-panel-service__head-field :is(select,.v2-select){inline-size:100%}
 .v2-panel-service__editor{display:contents}
 .v2-panel-service .v2-page-head__actions{align-items:flex-end}
 .v2-panel-service:dir(rtl) *,[data-ui-theme="v2"] [dir=rtl] .v2-panel-service *{letter-spacing:0}
@@ -127,9 +126,8 @@ export const PANEL_SERVICES_CSS = `.v2-panel-service{display:grid;gap:var(--spac
 @media(min-width:1280px){.v2-panel-service__table [data-xp-slot=command]{min-inline-size:260px}.v2-panel-service__table td :is([data-xp-slot=actions],.v2-panel-service__actions):has(>:nth-child(3)){min-inline-size:164px}}
 .v2-panel-service .v2-steps--inline>.v2-step{flex-basis:150px}
 @media(min-width:901px){.v2-panel-service__editor .v2-table{table-layout:fixed}.v2-panel-service__editor .v2-table th:first-child{inline-size:18%}.v2-panel-service__editor .v2-table th:nth-child(2){inline-size:132px}.v2-panel-service__editor .v2-table th:nth-child(3){inline-size:104px}.v2-panel-service__editor .v2-table th:nth-child(5){inline-size:100px}.v2-panel-service__editor .v2-table th:nth-child(6){inline-size:172px}}
-@media(max-width:1023px){.v2-panel-service{gap:var(--space-3)}}
 @media(max-width:640px){.v2-panel-service{--v2-panel-padding:var(--space-2)}}
-@media(max-width:600px){.v2-panel-service__table table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:.25rem var(--space-2);padding:var(--space-1) 0}.v2-panel-service__table table:not(:has(td)) th{background:none}.v2-panel-service__editor .v2-table tr{align-items:end}.v2-panel-service__editor .v2-table td:has(>:is(input,select,.v2-select)){display:flex;flex-direction:column;gap:.25rem}.v2-panel-service__editor .v2-table td>:is(input,select,.v2-select){inline-size:100%}.v2-panel-service__segments{display:flex;inline-size:100%}}
+@media(max-width:600px){.v2-panel-service__table table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:.25rem var(--space-2);padding:var(--space-1) 0}.v2-panel-service__table table:not(:has(td)) th{background:none}.v2-panel-service__editor .v2-table tr{align-items:end}.v2-panel-service__editor .v2-table td:has(>:is(input,select,.v2-select)){display:flex;flex-direction:column;gap:var(--space-1)}.v2-panel-service__editor .v2-table td>:is(input,select,.v2-select){inline-size:100%}.v2-panel-service__segments{display:flex;inline-size:100%}}
 @media(max-width:600px){.v2-panel-service .v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-panel-service .v2-kpi-row>.v2-kpi:last-child:nth-child(odd){grid-column:1/-1}}
 ${phoneLabelCss('.v2-panel-service')}
 @media(max-width:1100px){.v2-panel-service__columns,.v2-panel-service__columns--drawer{grid-template-columns:minmax(0,1fr)}}

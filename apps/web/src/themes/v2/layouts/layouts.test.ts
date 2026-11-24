@@ -122,7 +122,7 @@ describe('v2 page layouts', () => {
 
   it('build the page top and root hooks of every layout', () => {
     for (const html of [list(), settings({ kind: 'revision', bar: { pendingCount: 1, revision: 'r1', discard: {}, save: {} } }), custom('ready'), dashboard(), wizard(), log(), editor(true), matrix()]) {
-      expect(html).toMatch(/^<div class="v2-layout grid grid-cols-1 content-start gap-5 lg:gap-7\.5" data-[a-z-]+-workspace><header class="v2-page-head"(?: data-route="[^"]+")?>/)
+      expect(html).toMatch(/^<div class="v2-layout grid grid-cols-1 content-start gap-8" data-[a-z-]+-workspace><header class="v2-page-head"(?: data-route="[^"]+")?>/)
       expect(count(html, /<h1>/)).toBe(1)
       expect(html).toContain('<nav class="v2-crumbs" aria-label="Breadcrumb">')
     }
@@ -164,10 +164,9 @@ describe('v2 page layouts', () => {
   it('settings: field sections, the review aside and the apply bar or the revision-checked save', () => {
     const applied = settings({ kind: 'apply', review: fieldReview('Spam'), bar: { pendingCount: 2, tests: ['rspamadm configtest'], nextGeneration: 143, rollbackGeneration: 142, discard: { 'data-discard': true }, apply: { 'data-apply': true } } })
     expect(applied).toContain('<section class="v2-card kt-card" aria-labelledby="filtering">')
-    // Metronic settings rows: one column of rows 20px apart; a switch row, then a field row whose label keeps the
-    // first grid column (up to 14rem) with the control beside it.
-    expect(applied).toContain('<div class="v2-fields grid grid-cols-1 gap-5"><label class="v2-switch-row flex items-center justify-between gap-5 cursor-pointer" for="sw">')
-    expect(applied).toMatch(/<div class="v2-field v2-field--row kt-form-item lg:grid [^"]*"><label for="score" class="kt-form-label leading-tight max-w-56">Spam filters<\/label><input id="score" name="score" class="kt-input [^"]*" data-setting="score" type="text" value="Spam filters"><\/div><\/div><\/div><\/section>/)
+    // One column of fields 16px apart: a switch row, then a field whose label sits above its control.
+    expect(applied).toContain('<div class="v2-fields grid grid-cols-1 gap-4"><label class="v2-switch-row flex items-center justify-between gap-5 cursor-pointer" for="sw">')
+    expect(applied).toMatch(/<div class="v2-field kt-form-item"><label for="score" class="kt-form-label">Spam filters<\/label><input id="score" name="score" class="kt-input [^"]*" data-setting="score" type="text" value="Spam filters"><\/div><\/div><\/div><\/section>/)
     expect(applied).toMatch(/<aside class="v2-aside" aria-label="Review changes"><section class="v2-card v2-review kt-card" aria-labelledby="review-title">/)
     // Per-field rows: current beside proposed, each with Undo carrying the field it restores.
     expect(applied).toMatch(/<ul class="v2-review__rows [^"]*" data-review-rows><li class="v2-review__row [^"]*" data-state="changed"><div class="v2-review__row-head [^"]*"><span class="v2-review__name [^"]*" data-xp-slot="name">Spam<\/span><button type="button" class="v2-btn v2-btn--ghost v2-review__undo kt-btn kt-btn-sm kt-btn-ghost" data-xp-action="undo" data-xp-field="score" aria-label="Undo the change to Spam">Undo<\/button><\/div>/)
@@ -324,7 +323,7 @@ describe('v2 page layouts', () => {
     const names = new Set<string>()
     for (const html of pages) {
       // The workspace root opens the page and its matching </div> closes it: every template lies inside.
-      expect(html).toMatch(/^<div class="v2-layout grid grid-cols-1 content-start gap-5 lg:gap-7\.5" data-[a-z-]+-workspace>/)
+      expect(html).toMatch(/^<div class="v2-layout grid grid-cols-1 content-start gap-8" data-[a-z-]+-workspace>/)
       let depth = 0
       let close = -1
       for (const tag of html.matchAll(/<(\/?)div\b/g)) {

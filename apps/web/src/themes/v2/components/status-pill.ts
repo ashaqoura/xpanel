@@ -39,7 +39,7 @@ export const stateTones = (root: string, attribute: 'data-state' | 'data-level',
 
 // A pill written with the v2 classes alone (a template clone toned by its root's state, or page markup) takes the
 // kt-badge outline values from these rules.
-export const STATUS_PILL_CSS = `.v2-pill{display:inline-flex;align-items:center;justify-content:center;gap:.375rem;width:fit-content;height:1.5rem;min-inline-size:1.5rem;padding:0 .45rem;border-radius:30px;border:1px solid var(--line);font-size:.75rem;font-weight:500;line-height:1rem;white-space:nowrap}
+export const STATUS_PILL_CSS = `.v2-pill{display:inline-flex;align-items:center;justify-content:center;gap:.375rem;width:fit-content;height:1.5rem;min-inline-size:1.5rem;padding:0 .45rem;border-radius:30px;border:1px solid var(--line);font-size:.8125rem;font-weight:500;line-height:1rem;white-space:nowrap}
 .v2-pill__dot{flex:none;width:.375rem;height:.375rem;border-radius:50%;background:currentColor;opacity:.75}
 .v2-pill--hollow .v2-pill__dot{background:transparent;box-shadow:inset 0 0 0 1.5px currentColor}
 .v2-pill--ok{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}

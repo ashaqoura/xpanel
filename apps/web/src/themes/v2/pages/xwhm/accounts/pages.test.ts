@@ -74,8 +74,8 @@ describe('v2 account list', () => {
     expect([...html.matchAll(/role="meter"/g)]).toHaveLength(2)
     expect(html).not.toContain('Usage / configured plan limit. Usage has not been read.')
     const unreported = renderV2WhmAccountList(t, { ...props, plans: [limited], accountUsage: { [account.id]: { disk: read(null), traffic: { state: 'unavailable', bytes: null, observedAt: null, unmeasured: 1 } } } })
-    expect(unreported).toContain('<span class="text-sm text-foreground">Not read / <bdi dir="ltr">1000\u00a0MiB</bdi></span></div>')
-    expect(unreported).toContain('<span class="text-sm text-foreground">Not read / Unlimited</span></div>')
+    expect(unreported).toContain('<span class="text-base leading-(--lh-text) font-normal text-foreground">Not read / <bdi dir="ltr">1000\u00a0MiB</bdi></span></div>')
+    expect(unreported).toContain('<span class="text-base leading-(--lh-text) font-normal text-foreground">Not read / Unlimited</span></div>')
     expect(unreported).not.toContain('role="meter"')
   })
   it('keeps authorized real account actions, the native dialog and list controller hooks', () => {
@@ -207,13 +207,18 @@ describe('v2 stored account facts without provider qualification', () => {
 describe('v2 account list board regions', () => {
   it('names the list, counts it, keeps secondary values under their primary cell and folds every detail form', () => {
     const html = renderV2WhmAccountList(t, props)
-    expect(html).toContain('<h2 id="v2-whm-accounts-list">Account list</h2><p>1 account in total. Newest first.</p>')
+    // The page has one title: the list card carries no visible duplicate, its heading names the table region for
+    // assistive technology, and the total moves to the list footer.
+    expect(html).toContain('<h2 id="v2-whm-accounts-list" class="v2-sr">Account list</h2>')
+    expect(html).toContain('>1 account in total. Newest first.</p>')
     expect(html).toContain('Resellers see only the accounts they own.')
     // The header link keeps its target and name; its leading icon is decorative.
     expect(html).toMatch(/<a href="\/whm\/plans" class="v2-btn kt-btn kt-btn-outline">(?:<i [^>]*aria-hidden="true"><\/i>)?Plans<\/a>/)
-    expect(html.split('href="/whm/accounts">Clear filters<')).toHaveLength(3)
-    expect(html).toContain('<small class="v2-muted v2-mono text-xs text-secondary-foreground" data-account-table-value="ip"><bdi dir="ltr">192.0.2.10</bdi></small>')
-    expect(html).toContain('<small class="v2-muted text-xs text-secondary-foreground" data-account-table-value="owner">Owner <bdi dir="ltr">root</bdi></small>')
+    expect(html.split('href="/whm/accounts">Clear filters<')).toHaveLength(2)
+    expect(html).toContain('href="/whm/accounts" title="Clear filters">')
+    expect(html).toContain('<span class="v2-sr">Clear filters</span></a>')
+    expect(html).toContain('<small class="v2-mono text-[13px] leading-(--lh-cap) font-normal text-secondary-foreground" data-account-table-value="ip"><bdi dir="ltr">192.0.2.10</bdi></small>')
+    expect(html).toContain('<small class="text-[13px] leading-(--lh-cap) font-normal text-secondary-foreground" data-account-table-value="owner">Owner <bdi dir="ltr">root</bdi></small>')
     for (const hook of ['disk', 'bandwidth']) expect(html).toContain(`<div class="v2-whm-accounts__quota" data-account-table-value="${hook}">`)
     const nodes = parseMarkup(html)
     for (const hook of ['data-account-contact-form', 'data-account-password-form', 'data-account-plan-form', 'data-account-limits-form']) {
@@ -292,7 +297,7 @@ describe('v2 selected account detail composition', () => {
 })
 
 describe('v2 account row menu, drawer actions and status chips', () => {
-  it('opens details sections from the row menu, keeps Suspend and Delete in the drawer, and binds status chips with real counts', () => {
+  it('opens details sections from the row menu, keeps Suspend and Delete in the drawer, and binds the status chips', () => {
     const suspended = { ...account, id: 'internal-suspended', username: 'bob', primaryDomain: 'bob.example.test', uid: 20002, status: 'suspended' as const }
     const html = renderV2WhmAccountList(t, { ...props, accounts: [account, suspended] })
     const nodes = parseMarkup(html)
@@ -313,7 +318,8 @@ describe('v2 account row menu, drawer actions and status chips', () => {
     expect(html).toMatch(/data-account-detail-for="bob".*data-action="unsuspend-account"/s)
     const chips = nodes.filter(node => node.attrs.has('data-list-state-chip'))
     expect(chips.map(node => `${node.attrs.get('data-list-state-chip')}:${node.attrs.get('aria-pressed')}`)).toEqual([':true', 'active:false', 'suspended:false', 'terminating:false'])
-    expect(html).toMatch(/data-list-state-chip="suspended">Suspended<span class="v2-count v2-num[^"]*">1<\/span>/)
+    // The segments carry no counts so the toolbar stays one row; the footer states the total.
+    expect(html).toMatch(/data-list-state-chip="suspended">Suspended<\/button>/)
   })
 
   it('offers no chips before the list is readable', () => {

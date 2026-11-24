@@ -38,9 +38,9 @@ export function operationButton(label: string, hooks?: HookAttributes, disabled 
   return `<button type="button" class="${actionVariant(hooks, primary)}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}${hidden ? ' hidden' : ''}>${actionGlyph(hooks)}${escapeHtml(label)}</button>`
 }
 
-/** A table row action: the small Metronic button, soft danger for removal. */
+/** A table row action: a full-height (44px) Metronic button, soft danger for removal. */
 export function operationRowButton(label: string, hooks?: HookAttributes, disabled = true): string {
-  return `<button type="button" class="${actionVariant(hooks, false)} kt-btn-sm"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${actionGlyph(hooks)}${escapeHtml(label)}</button>`
+  return `<button type="button" class="${actionVariant(hooks, false)}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${actionGlyph(hooks)}${escapeHtml(label)}</button>`
 }
 
 export function operationSelect(selectHtml: string): string {
@@ -49,7 +49,7 @@ export function operationSelect(selectHtml: string): string {
 
 export function operationField(id: string, label: string, control: string, help?: string): string {
   const described = help ? control.replace(/<(input|select|textarea)\b/, `<$1 aria-describedby="${escapeHtml(id)}-help"`) : control
-  return `<div class="v2-field"><label class="kt-form-label leading-tight" for="${escapeHtml(id)}">${escapeHtml(label)}</label>${described}${help ? `<p id="${escapeHtml(id)}-help" class="v2-field__help">${escapeHtml(help)}</p>` : ''}</div>`
+  return `<div class="v2-field"><label class="kt-form-label" for="${escapeHtml(id)}">${escapeHtml(label)}</label>${described}${help ? `<p id="${escapeHtml(id)}-help" class="v2-field__help">${escapeHtml(help)}</p>` : ''}</div>`
 }
 
 export function operationFacts(facts: readonly { label: string; valueHtml: string }[]): string {
@@ -66,9 +66,9 @@ export function operationCard(id: string, title: string, bodyHtml: string, descr
   return card({ title, titleId: id, bodyHtml, ...(description ? { description } : {}), ...(actionsHtml ? { actionsHtml } : {}) })
 }
 
-/** A card's re-read action for its header toolbar: the small Metronic outline button with the refresh Keenicon. */
+/** A card's re-read action for its header toolbar: the Metronic outline button with the refresh Keenicon. */
 export function operationToolbarButton(label: string, hooks: HookAttributes, disabled = true): string {
-  return `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${actionGlyph(hooks) || '<i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>'}${escapeHtml(label)}</button>`
+  return `<button type="button" class="v2-btn kt-btn kt-btn-outline"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${actionGlyph(hooks) || '<i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>'}${escapeHtml(label)}</button>`
 }
 
 export function operationPage(props: PanelSurfaceProps, route: string, title: string, description: string, bodyHtml: string, hooks?: HookAttributes, authority: PanelOperationAuthority = deniedOperationAuthority): string {

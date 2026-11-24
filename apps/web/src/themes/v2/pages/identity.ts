@@ -19,43 +19,44 @@ export const IDENTITY_ROWS_CSS = `.v2-card[data-sec-workspace] :is(dd,td){font-v
 interface Ui { readonly t: Translate; readonly p: Family; readonly read: boolean; readonly manage: boolean }
 const LTR_FACTS = new Set(['host', 'group', 'observed-at', 'updated', 'count', 'client', 'redirect-uris'])
 
-// Metronic settings card (account/home/settings-plain.html): a row is its label beside the control, hints under the
-// control, facts as label and value rows, an on/off choice as a switch row and the actions at the end of the card.
-const ROW = 'flex flex-wrap lg:flex-nowrap items-baseline gap-2.5 min-w-0'
-const ROW_LABEL = 'kt-form-label max-w-56'
-const ROW_BODY = 'v2-field flex flex-col gap-1.5 w-full min-w-0'
-const HINT = 'v2-muted text-xs font-normal leading-relaxed text-muted-foreground'
-const FACT = 'grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:grid-cols-[minmax(9rem,14rem)_minmax(0,1fr)] items-baseline gap-2.5 min-w-0 p-0 border-0 rounded-none text-start'
-const FACT_LABEL = 'order-none text-sm font-normal text-secondary-foreground'
-const FACT_VALUE = 'order-none min-w-0 text-sm font-normal text-mono break-words'
+// Metronic settings card on the project rhythm (docs/STANDARDS.md): a field is its label 8px above a 44px control with
+// the hint under the control, fields 16px apart; a fact is its label above its value; an on/off choice is a switch row
+// and the actions sit at the end of the card.
+const ROW = 'flex flex-col gap-2 min-w-0'
+const ROW_LABEL = 'kt-form-label ps-3.25 text-sm leading-[22px] rtl:leading-6'
+const ROW_BODY = 'v2-field flex flex-col gap-2 w-full min-w-0'
+const HINT = 'v2-muted ps-3.25 text-[13px] leading-5 rtl:leading-[22px] font-normal text-muted-foreground'
+const FACT = 'flex flex-col gap-2 min-w-0 p-0 border-0 rounded-none text-start'
+const FACT_LABEL = 'order-none text-sm leading-[22px] rtl:leading-6 font-normal text-secondary-foreground'
+const FACT_VALUE = 'order-none min-w-0 text-base leading-6 rtl:leading-[26px] font-normal text-mono break-words'
 // full literal class lists of the family's own containers with the settings-card layout on them
-const FIELDS = { 'v2-observation': 'v2-observation__fields grid grid-cols-1 gap-5 min-w-0', 'v2-panel-settings': 'v2-panel-settings__fields grid grid-cols-1 gap-5 min-w-0' } as const
-const FACTS = { 'v2-observation': 'v2-observation__facts flex flex-col gap-3.5 min-w-0', 'v2-panel-settings': 'v2-panel-settings__facts flex flex-col gap-3.5 min-w-0' } as const
-const ACTIONS = { 'v2-observation': 'v2-observation__actions flex flex-row flex-wrap items-center justify-end gap-2.5', 'v2-panel-settings': 'v2-panel-settings__actions flex flex-row flex-wrap items-center justify-end gap-2.5' } as const
-const SWITCH = { 'v2-observation': 'v2-observation__check flex flex-row items-center justify-between gap-5 min-w-0 px-4 py-3 rounded-lg border border-border cursor-pointer', 'v2-panel-settings': 'v2-panel-settings__check flex flex-row items-center justify-between gap-5 min-w-0 px-4 py-3 rounded-lg border border-border cursor-pointer' } as const
+const FIELDS = { 'v2-observation': 'v2-observation__fields grid grid-cols-1 gap-4 min-w-0', 'v2-panel-settings': 'v2-panel-settings__fields grid grid-cols-1 gap-4 min-w-0' } as const
+const FACTS = { 'v2-observation': 'v2-observation__facts grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-x-6 min-w-0', 'v2-panel-settings': 'v2-panel-settings__facts grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-x-6 min-w-0' } as const
+const ACTIONS = { 'v2-observation': 'v2-observation__actions flex flex-row flex-wrap items-center justify-end gap-2', 'v2-panel-settings': 'v2-panel-settings__actions flex flex-row flex-wrap items-center justify-end gap-2' } as const
+const SWITCH = { 'v2-observation': 'v2-observation__check flex flex-row items-center justify-between gap-4 min-w-0 min-h-11 px-4 py-3 rounded-lg border border-border cursor-pointer', 'v2-panel-settings': 'v2-panel-settings__check flex flex-row items-center justify-between gap-4 min-w-0 min-h-11 px-4 py-3 rounded-lg border border-border cursor-pointer' } as const
 const SCROLL = { 'v2-observation': 'v2-observation__scroll kt-scrollable-x-auto', 'v2-panel-settings': 'v2-panel-settings__table kt-scrollable-x-auto' } as const
-const BUTTON = { primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-outline', ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive' } as const
+const BUTTON = { primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary h-11', outline: 'v2-btn kt-btn kt-btn-outline h-11', ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost h-11', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive h-11' } as const
 // the leading glyph Metronic shows on an action of that kind
 const GLYPHS: Readonly<Record<string, IconName>> = { add: 'plus', 'add-address': 'plus', 'add-current': 'plus', 'new-provider': 'plus', link: 'link', generate: 'refresh' }
 
-const control = (id: string, key: string, type = 'text', extra = ''): string => `<input class="kt-input" id="${esc(id)}" type="${esc(type)}" data-sec-input="${esc(key)}"${extra} disabled>`
+const control = (id: string, key: string, type = 'text', extra = ''): string => `<input class="kt-input h-11 text-base" id="${esc(id)}" type="${esc(type)}" data-sec-input="${esc(key)}"${extra} disabled>`
 const field = (ui: Ui, id: string, label: string, body: string, help?: string): string => `<div class="${ROW}"><label class="${ROW_LABEL}" for="${esc(id)}">${esc(ui.t(label))}</label><div class="${ROW_BODY}">${body}${help ? `<p class="${HINT}">${esc(ui.t(help))}</p>` : ''}</div></div>`
 const fields = (ui: Ui, body: string): string => `<div class="${FIELDS[ui.p]}">${body}</div>`
 const actions = (ui: Ui, body: string): string => `<div class="${ACTIONS[ui.p]}">${body}</div>`
 const button = (ui: Ui, label: string, action: string, primary = false, enabled = false, tone?: keyof typeof BUTTON): string =>
   `<button type="button" class="${BUTTON[tone ?? (primary ? 'primary' : 'outline')]}" data-sec-action="${esc(action)}"${enabled ? '' : ' disabled'}>${GLYPHS[action] ? icon(GLYPHS[action]!, 16) : ''}${esc(ui.t(label))}</button>`
-const help = (ui: Ui, text: string, hooks?: HookAttributes): string => `<p class="v2-muted text-sm font-normal leading-relaxed text-secondary-foreground"${hookAttrs(hooks)}>${esc(ui.t(text))}</p>`
-const check = (ui: Ui, label: string, key: string): string => `<label class="${SWITCH[ui.p]}"><span class="text-sm font-medium leading-snug text-mono">${esc(ui.t(label))}</span><input class="kt-switch kt-switch-sm" type="checkbox" data-sec-input="${esc(key)}" disabled></label>`
+const help = (ui: Ui, text: string, hooks?: HookAttributes): string => `<p class="v2-muted text-base leading-6 rtl:leading-[26px] font-normal text-secondary-foreground"${hookAttrs(hooks)}>${esc(ui.t(text))}</p>`
+const check = (ui: Ui, label: string, key: string): string => `<label class="${SWITCH[ui.p]}"><span class="text-base leading-6 font-medium text-mono">${esc(ui.t(label))}</span><input class="kt-switch kt-switch-sm" type="checkbox" data-sec-input="${esc(key)}" disabled></label>`
 const fact = (ui: Ui, key: string, label: string, extra = ''): string => `<div class="${FACT}"><dt class="${FACT_LABEL}">${esc(ui.t(label))}</dt><dd class="${FACT_VALUE}"><bdi${LTR_FACTS.has(key) ? ' dir="ltr"' : ''}${extra} data-sec-field="${esc(key)}">${esc(ui.t(msgid('Not read')))}</bdi></dd></div>`
 const facts = (ui: Ui, items: readonly (readonly [string, string])[]): string => `<dl class="${FACTS[ui.p]}">${items.map(([key, label]) => fact(ui, key, label)).join('')}</dl>`
-const select = (ui: Ui, id: string, key: string, placeholder: string): string => `<span class="v2-select"><select class="kt-select" id="${esc(id)}" data-sec-input="${esc(key)}" disabled><option value="">${esc(ui.t(placeholder))}</option></select></span>`
+const select = (ui: Ui, id: string, key: string, placeholder: string): string => `<span class="v2-select"><select class="kt-select h-11 text-base" id="${esc(id)}" data-sec-input="${esc(key)}" disabled><option value="">${esc(ui.t(placeholder))}</option></select></span>`
 const table = (ui: Ui, title: string, columns: readonly string[], rows: string): string =>
   `<div class="${columns.length > 2 ? `${SCROLL[ui.p]} v2-identity-rows` : SCROLL[ui.p]}" role="region" tabindex="0" aria-label="${esc(ui.t(title))}"><table class="kt-table text-start"><caption class="v2-sr">${esc(ui.t(title))}</caption><thead><tr>${columns.map(label => `<th class="text-start font-medium" scope="col">${esc(ui.t(label))}</th>`).join('')}</tr></thead><tbody data-sec-rows="${esc(rows)}"><tr><td class="text-sm font-normal text-secondary-foreground" colspan="${columns.length}">${esc(ui.t(msgid('Not read')))}</td></tr></tbody></table></div>`
 const workspace = (ui: Ui, page: string, title: string, body: string): string => card({
   title: ui.t(title), titleId: `v2-identity-${page}`,
-  actionsHtml: `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-sec-action="refresh"${ui.read ? '' : ' disabled'}>${icon('refresh', 14)}${esc(ui.t(msgid('Refresh')))}</button>`,
-  bodyHtml: `<div class="flex flex-col gap-5 min-w-0">${body}`
-    + `<p class="text-sm font-normal text-secondary-foreground" role="status" data-state="${ui.read ? 'unread' : 'unavailable'}" data-sec-status>${esc(ui.t(ui.read ? msgid('Nothing has been read yet.') : msgid('This page requires an authorized administrator. Nothing was read or changed.')))}</p><p class="kt-alert kt-alert-light block" role="status" data-sec-result hidden></p></div>` + v2SecClientTemplates(ui.p === 'v2-panel-settings' ? 'identity-panel' : 'identity-whm'),
+  actionsHtml: `<button type="button" class="v2-btn kt-btn kt-btn-outline h-11" data-sec-action="refresh"${ui.read ? '' : ' disabled'}>${icon('refresh', 16)}${esc(ui.t(msgid('Refresh')))}</button>`,
+  bodyHtml: `<div class="flex flex-col gap-6 min-w-0">${body}`
+    + `<p class="text-base leading-6 rtl:leading-[26px] font-normal text-secondary-foreground" role="status" data-state="${ui.read ? 'unread' : 'unavailable'}" data-sec-status>${esc(ui.t(ui.read ? msgid('Nothing has been read yet.') : msgid('This page requires an authorized administrator. Nothing was read or changed.')))}</p><p class="kt-alert kt-alert-light block" role="status" data-sec-result hidden></p></div>` + v2SecClientTemplates(ui.p === 'v2-panel-settings' ? 'identity-panel' : 'identity-whm'),
   hooks: { 'data-sec-workspace': true, 'data-sec-page': page, 'data-sec-can-read': String(ui.read), 'data-sec-can-manage': String(ui.read && ui.manage) },
 })
 const password = (id: string, key: string, autocomplete: string): string => control(id, key, 'password', ` dir="ltr" maxlength="1024" autocomplete="${autocomplete}" spellcheck="false"`)

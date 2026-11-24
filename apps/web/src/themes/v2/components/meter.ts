@@ -68,9 +68,9 @@ export const METER_CSS = `.v2-meter{display:flex;flex-direction:column;gap:.5rem
 .v2-meter__value{display:inline-flex;align-items:baseline;gap:.375rem;white-space:nowrap;color:var(--text-2)}
 .v2-meter__value>span,.v2-meter__scale>span{unicode-bidi:plaintext}
 .v2-meter__value>.v2-meter__pair{unicode-bidi:isolate}
-.v2-meter__unit{font-size:.75rem;color:var(--muted)}
+.v2-meter__unit{font-size:.8125rem;color:var(--muted)}
 .v2-meter__label{font-weight:500;color:var(--mono,var(--text))}
-.v2-meter__note{font-size:.75rem;color:var(--muted)}
+.v2-meter__note{font-size:.8125rem;color:var(--muted)}
 .v2-meter--scale{gap:.625rem}
 .v2-meter--scale .v2-meter__row{gap:.75rem}
 .v2-meter--scale .v2-meter__value>:first-child{font-size:1rem;font-weight:600;color:var(--mono,var(--text))}
@@ -81,6 +81,6 @@ export const METER_CSS = `.v2-meter{display:flex;flex-direction:column;gap:.5rem
 .v2-meter__tick{position:absolute;top:0;width:2px;height:18px;margin-inline-start:-1px;border-radius:1px}
 .v2-meter__tick--warn{background:var(--color-yellow-500,var(--warn))}
 .v2-meter__tick--bad{background:var(--destructive)}
-.v2-meter__scale{display:flex;justify-content:space-between;gap:.5rem;font-size:.6875rem;color:var(--muted)}
-.v2-meter__untracked{display:flex;align-items:center;min-height:2.125rem;padding:0 .75rem;border-radius:var(--radius-control);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);font-size:.75rem;color:var(--text-2)}
+.v2-meter__scale{display:flex;justify-content:space-between;gap:.5rem;font-size:.8125rem;color:var(--muted)}
+.v2-meter__untracked{display:flex;align-items:center;min-height:2.125rem;padding:0 .75rem;border-radius:var(--radius-control);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);font-size:.8125rem;color:var(--text-2)}
 `

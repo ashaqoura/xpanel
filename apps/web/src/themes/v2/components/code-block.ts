@@ -23,7 +23,7 @@ export function codeBlock(t: Translate, props: CodeBlockProps): string {
 
 export const CODE_BLOCK_CSS = `.v2-code{display:flex;flex-direction:column;border-radius:var(--radius-notice);border:1px solid var(--line);background:var(--code);color:var(--code-text);overflow:hidden}
 .v2-code__head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-1);min-height:2.5rem;padding-inline:1rem .25rem;border-bottom:1px solid color-mix(in oklab,var(--code-muted) 30%,transparent)}
-.v2-code code{font-size:.75rem}
+.v2-code code{font-size:.8125rem}
 .v2-code__head code{color:var(--code-muted)}
 .v2-code__copy{display:inline-flex;align-items:center;justify-content:center;width:var(--target);height:var(--target);border:0;border-radius:var(--radius-control);background:transparent;color:var(--code-muted);cursor:pointer}
 .v2-code__copy:hover{background:color-mix(in oklab,var(--code-muted) 20%,transparent);color:var(--code-text)}

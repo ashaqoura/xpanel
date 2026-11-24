@@ -23,5 +23,5 @@ export function renderV2WhmLogTools(t: Translate, canRead: boolean): string {
   const raw = section(t, 'raw-ftp-log', msgid('Raw FTP log'), help(t, msgid('A gzip of plain text with the FTP sign-ins and transfers of one domain, cut from the service journal. Connections made before a sign-in name no domain, so they are left out.'))
     + fields(field(t, 'v2-raw-ftp-domain', msgid('Domain'), select(t, 'v2-raw-ftp-domain', { 'data-raw-ftp-domain': true }, [], canRead)) + field(t, 'v2-raw-ftp-hours', msgid('Time range'), select(t, 'v2-raw-ftp-hours', { 'data-raw-ftp-hours': true }, ranges, canRead, '24')))
     + actions(button(t, msgid('Download log'), { 'data-raw-ftp-download': true }, canRead, true)) + line({ 'data-raw-ftp-status': true }, msgid('Nothing has been downloaded.')))
-  return `<div class="v2-observation__groups flex flex-col gap-5 lg:gap-7.5" data-whm-log-tools data-log-tools-can-read="${canRead}">${analysis}${database}${raw}</div>`
+  return `<div class="v2-observation__groups flex flex-col gap-8" data-whm-log-tools data-log-tools-can-read="${canRead}">${analysis}${database}${raw}</div>`
 }

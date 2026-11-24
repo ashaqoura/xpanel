@@ -24,7 +24,7 @@ export function renderV2TransferPage(props: V2TransferPageProps): string {
   const status = (label: string, hook: string): string => lifecycleStatus(t, label, { [`data-transfer-${hook}`]: true })
   const fields = (body: string): string => `<div class="v2-lifecycle__fields">${body}</div>`
   const actions = (body: string, end = false): string => `<div class="${end ? 'v2-lifecycle__actions justify-end' : 'v2-lifecycle__actions'}">${body}</div>`
-  const fact = (label: string, hook: string): string => `<div class="v2-lifecycle__field"><dt class="text-sm text-secondary-foreground">${text(t, label)}</dt><dd class="text-base font-medium leading-tight text-mono" data-transfer-${hook}>${text(t, msgid('Not read'))}</dd></div>`
+  const fact = (label: string, hook: string): string => `<div class="v2-lifecycle__field"><dt class="text-sm leading-(--lh-label) text-secondary-foreground">${text(t, label)}</dt><dd class="text-base leading-(--lh-text) font-medium text-mono" data-transfer-${hook}>${text(t, msgid('Not read'))}</dd></div>`
   const source = lifecycleCard(t, 'transfer-source', msgctxt('theme:v2', 'Connect source'), `
 ${status(msgid('No authenticated source inventory has been read.'), 'source-observation')}
 ${fields(select('transfer-session', msgid('Saved session'), 'session'))}
@@ -66,7 +66,7 @@ ${actions(button('resolve', msgid('Save resolution')) + button('review', msgid('
 <div data-transfer-review-results${phoneColumns([msgid('Source account'), msgid('Destination account'), msgid('Plan'), msgid('Domains'), msgid('Mailboxes')].map(label => t(label)))}></div>
 ${lifecycleHeading(t, msgid('What will be built here'))}
 ${buildTable}
-<div class="v2-transfer-slice-box flex flex-col gap-2.5 min-w-0 rounded-lg border border-border bg-muted/40 p-5" data-transfer-slice-box hidden><span class="v2-transfer-slice-box__label text-xs font-medium text-secondary-foreground" data-transfer-slice-label></span><pre class="v2-lifecycle__key" dir="ltr" data-transfer-slice-unit></pre></div>
+<div class="v2-transfer-slice-box flex flex-col gap-2 min-w-0 rounded-lg border border-border bg-muted/40 p-4" data-transfer-slice-box hidden><span class="v2-transfer-slice-box__label text-[13px] leading-(--lh-cap) font-medium text-secondary-foreground" data-transfer-slice-label></span><pre class="v2-lifecycle__key" dir="ltr" data-transfer-slice-unit></pre></div>
 `, { 'data-whm-detail-section': 'transfer-plans' })
 
   const execution = lifecycleCard(t, 'transfer-run', msgctxt('theme:v2', 'Run transfer'), `
@@ -94,7 +94,7 @@ ${fields(input('transfer-cpanel-host', 'cPanel host', 'text', ' maxlength="253"'
     + input('transfer-cpanel-port', msgid('SSH port'), 'number', ' min="1" max="65535" value="22"')
     + input('transfer-cpanel-user', 'cPanel username', 'text', ' maxlength="16"')
     + input('transfer-cpanel-fingerprint', msgid('Pinned host key'), 'text', ' maxlength="128"'))}
-<p class="v2-muted text-xs text-muted-foreground">${text(t, msgid('The cPanel server runs pkgacct as root with this server\'s transfer key; add its public key there first.'))} <bdi class="v2-mono" dir="ltr" data-transfer-ssh-key-value></bdi></p>
+<p class="v2-muted text-[13px] leading-(--lh-cap) font-normal text-secondary-foreground">${text(t, msgid('The cPanel server runs pkgacct as root with this server\'s transfer key; add its public key there first.'))} <bdi class="v2-mono" dir="ltr" data-transfer-ssh-key-value></bdi></p>
 ${actions(button('ssh-key', msgid('Show transfer key'), false, { icon: 'key' }) + button('fetch', msgid('Fetch over SSH'), false, { icon: 'download' }), true)}
 ${fields(select('transfer-import', msgid('Archive'), 'import') + select('transfer-import-plan', msgid('Plan here'), 'import-plan'))}
 <div data-transfer-archive-review${phoneColumns([msgid('Not imported or changed'), msgid('Detail'), msgid('Path')].map(label => t(label)))}></div>
@@ -108,7 +108,7 @@ ${actions(button('import-discard', msgid('Discard archive'), false, { icon: 'tra
     msgid('Resume a saved review, inspect actual source inventory and resolve conflicts. Connection and execution results are accepted only from the trusted server adapter.'),
     msgctxt('theme:v2', 'No destination account is created until the current review is confirmed. Source identity, resource limits and proposed changes must be checked before running.'),
   ]))
-  const summary = `<dl class="v2-lifecycle__summary grid grid-cols-2 lg:grid-cols-4 gap-5">${([['source', msgid('Source server'), 'server'], ['accounts', msgid('Selected accounts'), 'users'], ['conflicts', msgid('Conflicts'), 'shield'], ['ready', msgid('Ready to build'), 'check']] as const).map(([key, label, glyph]) => `<div class="v2-lifecycle__kpi kt-card p-5 gap-2.5"><dt class="flex items-center justify-between gap-2.5 text-sm font-normal text-secondary-foreground"><span>${text(t, label)}</span><span class="v2-tile v2-tile--neutral" aria-hidden="true">${icon(glyph)}</span></dt><dd class="text-lg leading-8 font-semibold text-mono" data-transfer-kpi="${key}">${text(t, msgid('Not read'))}</dd></div>`).join('')}</dl>`
+  const summary = `<dl class="v2-lifecycle__summary grid grid-cols-2 lg:grid-cols-4 gap-6">${([['source', msgid('Source server'), 'server'], ['accounts', msgid('Selected accounts'), 'users'], ['conflicts', msgid('Conflicts'), 'shield'], ['ready', msgid('Ready to build'), 'check']] as const).map(([key, label, glyph]) => `<div class="v2-lifecycle__kpi kt-card p-4 gap-2"><dt class="flex items-center justify-between gap-2 text-sm leading-(--lh-label) font-normal text-secondary-foreground"><span>${text(t, label)}</span><span class="v2-tile v2-tile--neutral" aria-hidden="true">${icon(glyph)}</span></dt><dd class="text-lg leading-8 font-semibold text-mono" data-transfer-kpi="${key}">${text(t, msgid('Not read'))}</dd></div>`).join('')}</dl>`
   const steps = `<ol class="v2-lifecycle__steps" aria-label="${text(t, msgid('Steps'))}">${([['transfer-source', msgctxt('theme:v2', 'Connect source')], ['transfer-selection', msgctxt('theme:v2', 'Select accounts')], ['transfer-plans', msgctxt('theme:v2', 'Plans and conflicts')], ['transfer-run', msgctxt('theme:v2', 'Run transfer')]] as const).map(([key, label], index) => `<li><span aria-hidden="true">${index + 1}</span><a href="#v2-lifecycle-${key}">${text(t, label)}</a></li>`).join('')}</ol>`
   const headerActions = lifecycleLink(t, msgid('Audit log'), `/whm/audit?lang=${props.locale}`, 'notes') + (scope === 'server' ? '' : lifecycleLink(t, msgid('Import a cPanel backup'), '#v2-lifecycle-transfer-import', 'download'))
   return `<div class="v2-lifecycle" data-whm-detail-route="${route}" data-capability-state="${props.canRead ? 'authorized' : 'unavailable'}" lang="${props.locale}" dir="${localeDirection(props.locale)}">

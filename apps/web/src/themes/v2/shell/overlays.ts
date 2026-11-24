@@ -49,14 +49,14 @@ export function commandPalette(t: Translate, props: CommandPaletteProps): string
     if (!matches.length && !commandItems) return ''
     const items = matches.map(item => {
       const favorite = item.persistable
-        ? `<button type="button" class="v2-cmdk__fav kt-btn kt-btn-sm kt-btn-icon kt-btn-dim" data-cmdk-favorite="${escapeHtml(item.route)}" aria-pressed="false" aria-label="${escapeHtml(`${t('Favorite page')}: ${item.label}`)}">${icon('star', 16)}</button>`
+        ? `<button type="button" class="v2-cmdk__fav kt-btn kt-btn-icon kt-btn-dim size-11" data-cmdk-favorite="${escapeHtml(item.route)}" aria-pressed="false" aria-label="${escapeHtml(`${t('Favorite page')}: ${item.label}`)}">${icon('star', 16)}</button>`
         : ''
       return `<li data-cmdk-row role="presentation" class="v2-cmdk__row flex items-center gap-1"><a id="xp-cmdk-option-${index++}" href="${escapeHtml(item.href)}" class="v2-cmdk__item" data-cmdk-item="${escapeHtml(item.route)}" data-cmdk-kind="${item.kind}" data-cmdk-key="${escapeHtml(item.key)}" data-cmdk-persistable="${item.persistable}" data-cmdk-search-text="${escapeHtml(item.search)}" role="option" aria-selected="false" tabindex="-1"><span class="v2-cmdk__tile flex items-center justify-center shrink-0 size-8 rounded-md border border-border bg-muted/60 text-muted-foreground" aria-hidden="true">${icon(KIND_ICONS[kind], 16)}</span><span class="v2-cmdk__copy flex flex-col min-w-0"><strong class="font-medium text-mono">${escapeHtml(item.label)}</strong><span class="text-xs text-muted-foreground">${escapeHtml(item.section)}</span></span><code dir="ltr"><bdi dir="ltr">${escapeHtml(item.hint)}</bdi></code></a>${favorite}</li>`
     }).join('') + commandItems
     return `<li data-cmdk-group="${kind}" role="presentation" class="v2-cmdk__group"><span class="v2-cmdk__group-label block px-2.5 pt-2 pb-1 text-xs font-medium text-muted-foreground">${escapeHtml(name)}</span><ul role="group" aria-label="${escapeHtml(name)}">${items}</ul></li>`
   }).join('')
   return `<div id="xp-cmdk-modal" class="v2-cmdk" data-xp-cmdk="true" data-cmdk-surface="${props.surface}" hidden role="dialog" aria-modal="true" aria-labelledby="xp-cmdk-title"><div class="v2-cmdk__panel kt-modal-content">
-<div class="v2-cmdk__head kt-modal-header"><h2 id="xp-cmdk-title" class="v2-sr">${escapeHtml(t('Quick bar'))}</h2>${icon('search', 20)}<label class="v2-sr" for="xp-cmdk-input">${escapeHtml(t('Search tools, accounts and domains'))}</label><input id="xp-cmdk-input" type="search" data-xp-filter-input="true" data-cmdk-search="true" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="xp-cmdk-results" autocomplete="off" maxlength="160" placeholder="${escapeHtml(t('Search tools, @account, #domain or >action'))}" class="kt-input kt-input-ghost"><button type="button" class="v2-cmdk__close kt-btn kt-btn-sm kt-btn-dim" data-action="close-cmdk" aria-label="${escapeHtml(t('Close'))}"><kbd class="kt-kbd kt-kbd-sm">Esc</kbd></button></div>
+<div class="v2-cmdk__head kt-modal-header"><h2 id="xp-cmdk-title" class="v2-sr">${escapeHtml(t('Quick bar'))}</h2>${icon('search', 20)}<label class="v2-sr" for="xp-cmdk-input">${escapeHtml(t('Search tools, accounts and domains'))}</label><input id="xp-cmdk-input" type="search" data-xp-filter-input="true" data-cmdk-search="true" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="xp-cmdk-results" autocomplete="off" maxlength="160" placeholder="${escapeHtml(t('Search tools, @account, #domain or >action'))}" class="kt-input kt-input-ghost h-11 text-base"><button type="button" class="v2-cmdk__close kt-btn kt-btn-dim h-11 min-w-11" data-action="close-cmdk" aria-label="${escapeHtml(t('Close'))}"><kbd class="kt-kbd kt-kbd-sm">Esc</kbd></button></div>
 <div class="v2-cmdk__scopes kt-tabs kt-tabs-line" role="group" aria-label="${escapeHtml(t('Search scope'))}">${scopes.map(([kind, name]) => `<button type="button" class="kt-tab-toggle" data-cmdk-scope="${kind}" aria-pressed="${kind === 'all'}">${escapeHtml(name)}</button>`).join('')}</div>
 <div class="v2-cmdk__history flex flex-col gap-3 px-5 pt-3" data-cmdk-history hidden><div data-cmdk-favorites-section hidden><h3 class="mb-2 text-xs font-medium text-muted-foreground">${escapeHtml(t('Favorites'))}</h3><div class="v2-cmdk__links flex flex-wrap gap-2" data-cmdk-favorites></div></div><div data-cmdk-recents-section hidden><h3 class="mb-2 text-xs font-medium text-muted-foreground">${escapeHtml(t('Recent pages'))}</h3><div class="v2-cmdk__links flex flex-wrap gap-2" data-cmdk-recents></div></div></div>
 <ul class="v2-cmdk__links flex flex-wrap gap-2 px-5 pt-3" data-cmdk-remote hidden aria-label="${escapeHtml(t('Accounts and domains'))}"></ul>
@@ -79,7 +79,7 @@ export function activityDrawer(t: Translate, props: ActivityDrawerProps): string
     : ''
   const body = props.bodyHtml ?? `<p class="v2-muted">${escapeHtml(t(msgctxt('theme:v2', 'Jobs, configuration generations and audit entries appear here as they happen.')))}</p>`
   return `<div id="xp-activity-drawer" class="v2-sheet" data-xp-drawer="activity" hidden role="dialog" aria-modal="true" aria-labelledby="xp-activity-drawer-title"><aside class="v2-sheet__panel" tabindex="-1">
-<header class="v2-drawer__head kt-drawer-header bg-transparent"><h2 id="xp-activity-drawer-title" class="kt-drawer-title">${escapeHtml(t('Activity & Jobs'))}</h2><button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-dim" data-action="close-activity-drawer" aria-label="${escapeHtml(t('Close'))}">${icon('x', 16)}</button></header>
+<header class="v2-drawer__head kt-drawer-header bg-transparent"><h2 id="xp-activity-drawer-title" class="kt-drawer-title">${escapeHtml(t('Activity & Jobs'))}</h2><button type="button" class="kt-btn kt-btn-icon kt-btn-dim size-11" data-action="close-activity-drawer" aria-label="${escapeHtml(t('Close'))}">${icon('x', 16)}</button></header>
 <div class="v2-drawer__body kt-drawer-content">${generation}${body}</div>
 </aside></div>`
 }
@@ -128,25 +128,25 @@ export const OVERLAYS_CSS = `.v2-cmdk,.v2-sheet{position:fixed;inset:0;z-index:9
 .v2-cmdk__head>input:focus-visible{outline:none;box-shadow:none}
 .v2-cmdk__head>input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
 .v2-cmdk__scopes{flex:none;gap:var(--space-3);padding-inline:var(--space-3);overflow-x:auto}
-.v2-cmdk__scopes>button{flex:none;padding-block:12px;border-inline:0;border-block-start:0;background:transparent;white-space:nowrap}
+.v2-cmdk__scopes>button{flex:none;min-block-size:2.75rem;min-inline-size:2.75rem;padding-block:10px;border-inline:0;border-block-start:0;background:transparent;white-space:nowrap}
 .v2-cmdk__scopes>button[aria-pressed="true"]{color:var(--accent)!important;border-block-end-color:var(--accent)!important}
 .v2-cmdk__links{margin:0;list-style:none}
-.v2-cmdk__links a{display:inline-flex;align-items:center;min-block-size:28px;padding-inline:10px;border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg);color:var(--text-2);font-size:12px;font-weight:500;text-decoration:none}
+.v2-cmdk__links a{display:inline-flex;align-items:center;min-block-size:2.75rem;padding-inline:12px;border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg);color:var(--text-2);font-size:14px;font-weight:500;text-decoration:none}
 .v2-cmdk__links a:hover{border-color:var(--accent-line);color:var(--accent)}
 .v2-cmdk__results,.v2-cmdk__group>ul{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
 .v2-cmdk__results{padding:var(--space-1) 10px;gap:var(--space-1);max-block-size:min(420px,50dvh);overflow-y:auto;overscroll-behavior:contain}
-.v2-cmdk__item{flex:1 1 auto;min-inline-size:0;display:flex;align-items:center;gap:12px;min-block-size:var(--target);padding:6px 10px;border:0;background:transparent;border-radius:var(--radius-control);color:var(--text);font:inherit;text-align:start;text-decoration:none;cursor:pointer}
+.v2-cmdk__item{flex:1 1 auto;min-inline-size:0;display:flex;align-items:center;gap:12px;min-block-size:2.75rem;padding:6px 10px;border:0;background:transparent;border-radius:var(--radius-control);color:var(--text);font:inherit;text-align:start;text-decoration:none;cursor:pointer}
 .v2-cmdk__item:hover,.v2-cmdk__item[aria-selected="true"]{background:var(--sunken);color:var(--text)}
-.v2-cmdk__item>code{margin-inline-start:auto;font-size:12px;color:var(--muted);text-align:start;overflow-wrap:anywhere}
+.v2-cmdk__item>code{margin-inline-start:auto;font-size:13px;color:var(--muted);text-align:start;overflow-wrap:anywhere}
 @media(max-width:959px){.v2-cmdk{padding-block-start:var(--space-2)}.v2-cmdk__item{display:grid;grid-template-columns:32px minmax(0,1fr)}.v2-cmdk__item>code{grid-column:2;justify-self:start;margin-inline-start:0;direction:inherit}}
 .v2-cmdk__fav[aria-pressed="true"] i{color:var(--warn)}
-.v2-cmdk__foot{flex-wrap:wrap;font-size:12px;color:var(--text-2)}
+.v2-cmdk__foot{flex-wrap:wrap;font-size:13px;line-height:20px;color:var(--text-2)}
 .v2-sheet{z-index:80;justify-content:flex-end;padding:var(--space-3)}
 .v2-sheet__panel{inline-size:min(450px,100%);block-size:100%;display:flex;flex-direction:column;border-radius:var(--radius-card);background:var(--surface);border:1px solid var(--line);box-shadow:var(--v2-elev);overflow:hidden}
 .v2-sheet__panel>.v2-drawer__body{flex:1 1 auto;min-block-size:0;overflow-y:auto}
 @media(max-width:600px){.v2-sheet{padding:var(--space-1)}}
 .v2-reconcile{box-shadow:none}
 .v2-reconcile[data-reconcile-status=failed]{border-color:var(--bad-line)!important}
-.v2-reconcile__error summary{min-block-size:var(--target);display:flex;align-items:center;font-weight:600;color:var(--bad);cursor:pointer}
+.v2-reconcile__error summary{min-block-size:2.75rem;display:flex;align-items:center;font-weight:600;color:var(--bad);cursor:pointer}
 .v2-reconcile__error pre{padding:var(--space-2);border-radius:var(--radius-control);background:var(--code);color:var(--code-text);font-size:12px;overflow-x:auto}
 `

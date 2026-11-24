@@ -41,7 +41,7 @@ describe('v2 sealed mailbox workspace pages', () => {
     expect(MAIL_WORKSPACES_CSS).toContain('.v2-mail-workspace__table tr{display:grid;grid-template-columns:minmax(0,1fr) fit-content(50%);')
     // An action button grows with a long loaded label instead of pushing its card wider.
     const folders = render('/mail/folders')
-    for (const hook of ['data-mail-folders-submit', 'data-mail-folders-editor-cancel']) expect(folders).toMatch(new RegExp(`class="v2-btn [^"]*max-w-full h-auto min-h-8[.]5 py-1[.]5 whitespace-normal text-start" ${hook}`))
+    for (const hook of ['data-mail-folders-submit', 'data-mail-folders-editor-cancel']) expect(folders).toMatch(new RegExp(`class="v2-btn [^"]*max-w-full h-auto min-h-11 py-2 whitespace-normal text-start" ${hook}`))
   })
 
   it('retains the folder create/rename/destructive confirmation contract and an unread table', () => {

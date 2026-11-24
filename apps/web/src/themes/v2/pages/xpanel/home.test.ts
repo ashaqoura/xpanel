@@ -187,7 +187,7 @@ describe('v2 account home', () => {
       for (const tool of ownTools) {
         const direct = nodes.filter(node => node.parent === nodes.indexOf(tool))
         expect(direct.map(node => node.attrs.get('class'))).toEqual([
-          expect.stringContaining('v2-home-tool__tile'), 'v2-home-tool__label text-sm font-medium text-mono', 'v2-home-tool__hint v2-num text-xs text-muted-foreground',
+          expect.stringContaining('v2-home-tool__tile'), 'v2-home-tool__label text-sm leading-(--lh-label) font-medium text-mono', 'v2-home-tool__hint v2-num text-[0.8125rem] leading-(--lh-cap) text-muted-foreground',
         ])
       }
     }
@@ -277,7 +277,7 @@ describe('v2 home registered personal navigation', () => {
   it.each(['en', 'ar'] as const)('keeps authorized personal links available without qualifying native tools in %s', locale => {
     const html = renderV2PanelHome(props({ locale, catalog: unverified }))
     const nodes = parseMarkup(html)
-    const currentLanguageHint = '<span class="v2-home-tool__hint v2-num text-xs text-muted-foreground">' + (locale === 'en' ? 'English' : 'العربية') + '</span>'
+    const currentLanguageHint = '<span class="v2-home-tool__hint v2-num text-[0.8125rem] leading-(--lh-cap) text-muted-foreground">' + (locale === 'en' ? 'English' : 'العربية') + '</span>'
     expect(html).toContain(currentLanguageHint)
     for (const id of personalIds) {
       const item = nodes.find(node => node.attrs.get('data-tool-capability') === id)!

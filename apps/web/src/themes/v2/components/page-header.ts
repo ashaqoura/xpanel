@@ -41,18 +41,19 @@ export function pageHeader(t: Translate, props: PageHeaderProps): string {
 </header>`
 }
 
-// The Metronic page toolbar: the title (text-xl, medium) over its secondary description, the actions 10px apart
-// at the end. The trail is a kt-breadcrumb; the ol rule keeps a trail written without that class in line.
+// The Metronic page toolbar: the page heading (26/34, medium) over its secondary description, the actions 10px apart
+// at the end. The trail is a kt-breadcrumb; the ol rule keeps a trail written without that class in line. Trail links
+// keep a 44px target whose extra height overlaps the band instead of growing it.
 export const PAGE_HEADER_CSS = `.v2-page-head{display:flex;flex-direction:column;gap:.5rem}
-.v2-crumbs ol{list-style:none;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:.375rem;font-size:.875rem;color:var(--muted)}
+.v2-crumbs ol{list-style:none;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:.375rem;font-size:.875rem;line-height:var(--lh-label);color:var(--muted)}
 .v2-crumbs li{display:inline-flex;align-items:center;gap:.375rem}
-.v2-crumbs a{color:var(--text-2);font-weight:400}
+.v2-crumbs a{display:inline-flex;align-items:center;min-block-size:var(--target);min-inline-size:var(--target);margin-block:-.6875rem;color:var(--text-2);font-weight:400}
 .v2-crumbs a:hover{color:var(--accent)}
 .v2-crumbs [aria-current="page"]{color:var(--mono,var(--text))}
 .v2-page-head__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.625rem 1.25rem}
 .v2-page-head__text{display:flex;flex-direction:column;gap:.5rem;min-width:0;max-width:84ch}
 .v2-page-head__title{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .625rem}
-.v2-page-head__text p{font-size:.875rem;line-height:1.5;color:var(--text-2)}
+.v2-page-head__text p{color:var(--text-2)}
 .v2-page-head__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem}
-.v2-page-head__status{display:flex;flex-direction:column;align-items:flex-end;gap:.125rem;font-size:.75rem}
+.v2-page-head__status{display:flex;flex-direction:column;align-items:flex-end;gap:.125rem;font-size:.8125rem;line-height:var(--lh-cap)}
 `

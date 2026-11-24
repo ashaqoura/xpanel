@@ -6,16 +6,16 @@ export type WhmDatabaseInput = WhmDataPageInput
 export const V2_WHM_DATABASE_ROUTES = Object.freeze(['/whm/databases', '/whm/databases/users', '/whm/databases/phpmyadmin', '/whm/databases/tuning', '/whm/databases/processes', '/whm/databases/servers', '/whm/databases/upgrade', '/whm/databases/redis', '/whm/databases/mongodb'] as const)
 /** The database pages' own rules. They load beside the shared data stylesheet (WHM_DATA_COMMON_CSS), which the route registry already serves on these routes. */
 export const WHM_DATABASE_PAGES_CSS = `.v2-whm-data pre[data-dbs-log]{max-block-size:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
-@media(min-width:1024px){.v2-whm-data[data-whm-detail-route^="/whm/databases"]>.v2-whm-data__stack{gap:1.875rem}}
-.v2-whm-data[data-whm-detail-route^="/whm/databases"] p[data-state]{margin:0;font-size:.875rem;line-height:1.25rem;color:var(--text-2)}
+@media(min-width:1024px){.v2-whm-data[data-whm-detail-route^="/whm/databases"]>.v2-whm-data__stack{gap:32px}}
+.v2-whm-data[data-whm-detail-route^="/whm/databases"] p[data-state]{margin:0;font-size:1rem;line-height:var(--lh-text);color:var(--text-2)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"]>p[data-state]:not([data-state=failed]){padding:.875rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] p[data-state]:is([data-state=failed],[data-state=uncertain],[data-state=unavailable]){color:var(--text)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"]>p[data-state=uncertain]{border-color:var(--bad-line);background:var(--bad-soft)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"]>p[data-state]:is([data-state=partial],[data-state=unavailable]){border-color:var(--warn-line);background:var(--warn-soft)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] table{min-inline-size:0}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] table :is(th,td){padding-inline:.75rem;white-space:normal}
-.v2-whm-data[data-whm-detail-route^="/whm/databases"] table :is(th,td):first-child{padding-inline-start:1.25rem}
-.v2-whm-data[data-whm-detail-route^="/whm/databases"] table :is(th,td):last-child{padding-inline-end:1.25rem}
+.v2-whm-data[data-whm-detail-route^="/whm/databases"] table :is(th,td):first-child{padding-inline-start:24px}
+.v2-whm-data[data-whm-detail-route^="/whm/databases"] table :is(th,td):last-child{padding-inline-end:24px}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] table th{vertical-align:middle}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] table td{overflow-wrap:break-word}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] table td:first-child{overflow-wrap:anywhere}
@@ -23,13 +23,13 @@ export const WHM_DATABASE_PAGES_CSS = `.v2-whm-data pre[data-dbs-log]{max-block-
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] input[type=file]{max-inline-size:480px}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] input[type=number]{max-inline-size:240px}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] .v2-card--flush>.v2-card__body{gap:0}
-.v2-whm-data[data-whm-detail-route^="/whm/databases"] .v2-card--flush>.v2-card__body>p{margin:0;padding:.75rem 1.25rem;border-block-start:1px solid var(--line)}
+.v2-whm-data[data-whm-detail-route^="/whm/databases"] .v2-card--flush>.v2-card__body>p{margin:0;padding:8px 16px;border-block-start:1px solid var(--line)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] .v2-card__foot{justify-content:flex-start}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] .v2-card__body .v2-whm-data__actions:not(td *){justify-content:flex-end}
-.v2-whm-data[data-whm-detail-route^="/whm/databases"] [data-db-tuning-plan]>article{gap:.625rem;padding-block-start:1.25rem;border-block-start:1px solid var(--line)}
+.v2-whm-data[data-whm-detail-route^="/whm/databases"] [data-db-tuning-plan]>article{gap:8px;padding-block-start:24px;border-block-start:1px solid var(--line)}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] [data-db-tuning-plan]>article:first-child{padding-block-start:0;border-block-start:0}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] [data-db-tuning-plan]>article>.v2-whm-data__actions{justify-content:space-between}
-.v2-whm-data [data-db-tuning-plan]:empty::before{content:attr(data-empty-text);font-size:.75rem;line-height:1rem;color:var(--muted)}
+.v2-whm-data [data-db-tuning-plan]:empty::before{content:attr(data-empty-text);font-size:.8125rem;line-height:var(--lh-cap);color:var(--muted)}
 .v2-whm-data[data-whm-detail-route="/whm/databases/upgrade"]>ol>li{font-variant-numeric:tabular-nums}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] tbody th{background:none;color:var(--mono,var(--text));font-size:.875rem;font-weight:500}
 .v2-whm-data[data-whm-detail-route^="/whm/databases"] td>bdi.v2-mono:is([data-xp-slot=databases],[data-xp-slot=trash],[data-xp-slot=users],[data-xp-slot=grants],[data-xp-slot=size],[data-xp-slot=tables]){font-family:var(--font-sans);font-variant-numeric:tabular-nums}
@@ -38,7 +38,7 @@ export const WHM_DATABASE_PAGES_CSS = `.v2-whm-data pre[data-dbs-log]{max-block-
 `
 type DatabaseKind = 'overview' | 'users' | 'processes' | 'servers'
 // The number of an upgrade step, as the Metronic step marker.
-const STEP_NUMBER = 'flex items-center justify-center size-7 shrink-0 rounded-full bg-primary/10 text-xs font-semibold text-primary'
+const STEP_NUMBER = 'flex items-center justify-center size-7 shrink-0 rounded-full bg-primary/10 text-2sm font-semibold text-primary'
 
 function databaseMapTool(input: WhmDatabaseInput): string {
   const { t, canRead } = context(input), text = (id: string, label: string, hook: string, maxlength: number): string => field(id, label, { kind: 'input', type: 'text', disabled: true, dir: 'ltr', maxlength, autocomplete: 'off', hooks: { [hook]: true } })
@@ -57,7 +57,7 @@ function databaseHostsTool(input: WhmDatabaseInput): string {
 function databaseProfiles(input: WhmDatabaseInput): string {
   const { t, canRead } = context(input), manage = canRead && input.dataAuthority?.canDbProfiles === true
   const text = (key: string, label: string, maxlength: number, type?: 'password' | 'number'): string => field('v2-db-' + key, t(label), { kind: 'input', ...(type ? { type } : {}), ...(type === 'number' ? { min: 1, max: 65535, value: '3306' } : {}), disabled: true, dir: 'ltr', maxlength, spellcheck: false, autocomplete: type === 'password' ? 'new-password' : 'off', hooks: { 'data-sec-input': key } })
-  return `<div data-db-profiles-workspace data-sec-can-read="${canRead}" data-sec-can-manage="${manage}"><template data-xp-template="sec-action"><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" disabled><span data-xp-slot="label"></span></button></template><template data-xp-template="sec-action-group"><div class="v2-whm-data__actions" data-xp-slot="items"></div></template>`
+  return `<div data-db-profiles-workspace data-sec-can-read="${canRead}" data-sec-can-manage="${manage}"><template data-xp-template="sec-action"><button type="button" class="v2-btn kt-btn kt-btn-outline" disabled><span data-xp-slot="label"></span></button></template><template data-xp-template="sec-action-group"><div class="v2-whm-data__actions" data-xp-slot="items"></div></template>`
     + section('database-profiles', t(msgid('Database server profiles')), status(t(msgid('Nothing has been read yet.')), { 'data-sec-status': true }) + `<p role="status" data-sec-result hidden></p>` + facts(t, [['profile-active', msgid('Active server')]], 'data-sec-field')
       + table(t, t(msgid('Database server profiles')), [msgid('Name'), msgid('Server'), msgid('User'), msgid('State'), msgid('Validation'), msgid('Actions')], { 'data-sec-rows': 'profiles' }, t(msgid('No profiles have been read.')))
       + fields(text('profile-name', msgid('Profile name'), 32) + text('profile-host', msgid('Server host'), 253) + text('profile-port', msgid('Port'), 5, 'number') + text('profile-user', msgid('Administrator user'), 80) + text('profile-password', msgid('Password'), 128, 'password') + text('profile-description', msgid('Description'), 200)
@@ -82,8 +82,8 @@ function databaseWorkspace(input: WhmDatabaseInput, kind: DatabaseKind): string 
   const titles = { overview: msgctxt('theme:v2', 'Databases'), users: msgctxt('theme:v2', 'Database users'), processes: msgctxt('theme:v2', 'Database processes'), servers: msgctxt('theme:v2', 'Database servers') }
   const route = kind === 'overview' ? '/whm/databases' : `/whm/databases/${kind}`
   const observedAt = ['observedAt', msgctxt('theme:v2', 'Observed at (UTC)')] as const
-  const filters = (drift: boolean) => `<label class="v2-sr" for="v2-whm-db-search-${kind}">${esc(t(msgid('Search')))}</label><span class="kt-input w-full sm:w-56 max-[959px]:text-base">${ki('search')}<input id="v2-whm-db-search-${kind}" type="search" autocomplete="off" spellcheck="false" placeholder="${esc(t(msgid('Search')))}" data-whm-db-search disabled></span>`
-    + (drift ? `<label class="text-sm font-normal text-secondary-foreground" for="v2-whm-db-drift-${kind}">${esc(t(msgctxt('theme:v2', 'Drift')))}</label><select id="v2-whm-db-drift-${kind}" class="kt-select w-full sm:w-44 max-[959px]:text-base" data-whm-db-drift-filter disabled>${[['', msgid('All')], ['in-sync', msgctxt('theme:v2', 'In sync')], ['saved-only', msgctxt('theme:v2', 'Saved only')], ['server-only', msgctxt('theme:v2', 'Server only')], ['system', msgctxt('theme:v2', 'System')], ['unverified', msgctxt('theme:v2', 'Not verified')]].map(([value, label]) => `<option value="${value}">${esc(t(label!))}</option>`).join('')}</select>` : '')
+  const filters = (drift: boolean) => `<label class="v2-sr" for="v2-whm-db-search-${kind}">${esc(t(msgid('Search')))}</label><span class="kt-input w-full sm:w-56 sm:self-end max-[959px]:text-base">${ki('search')}<input id="v2-whm-db-search-${kind}" class="self-stretch -my-px" type="search" autocomplete="off" spellcheck="false" placeholder="${esc(t(msgid('Search')))}" data-whm-db-search disabled></span>`
+    + (drift ? `<div class="flex flex-col gap-2 w-full sm:w-44"><label class="ps-[calc(.75rem+1px)] text-sm font-normal text-secondary-foreground" for="v2-whm-db-drift-${kind}">${esc(t(msgctxt('theme:v2', 'Drift')))}</label><select id="v2-whm-db-drift-${kind}" class="kt-select w-full max-[959px]:text-base" data-whm-db-drift-filter disabled>${[['', msgid('All')], ['in-sync', msgctxt('theme:v2', 'In sync')], ['saved-only', msgctxt('theme:v2', 'Saved only')], ['server-only', msgctxt('theme:v2', 'Server only')], ['system', msgctxt('theme:v2', 'System')], ['unverified', msgctxt('theme:v2', 'Not verified')]].map(([value, label]) => `<option value="${value}">${esc(t(label!))}</option>`).join('')}</select></div>` : '')
   const filterEmpty = note(t(msgctxt('theme:v2', 'No loaded rows match these filters.')), { 'data-whm-db-filter-empty': true }, true)
   const rows = (name: string, title: string, headers: readonly string[]) => table(t, title, headers, { 'data-whm-db-rows': name })
   let body: string
@@ -124,11 +124,11 @@ function engineWorkspace(input: WhmDatabaseInput, engine: 'phpmyadmin' | 'upgrad
   let body: string
   if (engine === 'phpmyadmin') {
     body = split(section('database-sso', t(msgctxt('theme:v2', 'Open phpMyAdmin')), facts(t, [['installed', msgctxt('theme:v2', 'phpMyAdmin package')], ['signon', msgctxt('theme:v2', 'Single sign-on')], ['session', msgctxt('theme:v2', 'Session length')], ['ticket', msgctxt('theme:v2', 'Sign-on link validity')]], 'data-db-fact') + actions(button(t(msgctxt('theme:v2', 'Open phpMyAdmin')), { 'data-db-action': 'open' }, true, true, 'open')) + note(t(msgctxt('theme:v2', 'Sign-on uses a temporary database administrator and opens only after every server requirement passes. No password is shown.')))),
-      section('database-sso-checks', t(msgctxt('theme:v2', 'Sign-on setup')), `<ol class="v2-whm-data__list text-sm text-secondary-foreground" data-db-checks><li>${esc(t(msgid('Not read')))}</li></ol>`) + section('database-pga', 'phpPgAdmin', facts(t, [['phppgadmin', msgctxt('theme:v2', 'phpPgAdmin package')]], 'data-db-fact') + note(t(msgid('phpPgAdmin sign-on is for account owners and covers their own databases. There is no server-wide phpPgAdmin sign-on.'))))) + pmaAccessTool(input, input.dataAuthority?.canPmaAccess)
+      section('database-sso-checks', t(msgctxt('theme:v2', 'Sign-on setup')), `<ol class="v2-whm-data__list text-base text-secondary-foreground" data-db-checks><li>${esc(t(msgid('Not read')))}</li></ol>`) + section('database-pga', 'phpPgAdmin', facts(t, [['phppgadmin', msgctxt('theme:v2', 'phpPgAdmin package')]], 'data-db-fact') + note(t(msgid('phpPgAdmin sign-on is for account owners and covers their own databases. There is no server-wide phpPgAdmin sign-on.'))))) + pmaAccessTool(input, input.dataAuthority?.canPmaAccess)
   } else if (engine === 'upgrade') {
-    body = `<ol class="v2-whm-data__list kt-card flex flex-row flex-wrap items-center gap-x-7.5 gap-y-2.5 list-none px-5 py-3.5" aria-label="${esc(t(msgctxt('theme:v2', 'Upgrade steps')))}">${[msgid('Review'), msgctxt('theme:v2', 'Back up'), msgid('Upgrade')].map((label, index) => `<li class="flex items-center gap-2.5"><span class="${STEP_NUMBER}">${index + 1}</span><span class="text-sm font-medium text-mono">${esc(t(label))}</span></li>`).join('')}</ol>`
+    body = `<ol class="v2-whm-data__list kt-card flex flex-row flex-wrap items-center gap-x-7.5 gap-y-2.5 list-none px-6 py-3.5" aria-label="${esc(t(msgctxt('theme:v2', 'Upgrade steps')))}">${[msgid('Review'), msgctxt('theme:v2', 'Back up'), msgid('Upgrade')].map((label, index) => `<li class="flex items-center gap-2"><span class="${STEP_NUMBER}">${index + 1}</span><span class="text-base font-medium text-mono">${esc(t(label))}</span></li>`).join('')}</ol>`
       + section('database-upgrade-review', t(msgctxt('theme:v2', 'Review the installed server')), facts(t, [['installed', msgctxt('theme:v2', 'Installed package')], ['running', msgctxt('theme:v2', 'Running version')], ['unit', msgctxt('theme:v2', 'Service unit')], ['active', msgctxt('theme:v2', 'Service state')], ['family', msgctxt('theme:v2', 'Package manager')], ['observedAt', msgctxt('theme:v2', 'Observed at (UTC)')]], 'data-db-fact') + rows('packages', t(msgctxt('theme:v2', 'Pending MariaDB packages')), [msgid('Package'), msgid('Installed'), msgid('Available'), msgctxt('theme:v2', 'Origin'), msgid('Security')]) + note('', { 'data-db-blocked': true }, true))
-      + section('database-upgrade-backup', t(msgctxt('theme:v2', 'Back up')), note(t(msgctxt('theme:v2', 'A complete logical backup is required before package changes. The upgrade stops if backup fails.'))) + `<p class="flex items-center gap-2 self-start rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-foreground">${ki('folder')}${technical('/var/backups/xpanel/mariadb-upgrade')}</p>`)
+      + section('database-upgrade-backup', t(msgctxt('theme:v2', 'Back up')), note(t(msgctxt('theme:v2', 'A complete logical backup is required before package changes. The upgrade stops if backup fails.'))) + `<p class="flex items-center gap-2 self-start rounded-md border border-border bg-muted/40 px-3 py-2 text-base text-foreground">${ki('folder')}${technical('/var/backups/xpanel/mariadb-upgrade')}</p>`)
       + section('database-upgrade-apply', t(msgid('Upgrade')), status(t(msgid('Not read')), { 'data-db-plan': true }) + actions(button(t(msgctxt('theme:v2', 'Start upgrade')), { 'data-db-action': 'upgrade' }, true, true, 'rocket')) + note('', { 'data-db-job': true }, true) + note(t(msgctxt('theme:v2', 'Repository upgrades run as verified host jobs. Submission is not completion.'))))
   } else {
     const configuration = engine === 'redis'

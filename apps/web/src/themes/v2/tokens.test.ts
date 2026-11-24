@@ -36,7 +36,12 @@ describe('v2 color tokens', () => {
     expect(contrastRatio(value(light, '--muted')!.toLowerCase(), value(light, '--surface')!.toLowerCase())).toBeGreaterThanOrEqual(4.5)
     expect(value(light, '--radius-card')).toBe('12px')
     expect(value(light, '--radius-control')).toBe('6px')
-    expect(value(light, '--target')).toBe('2.125rem')
+    expect(value(light, '--target')).toBe('2.75rem')
+    // Text-control boundaries keep 3:1 non-text contrast against the page and the card in both schemes.
+    for (const block of [light, dark]) {
+      expect(contrastRatio(value(block, '--line-strong')!.toLowerCase(), (value(block, '--bg') ?? value(light, '--bg')!).toLowerCase())).toBeGreaterThanOrEqual(3)
+      expect(contrastRatio(value(block, '--line-strong')!.toLowerCase(), (value(block, '--surface') ?? value(light, '--surface')!).toLowerCase())).toBeGreaterThanOrEqual(3)
+    }
     for (const name of ['--ok', '--warn', '--bad', '--scrim']) expect(value(dark, name), name).toBeDefined()
   })
 })

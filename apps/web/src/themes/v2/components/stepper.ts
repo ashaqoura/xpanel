@@ -42,7 +42,7 @@ export const STEPPER_CSS = `.v2-steps{list-style:none;margin:0;padding:0;display
 .v2-step__dot{flex:none;display:flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.8125rem;font-weight:600}
 .v2-step__text{grid-row:2;grid-column:1/-1;display:flex;flex-direction:column;min-width:0;padding-inline-end:.75rem}
 .v2-step__label{font-size:.875rem;font-weight:500;color:var(--text-2)}
-.v2-step__sub{font-size:.75rem;color:var(--text-2);overflow-wrap:anywhere}
+.v2-step__sub{font-size:.8125rem;color:var(--text-2);overflow-wrap:anywhere}
 .v2-step__rail{grid-row:1;grid-column:2;height:2px;border-radius:1px;background:var(--line)}
 .v2-step:last-child>.v2-step__rail{visibility:hidden}
 .v2-steps--inline{display:flex;flex-wrap:wrap}

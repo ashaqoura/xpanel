@@ -100,7 +100,7 @@ describe('v2 backup workspace', () => {
     const template = /<template data-xp-template="whm-local-archive-row"><tr>(.*?)<\/tr><\/template>/.exec(managed)?.[1] ?? ''
     expect(template).toContain('<bdi class="v2-mono" dir="ltr" data-xp-slot="archive"></bdi>')
     expect(template).toContain('data-xp-slot="bytes"')
-    expect(template).toContain('<a class="v2-btn kt-btn kt-btn-outline kt-btn-sm h-auto min-h-7 py-1 whitespace-normal text-start" href="/whm/backups/files" data-xp-slot="review"></a>')
+    expect(template).toContain('<a class="v2-btn kt-btn kt-btn-outline whitespace-normal text-start" href="/whm/backups/files" data-xp-slot="review"></a>')
     expect(managed).not.toContain('Local archive actions require the guarded preview')
     const forbidden = renderV2BackupsPage({ ...denied, accounts: [account] })
     expect(forbidden).not.toContain('alice')
@@ -277,7 +277,7 @@ describe('backup capability source parity', () => {
 });
 
 describe('v2 lifecycle board regions', () => {
-  const rulesOf = (html: string): string[] => html.match(/<ul class="v2-lifecycle__rules text-sm text-secondary-foreground">.*?<\/ul>/gs) ?? []
+  const rulesOf = (html: string): string[] => html.match(/<ul class="v2-lifecycle__rules text-base text-secondary-foreground">.*?<\/ul>/gs) ?? []
 
   it('links the backup pages to each other and to the audit log from the header', () => {
     const backups = renderV2BackupsPage({ ...admitted, locale: 'ar' })
@@ -334,7 +334,7 @@ describe('v2 lifecycle board regions', () => {
       const template = runs.split(`<template data-xp-template="whm-backup-${kind}-row"><tr>`)[1]?.split('</tr></template>')[0] ?? ''
       expect([...template.matchAll(/data-xp-slot="([a-z]+)"/g)].map(match => match[1])).toEqual(slots)
     }
-    expect(runs).toContain('<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-xp-slot="action" disabled></button>')
+    expect(runs).toContain('<button type="button" class="v2-btn kt-btn kt-btn-outline" data-xp-slot="action" disabled></button>')
     expect(html.split('data-xp-template="whm-backup-runs-row"')).toHaveLength(2)
   })
 

@@ -138,7 +138,7 @@ export const MATRIX_LAYOUT_CSS = `.v2-matrix th[scope=row]{padding:.75rem 1rem;c
 .v2-matrix__group>th{font-size:.8125rem;font-weight:500;color:var(--mono,var(--text))}
 .v2-matrix__group .v2-num{font-weight:400;color:var(--muted)}
 .v2-matrix__channel{display:inline-flex;flex-direction:column}
-.v2-matrix__channel>span+span{font-size:.75rem}
+.v2-matrix__channel>span+span{font-size:.8125rem}
 .v2-matrix__switch{display:inline-flex;align-items:center;gap:var(--space-1);min-height:var(--target);font-size:.8125rem;cursor:pointer}
 .v2-matrix__event{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1) .75rem}
 .v2-matrix__fixed{display:inline-flex;align-items:center;gap:.375rem;font-size:.8125rem;color:var(--ok)}

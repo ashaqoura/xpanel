@@ -30,9 +30,9 @@ export function v2PanelAccessSections(t: Translate, canRead: boolean, canManage:
     + section(t, 'access-subpanel', msgid('Sub-panel service'), help(t, msgid('A stopped entry point answers 503 until you start it. xWHM cannot be stopped.'))
       + checks('pa-stop', ENTRY.filter(([name]) => name !== 'xwhm').map(([name, label]) => [name, t(msgid('Stop {name}'), { name: t(label) })] as const))
       + facts(t, [['pa-cert-names', msgid('Certificate names')], ['pa-cert-issuer', msgid('Issuer')], ['pa-cert-until', msgid('Valid until (UTC)')], ['pa-cert-fingerprint', msgid('Fingerprint')]], 'data-sec-field')
-      + `<details class="${DISCLOSURE}">${summary(t, msgid('Certificate content'))}<pre dir="ltr" class="v2-mono v2-panel-access__code rounded-xl border border-border bg-muted/40 p-5 text-sm text-foreground"><bdi dir="ltr" data-sec-field="pa-cert-pem"></bdi></pre></details>`
+      + `<details class="${DISCLOSURE}">${summary(t, msgid('Certificate content'))}<pre dir="ltr" class="v2-mono v2-panel-access__code rounded-xl border border-border bg-muted/40 p-6 text-sm text-foreground"><bdi dir="ltr" data-sec-field="pa-cert-pem"></bdi></pre></details>`
       + actions(act('pa-reload', msgid('Reload the web server')) + act('pa-restart', msgid('Restart the panel'), false, 'ki-arrows-loop')))
-    + `<div class="v2-observation__savebar kt-card flex-row flex-wrap items-center justify-between gap-5 px-5 py-4">${state}<div class="v2-observation__actions flex flex-wrap items-center gap-2.5">${button(t, msgid('Refresh'), { 'data-sec-action': 'pa-refresh' }, canRead)}${button(t, msgid('Save access rules'), { 'data-sec-action': 'pa-gate-save' }, false, true)}</div></div>`
+    + `<div class="v2-observation__savebar kt-card flex-row flex-wrap items-center justify-between gap-4 px-6 py-4">${state}<div class="v2-observation__actions flex flex-wrap items-center gap-2">${button(t, msgid('Refresh'), { 'data-sec-action': 'pa-refresh' }, canRead)}${button(t, msgid('Save access rules'), { 'data-sec-action': 'pa-gate-save' }, false, true)}</div></div>`
     + section(t, 'access-temporary', msgid('Temporary sign-in links'), help(t, msgid('A link opens one read-only xWHM session for a helper. It cannot change anything or reach these settings, and each link has its own activity log.'))
       + facts(t, [['pa-updated', msgid('Last saved (UTC)')], ['pa-temp-url', msgid('New link')]], 'data-sec-field')
       + fields(input('pa-temp-lifetime', msgid('Lifetime, minutes'), ' dir="ltr" inputmode="numeric" min="5" max="1440" step="1" value="60"', 'number') + input('pa-temp-note', msgid('Note'), ' maxlength="128" autocomplete="off"'))
@@ -42,7 +42,7 @@ export function v2PanelAccessSections(t: Translate, canRead: boolean, canManage:
       + actions(act('pa-temp-activity', msgid('Show activity'), false, 'ki-eye') + dangerButton(t, msgid('Revoke link'), { 'data-sec-action': 'pa-temp-revoke' }))
       + table(t, msgid('Link activity'), [msgid('When (UTC)'), msgid('Request'), msgid('Outcome')], { 'data-sec-rows': 'pa-activity' }, msgid('Select a link.')))
     + section(t, 'access-recovery', msgid('Recovery from the server shell'), help(t, msgid('Locked out? As root on this server, these commands always work:'))
-      + `<pre dir="ltr" class="v2-mono v2-panel-access__code rounded-xl border border-border bg-muted/40 p-5 text-sm text-foreground">xpanel panel-access show\nxpanel panel-access reset all\nnode /opt/xpanel/current/scripts/management-tls.mjs reset-access</pre>`
+      + `<pre dir="ltr" class="v2-mono v2-panel-access__code rounded-xl border border-border bg-muted/40 p-6 text-sm text-foreground">xpanel panel-access show\nxpanel panel-access reset all\nnode /opt/xpanel/current/scripts/management-tls.mjs reset-access</pre>`
       + help(t, msgid('The first shows the entrance. The second clears allowlists, the entrance, basic authentication and temporary links. The third returns the default ports and host names.')))
-  return `<div class="flex flex-col gap-5 lg:gap-7.5" data-panel-access data-sec-can-read="${canRead}" data-sec-can-manage="${canManage}">${body}</div>`
+  return `<div class="flex flex-col gap-8" data-panel-access data-sec-can-read="${canRead}" data-sec-can-manage="${canManage}">${body}</div>`
 }

@@ -1,7 +1,7 @@
 import type { Translate } from '../../../../../i18n.ts'
 import { escapeHtml, xpTemplate } from '../../../html.ts'
 import { WHM_ACCOUNT_TOOLS_CSS } from '../account-tools/common.ts'
-import { whmPolish } from '../monitoring/common.ts'
+import { labelInset, whmPolish } from '../monitoring/common.ts'
 import { phoneRows, type PhoneRow } from '../lifecycle/shared.ts'
 
 /** Marks a recovery table for the two-column phone rows: which cell is the row name and which value sits opposite it.
@@ -27,7 +27,7 @@ export const recoveryRules = (t: Translate, rules: readonly string[]): string =>
 export function restoreMoreTemplates(t?: Translate): string {
   const technical = (name: string) => `<bdi dir="ltr" data-xp-slot="${name}"></bdi>`
   const label = (text: string): string => phoneLabel(t, text)
-  return xpTemplate('restore-more-archives', `<tr><td${label(msgid('Created (UTC)'))}>${technical('created')}</td><td>${technical('archive')}</td><td${label(msgid('Size'))}>${technical('bytes')}</td><td data-xp-slot="integrity"></td><td><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-xp-slot="open"></button></td></tr>`)
+  return xpTemplate('restore-more-archives', `<tr><td${label(msgid('Created (UTC)'))}>${technical('created')}</td><td>${technical('archive')}</td><td${label(msgid('Size'))}>${technical('bytes')}</td><td data-xp-slot="integrity"></td><td><button type="button" class="v2-btn kt-btn kt-btn-outline" data-xp-slot="open"></button></td></tr>`)
     + xpTemplate('restore-more-components', `<tr><td data-xp-slot="name"></td><td data-xp-slot="contents"></td><td data-xp-slot="action"${label(msgid('Restore here'))}></td></tr>`)
     + xpTemplate('restore-more-mailboxes', `<tr><td><input class="kt-checkbox" type="checkbox" data-xp-slot="select"></td><td>${technical('address')}</td><td${label(msgid('Messages'))}>${technical('messages')}</td><td${label(msgid('Size'))}>${technical('bytes')}</td><td data-xp-slot="state"${label(msgid('Mailbox now'))}></td></tr>`)
     + xpTemplate('restore-more-review', `<tr><td>${technical('path')}</td><td>${technical('bytes')}</td></tr>`)
@@ -37,11 +37,13 @@ export function restoreMoreTemplates(t?: Translate): string {
 }
 
 export const WHM_RECOVERY_TOOLS_CSS = WHM_ACCOUNT_TOOLS_CSS + `
-.v2-recovery__grid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:1.25rem;align-items:stretch;min-inline-size:0}
+.v2-recovery-tools .v2-account-tool__field{gap:8px}
+.v2-recovery-tools .v2-account-tool__fields{gap:16px 24px}
+${labelInset('.v2-recovery-tools .v2-account-tool__field')}.v2-recovery__grid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:24px;align-items:stretch;min-inline-size:0}
 .v2-recovery__grid>.v2-card,.v2-recovery__grid>.v2-recovery__column>.v2-card:last-child{flex:1 1 auto}
-.v2-recovery__column{display:flex;flex-direction:column;gap:1.25rem;min-inline-size:0}
-.v2-recovery__steps{display:flex;flex-wrap:wrap;gap:.625rem 0;list-style:none;margin:0;padding:0}
-.v2-recovery__steps>li{display:flex;flex:1 1 7.5rem;align-items:center;gap:.5rem;min-inline-size:0;font-size:.875rem;font-weight:500;color:var(--text-2)}
+.v2-recovery__column{display:flex;flex-direction:column;gap:24px;min-inline-size:0}
+.v2-recovery__steps{display:flex;flex-wrap:wrap;gap:8px 0;list-style:none;margin:0;padding:0}
+.v2-recovery__steps>li{display:flex;flex:1 1 7.5rem;align-items:center;gap:.5rem;min-inline-size:0;font-size:.875rem;line-height:var(--lh-label);font-weight:500;color:var(--text-2)}
 .v2-recovery__step-number{flex:none;display:flex;align-items:center;justify-content:center;inline-size:2rem;block-size:2rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.8125rem;font-weight:600;font-variant-numeric:tabular-nums}
 .v2-recovery__steps>li:not(:last-child)::after{content:"";flex:1 1 1rem;min-inline-size:.5rem;margin-inline-end:.5rem;block-size:2px;border-radius:1px;background:var(--line-strong)}
 .v2-recovery__steps>li[aria-current=step]{color:var(--mono,var(--text))}
@@ -49,20 +51,20 @@ export const WHM_RECOVERY_TOOLS_CSS = WHM_ACCOUNT_TOOLS_CSS + `
 .v2-recovery__steps>li:has(~li[aria-current=step]){color:var(--text)}
 .v2-recovery__steps>li:has(~li[aria-current=step])>.v2-recovery__step-number{background:var(--color-green-500,var(--ok));color:var(--on-accent)}
 .v2-recovery__steps>li:has(~li[aria-current=step])::after{background:var(--color-green-500,var(--ok))}
-.v2-recovery__rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:.625rem 1.25rem;list-style:none;margin:0;padding:0}
-.v2-recovery__rules>li{display:flex;align-items:flex-start;gap:.375rem;font-size:.875rem;line-height:1.375rem;color:var(--mono,var(--text))}
+.v2-recovery__rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:8px 24px;list-style:none;margin:0;padding:0}
+.v2-recovery__rules>li{display:flex;align-items:flex-start;gap:8px;font-size:1rem;line-height:1.5rem;color:var(--mono,var(--text))}
 .v2-recovery__rules>li>i{flex:none;line-height:1.375rem}
-.v2-recovery-tools>p[role=status]:not([data-state=failed],[data-state=error]),.v2-recovery-tools>[data-acct-convert-empty]{padding:.875rem 1.25rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--subtle);color:var(--text-2);font-size:.875rem;line-height:1.375rem}
-.v2-recovery-tools>[data-acct-convert-empty]{display:flex;flex-direction:column;gap:.375rem;border-style:dashed;border-color:var(--line-strong);background:transparent;text-align:center;align-items:center;padding:1.875rem 1.25rem}
+.v2-recovery-tools>p[role=status]:not([data-state=failed],[data-state=error]),.v2-recovery-tools>[data-acct-convert-empty]{padding:16px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--subtle);color:var(--text-2);font-size:.875rem;line-height:1.375rem}
+.v2-recovery-tools>[data-acct-convert-empty]{display:flex;flex-direction:column;gap:.375rem;border-style:dashed;border-color:var(--line-strong);background:transparent;text-align:center;align-items:center;padding:32px 24px}
 .v2-recovery-tools :is(.v2-account-tool__facts,.v2-account-tool__fields){grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
 .v2-recovery-tools .v2-account-tool__facts dd{font-variant-numeric:tabular-nums}
 .v2-recovery-tools .v2-account-tool__scroll{border:1px solid var(--line);border-radius:var(--radius-card)}
 .v2-recovery-tools table{inline-size:100%;border-collapse:collapse}
 .v2-recovery-tools thead th{white-space:nowrap;overflow-wrap:normal}
-.v2-recovery-tools td[colspan]{padding:1.25rem 1rem;text-align:center;color:var(--text-2)}
-.v2-recovery-tools fieldset{display:flex;flex-direction:column;gap:.625rem;margin:0;padding:0;border:0;min-inline-size:0}
+.v2-recovery-tools td[colspan]{padding:24px 16px;text-align:center;color:var(--text-2)}
+.v2-recovery-tools fieldset{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;border:0;min-inline-size:0}
 .v2-recovery-tools legend{float:inline-start;inline-size:100%;padding:0}
-@media(min-width:1024px){.v2-recovery__grid,.v2-recovery__column{gap:1.875rem}}
+@media(min-width:1024px){.v2-recovery__grid,.v2-recovery__column{gap:32px}}
 .v2-recovery-tools td{font-variant-numeric:tabular-nums}
 .v2-recovery-tools :is(input,select,textarea)[dir=ltr]{text-align:var(--v2-control-align,start)}
 .v2-recovery-tools td input[type=checkbox]{margin:0}

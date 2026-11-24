@@ -69,7 +69,7 @@ export const KPI_CARD_CSS = `.v2-kpi-row{display:grid;grid-template-columns:repe
 .v2-kpi__value--text>:first-child{font-size:1.125rem}
 .v2-kpi__unit{font-size:.875rem;font-weight:400;color:var(--text-2)}
 .v2-kpi__spark{display:block;width:100%;height:26px;color:var(--accent)}
-.v2-kpi__note{font-size:.75rem;line-height:1.4;color:var(--muted)}
+.v2-kpi__note{font-size:.8125rem;line-height:1.4;color:var(--muted)}
 .v2-tile{flex:none;display:flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border-radius:50%;border:1px solid var(--line)}
 .v2-tile--info{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent)}
 .v2-tile--ok{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}

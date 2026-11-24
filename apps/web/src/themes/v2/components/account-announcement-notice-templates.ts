@@ -20,5 +20,5 @@ export const V2_ACCOUNT_ANNOUNCEMENT_CSS = `:where([data-ui-theme="v2"]) [data-w
 :where([data-ui-theme="v2"]) [data-whm-announcements-workspace] .v2-account-announcement p{overflow-wrap:anywhere}
 :where([data-ui-theme="v2"]) [data-whm-announcements-workspace] .v2-account-announcement__title{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;font-weight:600;color:var(--mono,var(--text))}
 :where([data-ui-theme="v2"]) [data-whm-announcements-workspace] .v2-account-announcement__body{white-space:pre-line}
-:where([data-ui-theme="v2"]) [data-whm-announcements-workspace] .v2-account-announcement .v2-muted{font-size:.75rem}
+:where([data-ui-theme="v2"]) [data-whm-announcements-workspace] .v2-account-announcement .v2-muted{font-size:.8125rem}
 `

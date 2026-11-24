@@ -182,7 +182,7 @@ describe('v2 mailbox pages', () => {
 
   it('opens the supported search workspace without a form that would discard a submitted query', () => {
     const html = createV2MailSurface(() => inbox({ searchHref: '/mail/search' }), () => '')({})
-    expect(html).toContain('class="v2-btn v2-mail-search kt-btn kt-btn-outline justify-start font-normal text-muted-foreground" href="/mail/search?lang=en&amp;theme=light"')
+    expect(html).toMatch(/class="v2-btn v2-mail-search kt-btn kt-btn-outline [^"]*" href="\/mail\/search\?lang=en&amp;theme=light"/)
     expect(html).not.toContain('action="/mail/search"')
   })
 

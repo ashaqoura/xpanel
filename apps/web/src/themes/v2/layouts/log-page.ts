@@ -121,7 +121,7 @@ ${STATE('following')} .v2-log__dot{background:var(--ok)}
 .v2-log__details:has([data-xp-slot=details][hidden]){display:none}
 .v2-log__stream tbody .v2-log__details>td,.v2-log__stream tbody .v2-log__details:hover>td{padding:0 var(--v2-panel-padding) 1rem!important;border-top:0;background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
 .v2-log__detail{display:flex;flex-wrap:wrap;align-items:flex-start;gap:1rem 1.25rem;padding:1rem;border-radius:var(--radius-notice);border:1px solid var(--line);background:var(--surface)}
-.v2-log__facts{flex:2 1 420px;min-width:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:1rem;font-size:.75rem;line-height:1.5}
+.v2-log__facts{flex:2 1 420px;min-width:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:1rem;font-size:.8125rem;line-height:1.5}
 .v2-log__fact{display:flex;flex-direction:column;gap:.25rem;min-width:0}
 .v2-log__facts dt{color:var(--text-2)}
 .v2-log__facts dd{color:var(--mono,var(--text));text-align:start;overflow-wrap:anywhere}

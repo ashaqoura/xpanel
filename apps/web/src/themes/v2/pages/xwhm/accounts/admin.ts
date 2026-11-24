@@ -7,13 +7,13 @@ const formBlock = (editable: boolean, attrs: string, body: string): string =>
   editable ? `<form ${attrs} novalidate>${body}</form>` : `<div ${attrs}>${body}</div>`
 const technical = (slot: string): string => `<bdi dir="ltr" class="v2-mono" data-xp-slot="${slot}"></bdi>`
 /** A checkbox with its label, as the Metronic forms write one. */
-const choice = (inputAttrs: string, label: string): string => `<label class="v2-account-tool__choice kt-label leading-5"><input type="checkbox" class="kt-checkbox kt-checkbox-sm" ${inputAttrs}><span>${esc(label)}</span></label>`
-/** The destructive action of a saved row: a small soft-danger button with the Metronic trash icon. */
-const rowRemove = (label: string, off: string): string => `<button type="button" class="v2-btn kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive" data-xp-slot="remove"${off}>${keenicon('trash')}${esc(label)}</button>`
+const choice = (inputAttrs: string, label: string): string => `<label class="v2-account-tool__choice kt-label"><input type="checkbox" class="kt-checkbox kt-checkbox-sm" ${inputAttrs}><span>${esc(label)}</span></label>`
+/** The destructive action of a saved row: a soft-danger button with the Metronic trash icon. */
+const rowRemove = (label: string, off: string): string => `<button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-destructive" data-xp-slot="remove"${off}>${keenicon('trash')}${esc(label)}</button>`
 
 /** WHM Force Password Change: rows are painted by WHM_ACCOUNT_ADMIN_CLIENT_BINDING. */
 export function renderV2ForcePassword(t: Translate, editable: boolean): string {
-  const row = `<template data-xp-template="force-password-row"><tr><td><label class="v2-account-tool__choice kt-label leading-5"><input type="checkbox" class="kt-checkbox kt-checkbox-sm" data-xp-slot="forced"${editable ? '' : ' disabled'}>${technical('username')}</label></td><td>${technical('domain')}</td><td data-xp-slot="state"></td></tr></template>`
+  const row = `<template data-xp-template="force-password-row"><tr><td><label class="v2-account-tool__choice kt-label"><input type="checkbox" class="kt-checkbox kt-checkbox-sm" data-xp-slot="forced"${editable ? '' : ' disabled'}>${technical('username')}</label></td><td>${technical('domain')}</td><td data-xp-slot="state"></td></tr></template>`
   return toolCard('force-password', t(msgid('Force password change')), `<p>${esc(t(msgid('A selected user is signed out and can only change the password at the next sign-in. The mark stays until the password has been changed.')))}</p>${row}`
     + table(t(msgid('Force password change')), [t(msgid('Account')), t(msgid('Domain')), t(msgid('Status'))], { 'data-force-password-rows': true }, t(msgid('Accounts have not been read.')))
     + status(t(msgid('Accounts have not been read.')), { 'data-force-password-status': true })
@@ -71,7 +71,7 @@ export function renderV2EnhancementAssign(t: Translate, editable: boolean): stri
 export function renderV2WhmHome(t: Translate): string {
   // Metronic list cards: the view choice sits in the header toolbar, the rows form a divided list in the body and the
   // card-wide action closes the card in its footer. Rows are painted by the client into the lists.
-  const favorites = toolCard('favorites', t(msgid('Favorites')), `<p class="v2-whm-home__empty flex items-center gap-2 text-sm text-secondary-foreground" data-whm-favorites-empty><i class="ki-filled ki-star text-base text-muted-foreground" aria-hidden="true"></i><span>${esc(t(msgid('Star a page in the quick bar to keep it here and in the side menu.')))}</span></p><ul class="v2-whm-overview__services v2-whm-home__list" data-whm-favorites-list data-sortable-list></ul>`
+  const favorites = toolCard('favorites', t(msgid('Favorites')), `<p class="v2-whm-home__empty flex items-center gap-2 text-base text-secondary-foreground" data-whm-favorites-empty><i class="ki-filled ki-star text-base text-muted-foreground" aria-hidden="true"></i><span>${esc(t(msgid('Star a page in the quick bar to keep it here and in the side menu.')))}</span></p><ul class="v2-whm-overview__services v2-whm-home__list" data-whm-favorites-list data-sortable-list></ul>`
     + status('', { 'data-whm-favorites-status': true }, 'unread', true), { 'data-whm-favorites': true }, choice('data-whm-favorites-descriptions checked', t(msgid('Show descriptions'))))
   const inbox = card({ title: t(msgid('Notifications')), titleId: 'whm-inbox-heading', hooks: { 'data-whm-inbox': true }, actionsHtml: choice('data-whm-inbox-unread-only', t(msgid('Unread only'))).replace('v2-account-tool__choice', 'v2-whm-inbox__filter v2-account-tool__choice'),
     bodyHtml: status(t(msgid('Notifications have not been read.')), { 'data-whm-inbox-status': true }) + '<ul class="v2-whm-overview__services v2-whm-home__list" data-whm-inbox-list></ul>',
@@ -82,7 +82,7 @@ export function renderV2WhmHome(t: Translate): string {
 /** WHM Web Template Editor: one editor per page; the host publishes each save. */
 export function renderV2WebTemplates(t: Translate, editable: boolean): string {
   const off = editable ? '' : ' disabled'
-  const page = (kind: 'default' | 'suspended', label: string, help: string): string => formBlock(editable, `class="v2-account-tool__fields" data-web-template-form="${kind}"`, `<h3>${esc(label)}</h3><p class="v2-muted text-sm font-normal">${esc(help)}</p><p class="v2-muted text-xs font-normal" data-web-template-state></p>`
+  const page = (kind: 'default' | 'suspended', label: string, help: string): string => formBlock(editable, `class="v2-account-tool__fields" data-web-template-form="${kind}"`, `<h3>${esc(label)}</h3><p class="text-base leading-(--lh-text) font-normal text-secondary-foreground">${esc(help)}</p><p class="text-[13px] leading-(--lh-cap) text-secondary-foreground font-normal" data-web-template-state></p>`
     + row(`v2-web-template-${kind}`, label, `<textarea id="v2-web-template-${kind}" name="html" class="v2-mono" rows="12" dir="ltr" spellcheck="false"${off}></textarea>`)
     + actions(`<label class="v2-btn kt-btn kt-btn-outline">${keenicon('exit-up')}${esc(t(msgid('Upload a file')))}<input type="file" accept=".html,.htm,text/html" hidden data-web-template-upload${off}></label>`
       + button(t(msgid('Preview')), { 'data-web-template-action': 'preview' }, editable) + button(t(msgid('Revert to last saved')), { 'data-web-template-action': 'revert' }, editable) + button(t(msgid('Restore the shipped page')), { 'data-web-template-action': 'shipped' }, editable)

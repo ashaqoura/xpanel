@@ -175,5 +175,5 @@ export const EDITOR_LAYOUT_CSS = `.v2-editor{display:flex;background:var(--code)
 .v2-diff__line[data-state=removed] .v2-diff__mark::before{content:"-"}
 .v2-diff__line:not([data-state=added]) .v2-diff__added,.v2-diff__line:not([data-state=removed]) .v2-diff__removed{display:none}
 .v2-snippets{display:flex;flex-direction:column;gap:.625rem}
-.v2-snippets>li{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;font-size:.75rem;color:var(--text-2)}
+.v2-snippets>li{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;font-size:.8125rem;color:var(--text-2)}
 `

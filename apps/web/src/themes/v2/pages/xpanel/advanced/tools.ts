@@ -14,7 +14,7 @@ export function renderV2NetworkToolsPage(props: PanelSurfaceProps, authority: Pa
     + `<div data-nettools-field="port" hidden>${field('v2-network-port', t(msgid('Port')), input('v2-network-port', '', 'number', ' class="v2-mono v2-num" inputmode="numeric" dir="ltr" min="1" max="65535" step="1" data-nettools-port', !c.editable))}</div>`)
     + note(t(msgid('Runs from this server, not from your computer. Only public internet addresses are tested: private, loopback, link-local and reserved addresses, and names that resolve to them, are refused. DNS lookup takes a domain name. At most 10 runs per minute, one at a time.'))) + actions(button(t(msgid('Run')), { 'data-nettools-run': true }, !c.editable, true)))
   const result = section('v2-network-result', t(msgid('Result')), facts([['target', msgid('Target')], ['address', msgid('Address used')], ['at', msgid('Ran at (UTC)')]].map(([key, copy]) => ({ label: t(copy!), valueHtml: `<bdi dir="ltr" data-nettools-${key}>${esc(t(msgid('Not run')))}</bdi>` })))
-    + `<p class="v2-muted text-sm text-secondary-foreground" data-nettools-summary>${esc(t(msgid('No diagnostic has run.')))}</p>`
+    + `<p class="v2-muted text-base leading-(--lh-text) text-secondary-foreground" data-nettools-summary>${esc(t(msgid('No diagnostic has run.')))}</p>`
     + `<div class="v2-panel-settings__table kt-scrollable-x-auto" role="region" tabindex="0" aria-labelledby="v2-network-result-heading"><table class="kt-table"><thead data-nettools-head><tr><th scope="col">${esc(t(msgid('Details')))}</th></tr></thead><tbody data-nettools-rows>${unreadRow(1, t(msgid('No diagnostic has run.')))}</tbody></table></div>`
     + status(c.editable ? t(msgid('Choose a tool, enter a target and run it.')) : t(msgid('Network tools are unavailable here. Nothing was run.')), { 'data-nettools-status': true }))
   return page(props, authority, '/advanced/network-tools', title, description, run + result + networkDiagnosticClientTemplates(), { 'data-account-network-tools': true, 'data-nettools-manage': String(c.editable) })
@@ -27,7 +27,7 @@ export function renderV2AccountApiExplorerPage(props: PanelSurfaceProps, authori
     + `<form data-dev-form>${field('v2-api-operation', t(msgid('Operation')), select('v2-api-operation', '', [['', t(msgid('Read supported operations first'))]], ' data-dev-operation'))}${facts([fact('method', t(msgid('Method'))), fact('path', t(msgid('API route')))])}${actions(`<button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-dev-run disabled><i class="ki-filled ki-rocket" aria-hidden="true"></i>${esc(t(msgid('Run read request')))}</button>`)}</form>`
     + status(t(msgid('Supported operations have not been read.')), { 'data-dev-status': true }),
     // Re-reading the operation list is the card's toolbar action, as in Metronic.
-    button(t(msgid('Read supported operations')), { 'data-dev-refresh': true }, !c.readable).replace('kt-btn-outline"', 'kt-btn-outline kt-btn-sm"'))
+    button(t(msgid('Read supported operations')), { 'data-dev-refresh': true }, !c.readable))
   const response = section('v2-api-response', t(msgid('Response')), note(t(msgid('Only reviewed response fields are shown. Credential values, session information and internal identifiers are omitted.')))
     + facts([fact('status', t(msgid('HTTP status'))), fact('observed', t(msgid('Read at (UTC)')))])
     + `<dl class="v2-panel-settings__facts" data-dev-result-fields><div><dt>${esc(t(msgid('Result')))}</dt><dd>${esc(t(msgid('No read request has run.')))}</dd></div></dl>`

@@ -40,7 +40,7 @@ export function filterBar(props: FilterBarProps): string {
   const fields = Boolean(props.search || props.selects?.length)
   // The Metronic search input: the magnifier inside the kt-input wrapper, before the borderless input.
   const search = props.search
-    ? field('v2-filter__search', `<label class="v2-filter__label kt-form-label" for="${escapeHtml(props.search.id)}">${escapeHtml(props.search.label)}</label>`, `<span class="v2-filter__input kt-input max-[959px]:text-base">${icon('search', 16)}<input id="${escapeHtml(props.search.id)}" type="search" autocomplete="off" spellcheck="false"${attr('name', props.search.name)}${attr('placeholder', props.search.placeholder)}${attr('value', props.search.value)}${hookAttrs(props.search.hooks)}${off}></span>`) : ''
+    ? field('v2-filter__search', `<label class="v2-filter__label kt-form-label" for="${escapeHtml(props.search.id)}">${escapeHtml(props.search.label)}</label>`, `<span class="v2-filter__input kt-input max-[959px]:text-base"><input id="${escapeHtml(props.search.id)}" type="search" autocomplete="off" spellcheck="false"${attr('name', props.search.name)}${attr('placeholder', props.search.placeholder)}${attr('value', props.search.value)}${hookAttrs(props.search.hooks)}${off}>${icon('search', 16)}</span>`) : ''
   const chips = (props.chips ?? []).map(chip => `<button type="button" class="v2-chip v2-chip--applied kt-btn kt-btn-outline kt-btn-primary rounded-full" aria-label="${escapeHtml(chip.removeLabel)}"${hookAttrs(chip.hooks)}${off}>${escapeHtml(chip.label)}${icon('x', 12)}</button>`).join('')
   const segmentButtons = props.segments?.options.map(option => `<button type="button" class="${SEGMENT}" aria-pressed="${option.pressed}"${hookAttrs(option.hooks)}${off}>${escapeHtml(option.label)}${option.count === undefined ? '' : `<span class="v2-count v2-num kt-badge kt-badge-sm kt-badge-outline rounded-[30px]">${option.count}</span>`}</button>`).join('') ?? ''
   const segments = !props.segments ? ''
@@ -56,7 +56,7 @@ const SEG = '.v2-segmented>button:not(.kt-btn)'
 export const FILTER_BAR_CSS = `.v2-filter{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem;padding:.75rem var(--v2-panel-padding)}
 .v2-card__actions>.v2-filter{padding:0}
 .v2-filter--fields{align-items:flex-end}
-.v2-filter__field{display:flex;flex-direction:column;gap:.625rem;min-width:0}
+.v2-filter__field{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
 .v2-filter__search{flex:1 1 200px;max-inline-size:22.5rem}
 .v2-filter__select{flex:0 1 180px}
 .v2-filter__group{flex:0 1 auto}
@@ -68,5 +68,5 @@ ${SEG}:last-child{border-start-end-radius:var(--radius-control);border-end-end-r
 ${SEG}:is(:hover:not(:disabled),[aria-pressed="true"]){background:var(--kt-accent)}
 .v2-segmented>button:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:600px){.v2-segmented{flex-wrap:nowrap;max-inline-size:100%;overflow-x:auto;scrollbar-width:none}.v2-segmented>button{flex:none}}
-.v2-count{display:inline-flex;align-items:center;justify-content:center;height:1.25rem;min-inline-size:1.25rem;padding:0 .325rem;border-radius:30px;border:1px solid var(--line);background:var(--sunken);color:var(--text-2);font-size:.6875rem;font-weight:500;line-height:.75rem}
+.v2-count{display:inline-flex;align-items:center;justify-content:center;height:1.25rem;min-inline-size:1.25rem;padding:0 .325rem;border-radius:30px;border:1px solid var(--line);background:var(--sunken);color:var(--text-2);font-size:.8125rem;font-weight:500;line-height:.75rem}
 `

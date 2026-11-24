@@ -36,14 +36,14 @@ export const lifecycleLink = (t: Translate, label: string, href: string, glyph?:
 
 /** Standing rules of a workflow: each line carries a check mark, never a state. */
 export const lifecycleRules = (t: Translate, labels: readonly string[]): string =>
-  `<ul class="v2-lifecycle__rules text-sm text-secondary-foreground">${labels.map(label => `<li>${icon('okCircle', 16)}<span>${text(t, label)}</span></li>`).join('')}</ul>`
+  `<ul class="v2-lifecycle__rules text-base text-secondary-foreground">${labels.map(label => `<li>${icon('okCircle', 16)}<span>${text(t, label)}</span></li>`).join('')}</ul>`
 
 /** A section label inside a card. */
-export const lifecycleHeading = (t: Translate, label: string, id?: string): string => `<h3 class="text-sm font-semibold text-mono"${id ? ` id="${escapeHtml(id)}"` : ''}>${text(t, label)}</h3>`
+export const lifecycleHeading = (t: Translate, label: string, id?: string): string => `<h3 class="text-base font-semibold text-mono"${id ? ` id="${escapeHtml(id)}"` : ''}>${text(t, label)}</h3>`
 
 /** Body text of a card; a hint is the quieter line under a control or a group. */
 export const lifecycleNote = (t: Translate, label: string, hooks?: HookAttributes, hint = false): string =>
-  `<p class="${hint ? 'v2-muted text-xs text-muted-foreground' : 'text-sm text-secondary-foreground'}"${hookAttrs(hooks)}>${text(t, label)}</p>`
+  `<p class="${hint ? 'v2-muted text-[13px] leading-(--lh-cap) font-normal text-secondary-foreground' : 'text-base text-secondary-foreground'}"${hookAttrs(hooks)}>${text(t, label)}</p>`
 
 export interface LifecycleCardParts {
   /** Header toolbar: the read and add actions of the card, built with lifecycleButton. */
@@ -67,8 +67,8 @@ const BUTTON = {
   ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive',
 } as const
 const BUTTON_SMALL = {
-  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-sm kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-sm kt-btn-outline',
-  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-sm kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive',
+  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-outline',
+  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive',
 } as const
 
 export function lifecycleButton(t: Translate, label: string, hooks: HookAttributes, primary = false, look: LifecycleButtonLook = {}): string {
@@ -77,18 +77,18 @@ export function lifecycleButton(t: Translate, label: string, hooks: HookAttribut
 }
 
 export function lifecycleStatus(t: Translate, label: string, hooks: HookAttributes, hidden = false): string {
-  return `<p class="v2-lifecycle__status text-sm" role="status"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${text(t, label)}</p>`
+  return `<p class="v2-lifecycle__status text-base" role="status"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${text(t, label)}</p>`
 }
 
 /** Metronic control classes; a control that already carries a class keeps it. */
 const CONTROL_CLASS = { input: 'kt-input', select: 'kt-select', textarea: 'kt-textarea' } as const
 
-/** A settings row: the label beside its control in a wide card and above it in a narrow one, the hint under the control. */
+/** A stacked field: the label 8px above its control on the control's text edge, the hint under the control. */
 export function lifecycleField(t: Translate, id: string, label: string, controlHtml: string, help?: string): string {
   const helpId = `${id}-help`
   const styled = controlHtml.replace(/^<(input|select|textarea)\b(?![^>]*\sclass=)/, (_, tag: keyof typeof CONTROL_CLASS) => `<${tag} class="${CONTROL_CLASS[tag]}"`)
   const control = help ? styled.replace(/^<(input|select|textarea)\b/, `<$1 aria-describedby="${escapeHtml(helpId)}"`) : styled
-  return `<div class="v2-lifecycle__field"><label class="kt-form-label" for="${escapeHtml(id)}">${text(t, label)}</label>${control}${help ? `<p class="v2-muted kt-form-description" id="${escapeHtml(helpId)}">${text(t, help)}</p>` : ''}</div>`
+  return `<div class="v2-lifecycle__field v2-field kt-form-item"><label class="kt-form-label" for="${escapeHtml(id)}">${text(t, label)}</label>${control}${help ? `<p class="v2-field__help kt-form-description" id="${escapeHtml(helpId)}">${text(t, help)}</p>` : ''}</div>`
 }
 
 /** Which cell is the row name (default the first) and which value sits opposite it on a phone. */
@@ -107,7 +107,7 @@ export function lifecycleTable(t: Translate, title: string, columns: readonly Li
 }
 
 /** The label and value classes of a fact: a row of a fact table, or a dashed tile that leads with its value. */
-const FACT = { table: ['text-sm text-secondary-foreground', 'text-sm text-mono'], tiles: ['text-sm text-secondary-foreground', 'text-base font-medium leading-tight text-mono'] } as const
+const FACT = { table: ['text-sm leading-(--lh-label) text-secondary-foreground', 'text-base leading-(--lh-text) text-mono'], tiles: ['text-sm leading-(--lh-label) text-secondary-foreground', 'text-base leading-(--lh-text) font-medium text-mono'] } as const
 const FACT_LIST = { table: 'v2-lifecycle__fields', tiles: 'v2-lifecycle__fields v2-lifecycle__stats' } as const
 
 /** Facts a controller fills by key: label and value rows of a fact table, or summary tiles (`tiles`). */
@@ -115,7 +115,7 @@ export function lifecycleFacts(t: Translate, facts: readonly { key: string; labe
   return `<dl class="${FACT_LIST[look]}">${facts.map(fact => `<div class="v2-lifecycle__field"><dt class="${FACT[look][0]}">${text(t, fact.label)}</dt><dd class="${FACT[look][1]}"><bdi dir="ltr"${hookAttrs({ [hook]: fact.key })}>${fact.value === undefined ? text(t, msgid('Not read')) : escapeHtml(fact.value)}</bdi></dd></div>`).join('')}</dl>`
 }
 
-const PHONE_LABEL = 'display:block;margin-block-end:.125rem;color:var(--muted);font-size:.75rem;font-weight:400;line-height:1.4'
+const PHONE_LABEL = 'display:block;margin-block-end:.5rem;color:var(--text-2);font-size:.875rem;font-weight:400;line-height:var(--lh-label)'
 const PHONE_NAME = 'font-weight:500;color:var(--mono,var(--text))'
 
 /** The same placement for a table whose markup this page cannot mark: the name and value cells are fixed in the rule. */
@@ -154,8 +154,7 @@ ${row}>td[colspan]{grid-area:auto/1/auto/-1;justify-self:stretch;padding:.75rem 
 }
 
 const L = '.v2-lifecycle'
-/** A settings row is as wide as its card: the label column of `settings-plain` beside the control. */
-const WIDE = '@container v2-lifecycle (min-width:36rem)'
+
 /** The outline badge of Metronic on an element a controller creates without a class. */
 const BADGE = 'display:inline-flex;align-items:center;gap:.375rem;min-block-size:1.5rem;padding:.125rem .45rem;border:1px solid var(--line);border-radius:.375rem;background:var(--sunken);color:var(--text-2);font-size:.75rem;font-weight:500;line-height:1rem;font-variant-numeric:tabular-nums'
 /** A Metronic choice card: the selected card takes the primary border and tint. */
@@ -165,49 +164,40 @@ const CHOSEN = 'border-color:var(--accent-fill);background:var(--accent-soft)'
 const CHEVRON = 'content:"\\eaa3";flex:none;font-family:keenicons-filled;font-size:.875rem;line-height:1;color:var(--muted);transition:transform .14s ease-out'
 
 /** Scoped to lifecycle bodies: compact table cells do not inherit panel padding. */
-export const LIFECYCLE_PAGES_CSS = `${L}{display:flex;flex-direction:column;gap:1.25rem;min-inline-size:0;text-align:start}
+export const LIFECYCLE_PAGES_CSS = `${L}{display:flex;flex-direction:column;gap:2rem;min-inline-size:0;text-align:start}
 ${L} :is(p,dl,dd,h2,h3,ol,ul){margin:0}
 ${L} [hidden]{display:none!important}
 ${L} [dir=ltr]{text-align:var(--v2-control-align,start);unicode-bidi:isolate}
-${L}__column,${L}__group{display:flex;flex-direction:column;gap:1.25rem;min-inline-size:0}
-${L}__group{gap:.75rem}
-${L}__grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:1.25rem;align-items:stretch}
+${L}__column,${L}__group{display:flex;flex-direction:column;gap:2rem;min-inline-size:0}
+${L}__group{gap:1rem}
+${L}__grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:2rem;align-items:stretch}
 ${L}__grid--editor{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
 ${L}__grid>${L}__column>.v2-card:last-child{flex:1 1 auto}
-@media(min-width:1024px){${L},${L}__grid,${L}__column:not(.v2-card *){gap:1.875rem}}
-${L} .v2-card__body{gap:1.25rem;container:v2-lifecycle/inline-size}
+${L} .v2-card ${L}__column{gap:1.5rem}
+${L} .v2-card__body{gap:1.5rem}
 ${L}__summary dd{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;unicode-bidi:plaintext;inline-size:fit-content;max-inline-size:100%;margin-inline-end:auto}
-${L}__fields{display:flex;flex-direction:column;gap:1.25rem;min-inline-size:0}
-${L}__field{display:flex;flex-direction:column;gap:.625rem;min-inline-size:0;text-align:start}
+${L}__fields{display:flex;flex-direction:column;gap:1rem;min-inline-size:0}
+${L}__field{display:flex;flex-direction:column;gap:.5rem;min-inline-size:0;text-align:start}
 ${L}__field :is(input,select,textarea){inline-size:100%;min-inline-size:0;box-sizing:border-box}
 ${L}__field select{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 ${L}__field :is(dd,bdi){overflow-wrap:anywhere}
-${L} ${L}__address{flex-direction:row;flex-wrap:wrap;gap:.625rem}
+${L} ${L}__address{flex-direction:row;flex-wrap:wrap;gap:1rem}
 ${L} ${L}__address>div{flex:3 1 11.25rem;min-inline-size:0}
 ${L} ${L}__address>div:last-child{flex:1 1 4.5rem}
-${L} dl${L}__fields{gap:0}
-${L} dl${L}__fields>${L}__field{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:.625rem;align-items:baseline;padding-block:.5rem}
+${L} dl${L}__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:1rem 1.5rem}
+${L} dl${L}__fields dt{text-box:trim-end text}
 ${L} dl${L}__fields dd{min-inline-size:0;font-variant-numeric:tabular-nums}
-${L} dl${L}__stats{flex-direction:row;flex-wrap:wrap;align-items:stretch;gap:.5rem 1.25rem}
-${L} dl${L}__stats>${L}__field{display:flex;flex-direction:column-reverse;justify-content:space-between;gap:.375rem;min-inline-size:6rem;max-inline-size:100%;padding:.5rem .875rem;border:1px dashed var(--line-strong);border-radius:.375rem}
-${L}__release{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1.25rem}
-${WIDE}{${L} ${L}__field:has(>label){display:grid;grid-template-columns:minmax(0,14rem) minmax(0,1fr);align-items:baseline;max-inline-size:none}
-${L}__field:has(>label)>:not(label){grid-column:2}
-${L} ${L}__address{display:grid;grid-template-columns:minmax(0,14rem) minmax(0,1fr) auto minmax(0,7rem);align-items:baseline}
-${L} ${L}__address>div,${L} ${L}__address ${L}__field{display:contents}
-${L}__address ${L}__field>:not(label){grid-column:auto}
-${L} dl${L}__fields:not(${L}__stats)>${L}__field{grid-template-columns:minmax(0,14rem) minmax(0,1fr)}
-${L}__choice${L}__switch{display:grid;grid-template-columns:minmax(0,14rem) minmax(0,1fr)}
-${L}__switch>input{grid-area:1/2;justify-self:start}
-${L}__switch>span{grid-area:1/1}}
+${L} dl${L}__stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:.5rem}
+${L} dl${L}__stats>${L}__field{min-inline-size:0;max-inline-size:100%;padding:.75rem 1rem;border:1px dashed var(--line-strong);border-radius:.375rem}
+${L}__release{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1.5rem}
 .v2-lifecycle__actions,.v2-lifecycle__choices{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
-${L}__actions{gap:.625rem}
-${L}__choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13.75rem),1fr));gap:.625rem;align-items:stretch}
+${L}__actions{gap:.5rem}
+${L}__choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13.75rem),1fr));gap:.5rem;align-items:stretch}
 ${L}__choices>:not(${L}__choice){grid-column:1/-1}
 ${L} :is(${L}__choices,${L}__actions,[data-transfer-review-results],[data-transfer-archive-review]):empty{display:none}
-${L}__choice{display:flex;align-items:flex-start;gap:.625rem;min-inline-size:0;min-block-size:var(--target);overflow-wrap:anywhere;cursor:pointer}
+${L}__choice{display:flex;align-items:flex-start;gap:.5rem;min-inline-size:0;min-block-size:var(--target);overflow-wrap:anywhere;cursor:pointer}
 ${L}__choice>input{flex:none}
-${L}__choice>span{display:flex;flex-direction:column;gap:.125rem;min-inline-size:0}
+${L}__choice>span{display:flex;flex-direction:column;gap:.25rem;min-inline-size:0}
 ${L}__choice:has(input:disabled){cursor:not-allowed}
 ${L}__choice${L}__switch{flex-direction:row-reverse;align-items:center;justify-content:space-between}
 ${L}__choices>${L}__choice{${CHOICE_CARD}}
@@ -230,7 +220,7 @@ ${L}__table :is(th,td){text-align:start;overflow-wrap:break-word}
 ${L}__table thead th{overflow-wrap:normal}
 ${L}__table tbody th{padding:.75rem 1rem;font-weight:500;color:var(--mono,var(--text))}
 ${L}__table td{font-variant-numeric:tabular-nums}
-${L}__table td[colspan]{padding-block:1.25rem;text-align:center;color:var(--muted)}
+${L}__table td[colspan]{padding-block:1.5rem;text-align:center;color:var(--muted)}
 ${L}__table bdi{overflow-wrap:anywhere}
 @media(min-width:1280px){${L}__table bdi{overflow-wrap:break-word}}
 ${L}__table ${L}__actions{gap:.5rem}
@@ -240,12 +230,12 @@ ${L} ${L}__table .v2-btn:where(:not(.kt-btn)):is([data-xp-action=delete],[data-x
 ${L}__nowrap{white-space:nowrap}
 ${L} [data-account-backups] ${L}__table bdi.v2-num{white-space:nowrap}
 ${L} [data-account-backups] ${L}__table a.v2-btn{overflow-wrap:anywhere}
-${L} :is(ul,ol):not([class],.v2-crumbs *){display:flex;flex-direction:column;gap:.25rem;padding-inline-start:1.25rem;list-style:disc;font-size:.875rem;line-height:1.375rem;color:var(--text-2)}
+${L} :is(ul,ol):not([class],.v2-crumbs *){display:flex;flex-direction:column;gap:.25rem;padding-inline-start:1.25rem;list-style:disc;font-size:1rem;line-height:var(--lh-text);color:var(--text-2)}
 ${L}__status{overflow-wrap:anywhere}${L}__status:not([role=alert],[data-state=failed],[data-state=error]){color:var(--text-2)}
-${L}__column>${L}__status:not([role=alert],[data-state=failed],[data-state=error]){padding:.875rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken)}
+${L}__column>${L}__status:not([role=alert],[data-state=failed],[data-state=error]){padding:1rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken)}
 ${L}__key{padding:1rem;border-radius:var(--radius-control);background:var(--code);color:var(--code-text);font:.75rem/1.7 var(--font-mono);font-variant-numeric:tabular-nums;white-space:pre-wrap;overflow-wrap:anywhere}
-${L}__steps{display:flex;flex-wrap:wrap;gap:.625rem 0;list-style:none;padding:0}
-${L}__steps>li{display:flex;flex:1 1 8.25rem;align-items:center;gap:.5rem;min-inline-size:0;color:var(--text-2);font-size:.875rem;font-weight:500}
+${L}__steps{display:flex;flex-wrap:wrap;gap:.5rem 0;list-style:none;padding:0}
+${L}__steps>li{display:flex;flex:1 1 8.25rem;align-items:center;gap:.5rem;min-inline-size:0;color:var(--text-2);font-size:1rem;line-height:var(--lh-text);font-weight:500}
 ${L}__steps>li>span:first-child{display:flex;align-items:center;justify-content:center;flex:none;inline-size:2rem;block-size:2rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.8125rem;font-weight:600;font-variant-numeric:tabular-nums}
 ${L}__steps>li:not(:last-child)::after{content:"";flex:1 1 1rem;min-inline-size:.5rem;margin-inline-end:.5rem;block-size:2px;border-radius:1px;background:var(--line-strong)}
 ${L}__steps>li[aria-current=step]{color:var(--mono,var(--text))}
@@ -253,33 +243,33 @@ ${L}__steps>li[aria-current=step]>span:first-child{background:var(--accent-fill)
 ${L}__steps a{display:inline-flex;align-items:center;min-block-size:var(--target);color:inherit;text-decoration:none}
 ${L}__steps a:hover{color:var(--accent)}
 ${L} details{display:block;min-inline-size:0;border:1px solid var(--line);border-radius:var(--radius-card)}
-${L} details>summary{display:flex;align-items:center;justify-content:space-between;gap:.625rem;min-block-size:var(--target);padding:1rem;list-style:none;font-size:.875rem;font-weight:500;color:var(--mono,var(--text));cursor:pointer}
+${L} details>summary{display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-block-size:var(--target);padding:.5rem 1rem;list-style:none;font-size:1rem;line-height:var(--lh-text);font-weight:500;color:var(--mono,var(--text));cursor:pointer}
 ${L} details>summary::-webkit-details-marker{display:none}
 ${L} details>summary:not(:has(>i))::after{${CHEVRON}}
 ${L} details>summary>i{transition:transform .14s ease-out}
 ${L} details[open]>summary{border-block-end:1px solid var(--line)}
 ${L} details[open]>summary::after,${L} details[open]>summary>i{transform:rotate(180deg)}
 ${L} details>:not(summary){margin:1rem}
-${L} .v2-card__body>details+details{margin-block-start:-.625rem}
+${L} .v2-card__body>details+details{margin-block-start:-1rem}
 ${L}__table details{border:0;border-radius:0}
 ${L}__table details>summary{justify-content:flex-start;padding:0;border:0}
 ${L}__table details>:not(summary){margin:.5rem 0 0}
 ${L} fieldset{border:0;padding:0;margin:0;min-inline-size:0}
-${L} fieldset>legend{float:inline-start;inline-size:100%;margin-block-end:1.25rem;padding:0;font-size:.875rem;font-weight:600;color:var(--mono,var(--text))}
+${L} fieldset>legend{float:inline-start;inline-size:100%;margin-block-end:1rem;padding:0;font-size:1rem;line-height:var(--lh-text);font-weight:600;color:var(--mono,var(--text))}
 ${L} fieldset>legend+*{clear:both}
-${L} .v2-card__body>fieldset+fieldset{padding-block-start:1.25rem;border-block-start:1px solid var(--line)}
-${whmPolish(L)}${L}__rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:.625rem 1.875rem;padding:0;list-style:none}
+${L} .v2-card__body>fieldset+fieldset{padding-block-start:1.5rem;border-block-start:1px solid var(--line)}
+${whmPolish(L)}${L}__rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:.5rem 2rem;padding:0;list-style:none}
 ${L}__rules>li{display:flex;align-items:flex-start;gap:.5rem}
 ${L}__rules>li>.v2-icon{flex:none;margin-block-start:.1875rem;color:var(--color-green-500,var(--ok))}
 ${phoneRows(`${L}__grid--editor ${L}__table:has(>[data-destination-rows])`)}
 ${L}__grid--editor ${L}__scroll:has(>table>[data-destination-rows]:empty){display:none}
-${L}__archive-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem 1.25rem;min-inline-size:0}
+${L}__archive-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:1rem 1.5rem;min-inline-size:0}
 ${L}__archive-bar>${L}__field{flex:1 1 13.75rem}
-.v2-backup-pending{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.625rem 1.25rem;padding:.75rem 1rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--sunken)}
+.v2-backup-pending{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem 1.5rem;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--sunken)}
 .v2-backup-pending[data-dirty="true"]{border-color:var(--accent-line);background:var(--accent-soft)}
 .v2-backup-pending__meta{display:flex;flex-direction:column;gap:.5rem;flex:1 1 16.25rem;min-inline-size:0}
-.v2-backup-pending__summary{font-size:.875rem;font-weight:500;color:var(--mono,var(--text))}
-.v2-backup-pending__diff,.v2-transfer-discovery-pills{display:flex;flex-wrap:wrap;gap:.375rem;list-style:none;padding:0}
+.v2-backup-pending__summary{font-size:1rem;line-height:var(--lh-text);font-weight:500;color:var(--mono,var(--text))}
+.v2-backup-pending__diff,.v2-transfer-discovery-pills{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0}
 .v2-backup-pending__diff>li,.v2-transfer-discovery-pills>li{${BADGE}}
 .v2-backup-pending[data-dirty="true"] .v2-backup-pending__diff>li{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent)}
 .v2-upgrade-progress__head{font-variant-numeric:tabular-nums}

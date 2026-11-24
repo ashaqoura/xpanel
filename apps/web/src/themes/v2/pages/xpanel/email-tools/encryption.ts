@@ -24,7 +24,7 @@ export function renderV2PanelEmailEncryption(props: PanelSurfaceProps, authority
   const remove = section('v2-pgp-delete', t(msgid('Delete a key pair')),
     `<p>${esc(t(msgid('Select Delete on a key above, then type its complete fingerprint. Deletion removes the public and private key from this account. Keep your own backup before deleting.')))}</p>`
     + field('pgp-confirm', t(msgid('Fingerprint to delete')), input('pgp-confirm', { 'data-pgp-confirm': true }, ' type="text" dir="ltr" autocomplete="off" spellcheck="false" maxlength="64"', !canManage))
-    + `<p class="text-sm font-medium text-mono"><bdi dir="ltr" class="v2-mono" data-pgp-selected>—</bdi></p>`
+    + `<p class="font-medium text-mono"><bdi dir="ltr" class="v2-mono" data-pgp-selected>—</bdi></p>`
     + endActions(button(t(msgid('Delete selected key pair')), { 'data-pgp-delete': true }, true, false, { icon: mailGlyph.trash, kind: 'danger' })))
   return page(locale, route, header(t, route, title, t(msgctxt('theme:v2', 'Generate, import, export and explicitly remove account mailbox keys.')))
     + `<div class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''} data-account-pgp data-account="${esc((account?.id ?? ''))}" data-pgp-manage="${canManage}">${keys}${generate}${imported}${remove}${accountPgpClientTemplates()}</div>`)

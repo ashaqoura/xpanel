@@ -5,15 +5,16 @@ import { icon } from './icons.ts'
 
 /** The V2 skin of the shared runtime, developer and panel-data cards; every control waits for its controller.
  *  Controls, buttons, alerts and tables are Metronic (kt-input, kt-btn, kt-alert, kt-table); these rules keep the
- *  20px rhythm between the blocks, the fact tiles and the dark output block. */
-export const TOOL_CARD_CSS = `.v2-tool-card__stack{display:flex;flex-direction:column;gap:1.25rem;min-inline-size:0}
-.v2-tool-card__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1.25rem;min-inline-size:0}
+ *  standard rhythm (24px between the blocks, 16px between fields, labels 8px above their values), the fact tiles
+ *  and the dark output block. */
+export const TOOL_CARD_CSS = `.v2-tool-card__stack{display:flex;flex-direction:column;gap:var(--space-3);min-inline-size:0}
+.v2-tool-card__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--space-2);min-inline-size:0}
 .v2-tool-card__fields:has(>.v2-field:only-child:not(:has(textarea))):not(.v2-tool-card__fields--rows){max-inline-size:480px}
 .v2-tool-card__fields--rows{display:flex;flex-direction:column}
-.v2-tool-card__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:.625rem;min-inline-size:0}
-.v2-tool-card__facts>div{display:flex;flex-direction:column;gap:.25rem;padding:.75rem 1rem;border-radius:var(--radius-notice);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);min-inline-size:0}
-.v2-tool-card__facts dt{font-size:.75rem;color:var(--text-2)}
-.v2-tool-card__facts dd{font-size:.875rem;font-weight:500;color:var(--mono,var(--text));overflow-wrap:anywhere}
+.v2-tool-card__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--space-2);min-inline-size:0}
+.v2-tool-card__facts>div{display:flex;flex-direction:column;gap:var(--space-1);padding:.75rem 1rem;border-radius:var(--radius-notice);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);min-inline-size:0}
+.v2-tool-card__facts dt{font-size:.875rem;line-height:var(--lh-label);color:var(--text-2)}
+.v2-tool-card__facts dd{font-weight:500;color:var(--mono,var(--text));overflow-wrap:anywhere}
 .v2-tool-card__output{padding:1rem;max-block-size:320px;overflow:auto;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--code);color:var(--code-text);font:.75rem/1.65 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere}
 .v2-tool-card__stack [data-state=unread]{font-size:.875rem;color:var(--text-2)}
 .v2-tool-card__stack ul{padding-inline-start:1.25rem;list-style:disc}
@@ -21,10 +22,9 @@ export const TOOL_CARD_CSS = `.v2-tool-card__stack{display:flex;flex-direction:c
 
 type Translate = (message: string) => string
 const hooks = (value: ToolHooks): string => hookAttrs(value)
-const ROW = 'v2-field v2-field--row kt-form-item lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-baseline lg:[&>:not(label)]:col-start-2'
-const field = (t: Translate, item: ToolField, row = false): string => {
+const field = (t: Translate, item: ToolField): string => {
   const id = escapeHtml(item.id), label = escapeHtml(t(item.label))
-  if (item.kind === 'check') return `<label class="${row ? 'v2-tool-card__check flex items-center gap-2 min-h-8.5 text-sm cursor-pointer lg:ps-[14.625rem]' : 'v2-tool-card__check flex items-center gap-2 min-h-8.5 text-sm cursor-pointer'}"><input id="${id}" type="checkbox" class="kt-checkbox kt-checkbox-sm"${hooks(item.hooks)} disabled><span>${label}</span></label>`
+  if (item.kind === 'check') return `<label class="v2-tool-card__check flex items-center gap-2 min-h-11 text-sm cursor-pointer"><input id="${id}" type="checkbox" class="kt-checkbox kt-checkbox-sm"${hooks(item.hooks)} disabled><span>${label}</span></label>`
   const help = 'help' in item && item.help ? `<p id="${id}-help" class="v2-field__help kt-form-description">${escapeHtml(t(item.help))}</p>` : ''
   const described = 'help' in item && item.help ? ` aria-describedby="${id}-help"` : ''
   const ltr = 'ltr' in item && item.ltr ? ' dir="ltr"' : ''
@@ -32,7 +32,7 @@ const field = (t: Translate, item: ToolField, row = false): string => {
     : item.kind === 'area' ? `<textarea id="${id}" class="kt-textarea max-[959px]:text-base" rows="${item.rows ?? 3}"${ltr}${hooks(item.hooks)}${described} spellcheck="false" disabled></textarea>`
       : item.kind === 'file' ? `<input id="${id}" type="file" class="kt-input"${item.accept ? ` accept="${escapeHtml(item.accept)}"` : ''}${hooks(item.hooks)} disabled>`
         : `<input id="${id}" class="kt-input max-[959px]:text-base" type="${escapeHtml(item.type ?? 'text')}"${ltr}${item.placeholder ? ` placeholder="${escapeHtml(item.placeholder)}"` : ''} autocomplete="${escapeHtml(item.autocomplete ?? 'off')}"${hooks(item.hooks)}${described} disabled>`
-  return `<div class="${row ? ROW : 'v2-field kt-form-item'}"><label for="${id}" class="${row ? 'kt-form-label leading-tight max-w-56' : 'kt-form-label leading-tight'}">${label}</label>${control}${help}</div>`
+  return `<div class="v2-field kt-form-item"><label for="${id}" class="kt-form-label">${label}</label>${control}${help}</div>`
 }
 type ToolButton = Extract<ToolBlock, { kind: 'actions' }>['buttons'][number]
 // Leading Keenicons for the server-rendered buttons, keyed by the untranslated label (no client template is involved).
@@ -55,10 +55,10 @@ const block = (t: Translate, cardId: string, item: ToolBlock, index: number): st
     case 'warning': return `<p class="v2-tool-card__warning kt-alert kt-alert-light kt-alert-destructive" role="note">${escapeHtml(t(item.text))}</p>`
     case 'facts': return `<dl class="v2-tool-card__facts">${item.rows.map(row => `<div><dt>${escapeHtml(t(row.label))}</dt><dd${hooks(row.hooks)}${row.technical ? ' dir="ltr"' : ''}>${escapeHtml(t(msgid('Not read')))}</dd></div>`).join('')}</dl>`
     case 'fields': {
-      // A package import (a file chooser and its options, in a full-width card) is a Metronic settings row: the label
-      // column at the start, the control beside it.
+      // A package import (a file chooser and its options, in a full-width card) stacks its fields in one column, each
+      // label above its control.
       const rows = item.fields.some(entry => entry.kind === 'file') && item.fields.some(entry => entry.kind === 'check') && item.fields.every(entry => entry.kind === 'file' || entry.kind === 'check')
-      return `<div class="${rows ? 'v2-tool-card__fields v2-tool-card__fields--rows' : 'v2-tool-card__fields'}">${item.fields.map(entry => field(t, entry, rows)).join('')}</div>`
+      return `<div class="${rows ? 'v2-tool-card__fields v2-tool-card__fields--rows' : 'v2-tool-card__fields'}">${item.fields.map(entry => field(t, entry)).join('')}</div>`
     }
     case 'table': { const caption = `v2-${cardId}-table-${index}`; return `<div class="v2-tool-card__table kt-scrollable-x-auto min-w-0 rounded-lg border border-border" role="region" tabindex="0" aria-labelledby="${caption}"><table class="kt-table"><caption id="${caption}" class="v2-sr">${escapeHtml(t(item.label))}</caption><thead><tr>${item.columns.map(name => `<th scope="col">${escapeHtml(t(name))}</th>`).join('')}</tr></thead><tbody${hooks(item.hooks)}><tr><td colspan="${item.columns.length}">${escapeHtml(t(item.empty))}</td></tr></tbody></table></div>` }
     case 'actions': return actions(t, item.buttons, 'v2-tool-card__actions flex flex-wrap items-center gap-2.5')

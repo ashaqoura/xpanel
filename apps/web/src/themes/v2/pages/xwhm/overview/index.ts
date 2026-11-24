@@ -48,7 +48,7 @@ function resources(t: Translate, props: WhmSurfaceProps): string {
     { label: inodes ? t('Inodes on {mount}', { mount: inodes.mount }) : t(msgctxt('theme:v2', 'Inodes')), icon: 'files', value: validInodes ? number(inodes.used) : '—',
       ...(validInodes ? { unit: `/ ${number(inodes.total)}`, meter: { percent: 100 * inodes.used / inodes.total } } : { note: missing }) },
   ]
-  return `<section class="v2-kpi-row grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7.5" aria-label="${escapeHtml(t('Server resources'))}">${items.map(item => kpiCard({ ...item, headingLevel: 2 })).join('')}</section>`
+  return `<section class="v2-kpi-row grid grid-cols-2 lg:grid-cols-4 gap-8" aria-label="${escapeHtml(t('Server resources'))}">${items.map(item => kpiCard({ ...item, headingLevel: 2 })).join('')}</section>`
 }
 
 /** Stored samples at their bucket positions; missing intervals leave gaps, and the description says how many were read. */
@@ -76,7 +76,7 @@ function history(t: Translate, props: WhmSurfaceProps): string {
   const link = canOpenRegisteredRoute('/whm/monitoring/performance', props.visibility)
   const toolbar = link ? toolbarLink('/whm/monitoring/performance', t('Performance history')) : undefined
   if (!data || !series.length) return card({ title: t(msgctxt('theme:v2', 'CPU and memory, last 24 hours')), titleId: 'v2-whm-history', actionsHtml: toolbar,
-    bodyHtml: `<div class="v2-whm-overview__chart grow flex flex-col items-center justify-center gap-2.5 min-h-52 p-5 rounded-xl border border-dashed border-input text-sm text-secondary-foreground text-center" role="status">${ki('ki-chart-line', 'text-3xl text-muted-foreground')}<span>${escapeHtml(t('Performance history has not been read.'))}</span></div>`,
+    bodyHtml: `<div class="v2-whm-overview__chart grow flex flex-col items-center justify-center gap-2 min-h-52 p-6 rounded-xl border border-dashed border-input text-base text-secondary-foreground text-center" role="status">${ki('ki-chart-line', 'text-3xl text-muted-foreground')}<span>${escapeHtml(t('Performance history has not been read.'))}</span></div>`,
   })
   const sampled = Array.from({ length: count }, (_, index) => cpuBuckets[index] !== null || (memoryBuckets[index] ?? null) !== null).filter(Boolean).length
   const top = Math.max(100, Math.ceil(Math.max(...cpu, ...memory)))
@@ -90,9 +90,9 @@ function history(t: Translate, props: WhmSurfaceProps): string {
 }
 
 /** Metronic stat tile: the value leads and its label sits under it, inside a dashed frame. */
-const TILE = 'flex flex-col-reverse justify-end gap-2 min-w-0 rounded-md border border-dashed border-input px-3.5 py-3'
+const TILE = 'flex flex-col gap-2 min-w-0 rounded-md border border-dashed border-input px-4 py-3'
 const tile = (label: string, value: string, options: { href?: string; warn?: boolean } = {}): string => {
-  const body = `<span class="text-xs text-secondary-foreground">${escapeHtml(label)}</span><strong class="v2-num text-2xl leading-none font-semibold ${options.warn ? 'text-yellow-500' : 'text-mono'}"${options.warn ? ' data-tone="warn"' : ''}>${ltr(value)}</strong>`
+  const body = `<span class="text-sm text-secondary-foreground">${escapeHtml(label)}</span><strong class="v2-num text-2xl leading-none font-semibold ${options.warn ? 'text-yellow-500' : 'text-mono'}"${options.warn ? ' data-tone="warn"' : ''}>${ltr(value)}</strong>`
   return options.href ? `<a class="v2-whm-overview__tile ${TILE} hover:border-primary hover:bg-accent/50" href="${escapeHtml(options.href)}">${body}</a>` : `<div class="v2-whm-overview__tile ${TILE}">${body}</div>`
 }
 
@@ -113,7 +113,7 @@ function reconciler(t: Translate, props: WhmSurfaceProps): string {
   // "Desired = applied" is stated only for a read drift count of zero; otherwise the tile names the generation alone.
   const generation = inSync ? tile(t(msgctxt('theme:v2', 'Desired = applied')), `${gen} = ${gen}`) : tile(t('Active generation'), gen === undefined ? '\u2014' : String(gen))
   return card({ title: t('Reconciler'), titleId: 'v2-whm-reconciler', actionsHtml: statusPill(state),
-    bodyHtml: `<p class="v2-muted text-sm text-secondary-foreground">${escapeHtml(t(msgctxt('theme:v2', 'Changes are applied as tested configuration generations.')))}</p><div class="v2-whm-overview__tiles grid grid-cols-2 gap-2.5">${generation}${tile(t('Drift'), knownDrift ? String(props.driftCount) : '\u2014', { warn: knownDrift && props.driftCount !== 0 })}</div><dl class="v2-whm-overview__rows grid gap-3 pt-5 border-t border-input">${rows.map(row => `<div class="flex items-center justify-between flex-wrap gap-2"><dt class="flex items-center gap-1.5 text-sm font-normal text-mono">${ki(row.glyph, 'text-base text-muted-foreground')}${row.mono ? `<span class="v2-mono">${ltr(row.label)}</span>` : escapeHtml(row.label)}</dt><dd class="v2-num text-sm font-medium text-foreground text-end">${ltr(row.value)}</dd></div>`).join('')}</dl><p class="v2-muted v2-whm-overview__reconciler-note mt-auto text-xs text-muted-foreground" role="status">${escapeHtml(knownDrift ? t(msgctxt('theme:v2', 'This is the last supplied observation.')) : t(msgctxt('theme:v2', 'The applied state has not been read.')))}</p>`,
+    bodyHtml: `<p class="v2-muted text-base text-secondary-foreground">${escapeHtml(t(msgctxt('theme:v2', 'Changes are applied as tested configuration generations.')))}</p><div class="v2-whm-overview__tiles grid grid-cols-2 gap-4">${generation}${tile(t('Drift'), knownDrift ? String(props.driftCount) : '\u2014', { warn: knownDrift && props.driftCount !== 0 })}</div><dl class="v2-whm-overview__rows grid gap-4 pt-6 border-t border-input">${rows.map(row => `<div class="flex flex-col gap-2 min-w-0"><dt class="flex items-center gap-1.5 text-sm font-normal text-secondary-foreground">${ki(row.glyph, 'text-base text-muted-foreground')}${row.mono ? `<span class="v2-mono">${ltr(row.label)}</span>` : escapeHtml(row.label)}</dt><dd class="text-base font-medium text-mono tabular-nums">${ltr(row.value)}</dd></div>`).join('')}</dl><p class="v2-muted v2-whm-overview__reconciler-note mt-auto text-2sm text-muted-foreground" role="status">${escapeHtml(knownDrift ? t(msgctxt('theme:v2', 'This is the last supplied observation.')) : t(msgctxt('theme:v2', 'The applied state has not been read.')))}</p>`,
     footerHtml: canOpenRegisteredRoute('/whm/audit', props.visibility) ? footerLink('/whm/audit', t(msgctxt('theme:v2', 'View generations'))) : undefined,
   })
 }
@@ -125,14 +125,14 @@ function accountsCard(t: Translate, props: WhmSurfaceProps): string {
   const root = (props.visibility?.principal ?? props.principal)?.kind === 'root'
   const resellers = root && canOpenRegisteredRoute('/whm/resellers', props.visibility)
     ? tile(t('Resellers'), props.resellers ? String(props.resellers.length) : '\u2014', { href: '/whm/resellers' }) : ''
-  const total = accounts ? `<p class="v2-muted text-sm text-secondary-foreground">${escapeHtml(t(msgctxt('theme:v2', '{count, plural, one {# account in total.} other {# accounts in total.}}'), { count: accounts.length }))}${root ? ' ' + escapeHtml(t(msgctxt('theme:v2', 'Resellers see only the accounts they own.'))) : ''}</p>` : ''
+  const total = accounts ? `<p class="v2-muted text-base text-secondary-foreground">${escapeHtml(t(msgctxt('theme:v2', '{count, plural, one {# account in total.} other {# accounts in total.}}'), { count: accounts.length }))}${root ? ' ' + escapeHtml(t(msgctxt('theme:v2', 'Resellers see only the accounts they own.'))) : ''}</p>` : ''
   const near = props.nearLimits
   const attention = near?.length
-    ? `<ul class="v2-whm-overview__attention grid gap-2.5">${near.map(item => `<li class="flex flex-wrap items-center gap-2.5 rounded-xl border border-border px-3.5 py-2.5 text-sm"><span class="flex items-center justify-center shrink-0 size-8 rounded-full bg-yellow-500/10 text-yellow-500" aria-hidden="true">${ki('ki-information-2', 'text-base')}</span><span class="flex flex-col gap-0.5 grow basis-48 min-w-0"><strong class="v2-mono text-sm font-medium text-mono">${ltr(item.name)}</strong><span class="text-xs text-secondary-foreground">${escapeHtml(item.note)}</span></span><a class="v2-btn kt-btn kt-btn-outline kt-btn-sm" href="/whm/accounts" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Review {account}'), { account: item.name }))}">${escapeHtml(t('Review'))}</a></li>`).join('')}</ul>`
-    : `<p class="v2-muted text-sm text-secondary-foreground" role="status">${escapeHtml(near === undefined ? t(msgctxt('theme:v2', 'Account usage has not been read.')) : t(msgctxt('theme:v2', 'No accounts are near a limit in the supplied observation.')))}</p>`
+    ? `<ul class="v2-whm-overview__attention grid gap-2">${near.map(item => `<li class="flex flex-wrap items-center gap-2 rounded-xl border border-border px-3.5 py-2.5 text-base"><span class="flex items-center justify-center shrink-0 size-8 rounded-full bg-yellow-500/10 text-yellow-500" aria-hidden="true">${ki('ki-information-2', 'text-base')}</span><span class="flex flex-col gap-0.5 grow basis-48 min-w-0"><strong class="v2-mono text-base font-medium text-mono">${ltr(item.name)}</strong><span class="text-2sm text-secondary-foreground">${escapeHtml(item.note)}</span></span><a class="v2-btn kt-btn kt-btn-outline" href="/whm/accounts" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Review {account}'), { account: item.name }))}">${escapeHtml(t('Review'))}</a></li>`).join('')}</ul>`
+    : `<p class="v2-muted text-base text-secondary-foreground" role="status">${escapeHtml(near === undefined ? t(msgctxt('theme:v2', 'Account usage has not been read.')) : t(msgctxt('theme:v2', 'No accounts are near a limit in the supplied observation.')))}</p>`
   const suspended = count('suspended')
   return card({ title: t('Accounts'), titleId: 'v2-whm-accounts', actionsHtml: toolbarLink('/whm/accounts', t('View accounts')),
-    bodyHtml: `<div class="v2-whm-overview__tiles v2-whm-overview__tiles--auto grid gap-2.5">${tile(t('Active'), count('active'), { href: '/whm/accounts' })}${tile(t('Suspended'), suspended, { href: '/whm/accounts', warn: suspended !== '0' && suspended !== '\u2014' })}${resellers}</div>${total}<h3 class="v2-whm-overview__sub text-sm font-semibold text-mono">${escapeHtml(t(msgctxt('theme:v2', 'Need attention')))}</h3>${attention}`,
+    bodyHtml: `<div class="v2-whm-overview__tiles v2-whm-overview__tiles--auto grid gap-4">${tile(t('Active'), count('active'), { href: '/whm/accounts' })}${tile(t('Suspended'), suspended, { href: '/whm/accounts', warn: suspended !== '0' && suspended !== '\u2014' })}${resellers}</div>${total}<h3 class="v2-whm-overview__sub text-base font-semibold text-mono">${escapeHtml(t(msgctxt('theme:v2', 'Need attention')))}</h3>${attention}`,
   })
 }
 
@@ -146,11 +146,11 @@ function services(t: Translate, props: WhmSurfaceProps): string {
   const rows = props.services?.map(service => {
     const tone: Tone = service.checked === false || service.installed === false ? 'neutral' : service.active ? 'ok' : 'bad'
     const state = service.checked === false ? t('Not checked') : service.installed === false ? t('Not installed') : service.active ? t('Running') : t('Stopped')
-    return `<li class="v2-whm-overview__service flex items-center justify-between flex-wrap gap-2.5"><span class="flex items-center gap-2.5 min-w-0"><span class="flex items-center justify-center shrink-0 size-9 rounded-full border border-input bg-accent/60 text-secondary-foreground" aria-hidden="true">${ki(SERVICE_GLYPHS[service.name] ?? 'ki-row-horizontal', 'text-base')}</span><span class="flex flex-col gap-0.5 min-w-0"><strong class="text-sm font-medium text-mono">${ltr(service.name)}</strong><span class="v2-mono v2-muted text-xs text-secondary-foreground">${ltr(service.version)}</span></span></span>${statusPill({ tone, label: state })}</li>`
+    return `<li class="v2-whm-overview__service flex items-center justify-between flex-wrap gap-2"><span class="flex items-center gap-2 min-w-0"><span class="flex items-center justify-center shrink-0 size-9 rounded-full border border-input bg-accent/60 text-secondary-foreground" aria-hidden="true">${ki(SERVICE_GLYPHS[service.name] ?? 'ki-row-horizontal', 'text-base')}</span><span class="flex flex-col gap-0.5 min-w-0"><strong class="text-base font-medium text-mono">${ltr(service.name)}</strong><span class="v2-mono v2-muted text-2sm text-secondary-foreground">${ltr(service.version)}</span></span></span>${statusPill({ tone, label: state })}</li>`
   })
   return card({ title: t('Services'), titleId: 'v2-whm-services', flush: true,
     actionsHtml: canOpenRegisteredRoute('/whm/services', props.visibility) ? toolbarLink('/whm/services', t('Manage services')) : undefined,
-    bodyHtml: rows?.length ? `<ul class="v2-whm-overview__services flex flex-col">${rows.join('')}</ul>` : `<p class="v2-inset text-sm text-secondary-foreground" role="status">${escapeHtml(props.services === undefined ? t(msgctxt('theme:v2', 'Service status has not been read.')) : t('No services were reported.'))}</p>`,
+    bodyHtml: rows?.length ? `<ul class="v2-whm-overview__services flex flex-col">${rows.join('')}</ul>` : `<p class="v2-inset text-base text-secondary-foreground" role="status">${escapeHtml(props.services === undefined ? t(msgctxt('theme:v2', 'Service status has not been read.')) : t('No services were reported.'))}</p>`,
   })
 }
 
@@ -180,11 +180,11 @@ function auditEvents(t: Translate, props: WhmSurfaceProps): string {
     const target = auditTargetLabel(entry.target, t.locale)
     const tone: Tone = entry.outcome === 'ok' ? 'ok' : entry.outcome === 'denied' ? 'warn' : 'bad'
     const last = index === entries.length - 1
-    return `<li class="flex items-start relative">${last ? '' : '<span class="w-9 start-0 top-9 absolute bottom-0 rtl:-translate-x-1/2 translate-x-1/2 border-s border-s-input" aria-hidden="true"></span>'}<span class="flex items-center justify-center shrink-0 rounded-full bg-accent/60 border border-input size-9 text-secondary-foreground" aria-hidden="true">${ki(AUDIT_GLYPHS[tone], 'text-base')}</span><div class="${last ? 'flex flex-wrap items-start justify-between gap-2.5 grow min-w-0 ps-2.5' : 'flex flex-wrap items-start justify-between gap-2.5 grow min-w-0 ps-2.5 mb-7'}"><div class="flex flex-col gap-0.5 min-w-0"><div class="text-sm text-foreground">${name(t(msgctxt('xwhm', 'Action')))}${escapeHtml(auditActionLabel(entry.action, t.locale, entry))}${target ? ` ${name(t('Target'))}<span class="font-medium text-mono">${ltr(target)}</span>` : ''}</div><div class="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-secondary-foreground"><span>${name(t('Time'))}${time}</span>${actor ? `<span class="inline-flex items-center gap-1">${ki('ki-user', 'text-xs text-muted-foreground')}${name(t('Actor'))}${ltr(actor)}</span>` : ''}</div></div><span>${name(t('Result'))}${statusPill({ tone, label: auditOutcomeLabel(entry.action, entry.outcome, t.locale) })}</span></div></li>`
+    return `<li class="flex items-start relative">${last ? '' : '<span class="w-9 start-0 top-9 absolute bottom-0 rtl:-translate-x-1/2 translate-x-1/2 border-s border-s-input" aria-hidden="true"></span>'}<span class="flex items-center justify-center shrink-0 rounded-full bg-accent/60 border border-input size-9 text-secondary-foreground" aria-hidden="true">${ki(AUDIT_GLYPHS[tone], 'text-base')}</span><div class="${last ? 'flex flex-wrap items-start justify-between gap-2 grow min-w-0 ps-2.5' : 'flex flex-wrap items-start justify-between gap-2 grow min-w-0 ps-2.5 mb-7'}"><div class="flex flex-col gap-0.5 min-w-0"><div class="text-base text-foreground">${name(t(msgctxt('xwhm', 'Action')))}${escapeHtml(auditActionLabel(entry.action, t.locale, entry))}${target ? ` ${name(t('Target'))}<span class="font-medium text-mono">${ltr(target)}</span>` : ''}</div><div class="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-2sm text-secondary-foreground"><span>${name(t('Time'))}${time}</span>${actor ? `<span class="inline-flex items-center gap-1">${ki('ki-user', 'text-2sm text-muted-foreground')}${name(t('Actor'))}${ltr(actor)}</span>` : ''}</div></div><span>${name(t('Result'))}${statusPill({ tone, label: auditOutcomeLabel(entry.action, entry.outcome, t.locale) })}</span></div></li>`
   })
-  const bodyHtml = rows === undefined ? `<p class="text-sm text-secondary-foreground" role="status">${escapeHtml(t('Not read'))}</p>`
+  const bodyHtml = rows === undefined ? `<p class="text-base text-secondary-foreground" role="status">${escapeHtml(t('Not read'))}</p>`
     : rows.length ? `<ol class="v2-whm-overview__timeline flex flex-col" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Recent audit events')))}">${rows.join('')}</ol>`
-      : `<div class="flex flex-col items-center gap-2.5 py-5 text-sm text-secondary-foreground text-center" role="status">${ki('ki-shield-search', 'text-3xl text-muted-foreground')}<span>${escapeHtml(t('No audit entries yet'))}</span></div>`
+      : `<div class="flex flex-col items-center gap-2 py-5 text-base text-secondary-foreground text-center" role="status">${ki('ki-shield-search', 'text-3xl text-muted-foreground')}<span>${escapeHtml(t('No audit entries yet'))}</span></div>`
   return card({ title: t(msgctxt('theme:v2', 'Recent audit events')), titleId: 'v2-whm-recent-audit', bodyHtml, actionsHtml: toolbarLink('/whm/audit', t('Audit log')) })
 }
 
@@ -244,16 +244,16 @@ export function renderV2WhmOverview(t: Translate, props: WhmSurfaceProps): strin
   const certStrip = principal.kind === 'root' ? certificateRenewalStrip(t, props, open('/whm/tls')) : ''
   const jobs = card({ title: t(msgctxt('theme:v2', 'Background jobs')), titleId: 'v2-whm-background-jobs',
     bodyHtml: `<div class="v2-whm-overview__unread" role="status">${emptyState({ icon: 'clock', title: t('Not read'), text: t(msgctxt('theme:v2', 'Background jobs have not been read.')),
-      ...(open('/whm/jobs') ? { actionHtml: `<a class="v2-btn kt-btn kt-btn-outline kt-btn-sm" href="/whm/jobs">${ki('ki-time')}${escapeHtml(t(msgctxt('theme:v2', 'View jobs')))}</a>` } : {}) })}</div>`,
+      ...(open('/whm/jobs') ? { actionHtml: `<a class="v2-btn kt-btn kt-btn-outline" href="/whm/jobs">${ki('ki-time')}${escapeHtml(t(msgctxt('theme:v2', 'View jobs')))}</a>` } : {}) })}</div>`,
   })
   const audit = open('/whm/audit') ? auditEvents(t, props) : ''
-  return `<div class="v2-layout v2-whm-overview flex flex-col gap-5 lg:gap-7.5" data-whm-overview>${pageHeader(t, { breadcrumb: [{ label: t('Home') }, { label: t('Dashboard') }], route: '/whm', title: t('Server dashboard'), description: t(msgctxt('theme:v2', 'The reconciler, accounts, resources and services.')), actionsHtml: actions })}${upgrade}${certStrip}${resources(t, props)}<div class="v2-whm-overview__primary grid gap-5 lg:gap-7.5 items-stretch">${history(t, props)}${reconciler(t, props)}</div><div class="v2-whm-overview__secondary grid gap-5 lg:gap-7.5 items-stretch">${open('/whm/services') ? services(t, props) : ''}<div class="v2-stack flex flex-col gap-5 lg:gap-7.5 min-w-0">${open('/whm/accounts') ? accountsCard(t, props) : ''}${jobs}</div></div>${renderV2WhmHome(t)}${hostFacts(t, props)}${audit}</div>`
+  return `<div class="v2-layout v2-whm-overview flex flex-col gap-8" data-whm-overview>${pageHeader(t, { breadcrumb: [{ label: t('Home') }, { label: t('Dashboard') }], route: '/whm', title: t('Server dashboard'), description: t(msgctxt('theme:v2', 'The reconciler, accounts, resources and services.')), actionsHtml: actions })}${upgrade}${certStrip}${resources(t, props)}<div class="v2-whm-overview__primary grid gap-8 items-stretch">${history(t, props)}${reconciler(t, props)}</div><div class="v2-whm-overview__secondary grid gap-8 items-stretch">${open('/whm/services') ? services(t, props) : ''}<div class="v2-stack flex flex-col gap-8 min-w-0">${open('/whm/accounts') ? accountsCard(t, props) : ''}${jobs}</div></div>${renderV2WhmHome(t)}${hostFacts(t, props)}${audit}</div>`
 }
 
 /** Structure only: Metronic classes in the markup supply surfaces, type and spacing. The favourites and inbox cards
  * (accounts/admin.ts) reuse the two-column row and the separated list, so their geometry stays here. */
 export const WHM_OVERVIEW_CSS = `.v2-whm-overview :is(.v2-chart__x,.v2-chart__y),.v2-whm-overview [data-cert-renewal-strip],.v2-whm-overview__timeline time,.v2-whm-overview #v2-whm-host-facts dd{font-variant-numeric:tabular-nums}
-.v2-whm-overview__primary,.v2-whm-overview__secondary{display:grid;gap:1.25rem;align-items:stretch;min-inline-size:0}
+.v2-whm-overview__primary,.v2-whm-overview__secondary{display:grid;gap:24px;align-items:stretch;min-inline-size:0}
 .v2-whm-overview__primary{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 .v2-whm-overview__secondary{grid-template-columns:repeat(2,minmax(0,1fr))}
 .v2-whm-overview__primary>.v2-card>.v2-card__body,.v2-whm-overview__secondary>.v2-card>.v2-card__body{flex:1 1 auto}
@@ -263,18 +263,18 @@ export const WHM_OVERVIEW_CSS = `.v2-whm-overview :is(.v2-chart__x,.v2-chart__y)
 .v2-whm-overview__tile{text-decoration:none;overflow-wrap:anywhere;transition:background-color 140ms ease-out,border-color 140ms ease-out}
 .v2-whm-overview__services{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .v2-whm-overview__services:empty{display:none}
-.v2-whm-overview__services>li{padding:.75rem 1.25rem;border-block-end:1px solid var(--line);overflow-wrap:anywhere}
+.v2-whm-overview__services>li{padding:8px 16px;border-block-end:1px solid var(--line);overflow-wrap:anywhere}
 .v2-whm-overview__services>li:last-child{border-block-end:0}
 .v2-whm-overview__services>.v2-whm-inbox__row{padding-inline:0}
 .v2-whm-inbox__row[data-read=true]{color:var(--muted)}
 .v2-whm-inbox__row[hidden]{display:none}
 .v2-whm-inbox__main{display:flex;flex-direction:column;gap:.125rem;flex:1 1 13.75rem;min-inline-size:0}
-.v2-whm-inbox__meta{display:flex;flex-wrap:wrap;align-items:center;gap:.375rem;font-size:.75rem;font-variant-numeric:tabular-nums}
+.v2-whm-inbox__meta{display:flex;flex-wrap:wrap;align-items:center;gap:.375rem;font-size:.8125rem;font-variant-numeric:tabular-nums}
 .v2-whm-inbox__meta bdi{white-space:nowrap}
 .v2-whm-inbox__filter{display:inline-flex;align-items:center;gap:.5rem;min-block-size:var(--target);color:var(--text-2);cursor:pointer}
-.v2-whm-overview__services>.v2-whm-favorites__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.625rem;padding-inline:0}
+.v2-whm-overview__services>.v2-whm-favorites__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding-inline:0}
 .v2-whm-favorites__link{display:flex;flex-direction:column;gap:.125rem;flex:1 1 11.25rem;min-inline-size:0}
-.v2-whm-favorites__link>a{font-size:.875rem;font-weight:500;color:var(--mono,var(--text));text-decoration:none}
+.v2-whm-favorites__link>a{font-size:1rem;font-weight:500;color:var(--mono,var(--text));text-decoration:none}
 .v2-whm-favorites__link>a:hover{color:var(--accent)}
 .v2-whm-favorites__actions{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.375rem}
 .v2-whm-overview__unread>.v2-state--empty{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;justify-items:start;gap:.25rem .875rem;padding:.875rem;border-radius:.75rem;text-align:start}
@@ -282,7 +282,7 @@ export const WHM_OVERVIEW_CSS = `.v2-whm-overview :is(.v2-chart__x,.v2-chart__y)
 .v2-whm-overview__unread :is(h2,h3,p){grid-column:2}
 .v2-whm-overview__unread .v2-btn{grid-column:3;grid-row:1/3}
 @media(prefers-reduced-motion:reduce){.v2-whm-overview__tile{transition:none}}
-@media(min-width:1024px){.v2-whm-overview__primary,.v2-whm-overview__secondary{gap:1.875rem}}
+@media(min-width:1024px){.v2-whm-overview__primary,.v2-whm-overview__secondary{gap:32px}}
 @media(max-width:1050px){.v2-whm-overview__primary,.v2-whm-overview__secondary{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:640px){.v2-whm-overview__unread .v2-btn{grid-column:1/-1;grid-row:auto;justify-self:stretch;margin-block-start:.5rem}.v2-whm-overview__services>li:not(.v2-whm-inbox__row,.v2-whm-favorites__row){padding-inline:1rem}}
 `

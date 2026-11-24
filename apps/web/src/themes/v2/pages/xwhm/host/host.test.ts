@@ -184,14 +184,14 @@ describe('v2 host page authorization and observations', () => {
   it('fills the ruleset tiles from supplied props only and leaves enforcement unread', () => {
     const rule = { id: 'r1', kind: 'port' as const, action: 'accept' as const, protocol: 'tcp' as const, port: '8443', source: null, forwardTo: null, list: null, comment: '', enabled: true }
     const html = renderV2WhmFirewall({ ...root, firewallRules: [rule], generationId: 7, generationActivatedAt: '2026-10-22T11:45:00Z', adminSessionIp: '192.0.2.3', serverSettings: { panelPort: 2087, sshPort: 2222, backendPort: 8080 } as HostPageProps['serverSettings'] })
-    const tile = (label: string): string => html.match(new RegExp(`<div class="v2-host__tile [^"]*"><dt class="text-sm text-secondary-foreground">${label}</dt>(.*?)</div>`))![1]!
+    const tile = (label: string): string => html.match(new RegExp(`<div class="v2-host__tile [^"]*"><dt class="text-sm leading-\\(--lh-label\\) text-secondary-foreground">${label}</dt>(.*?)</div>`))![1]!
     expect(tile('Generation')).toContain('Applied at <bdi class="v2-num" dir="ltr">2026-10-22 11:45 UTC</bdi>')
     expect(tile('Management ports')).toMatch(/2087<\/bdi> xWHM.*2222<\/bdi> SSH/)
     expect(tile('Saved rules')).toContain('>1</bdi>')
-    for (const label of ['Enforcement', 'Input policy', 'Temporary blocks']) expect(tile(label)).toBe('<dd class="v2-num order-first text-base font-medium leading-none text-mono">Not read</dd>')
+    for (const label of ['Enforcement', 'Input policy', 'Temporary blocks']) expect(tile(label)).toBe('<dd class="v2-num text-base leading-(--lh-text) font-medium text-mono">Not read</dd>')
     const bare = renderV2WhmFirewall(root)
     expect(bare).not.toContain('v2-host__tile-note')
-    expect(bare.match(/<div class="v2-host__tile [^"]*"><dt class="text-sm text-secondary-foreground">Management ports<\/dt>(.*?)<\/div>/)![1]).toBe('<dd class="v2-num order-first text-base font-medium leading-none text-mono">Not read</dd>')
+    expect(bare.match(/<div class="v2-host__tile [^"]*"><dt class="text-sm leading-\(--lh-label\) text-secondary-foreground">Management ports<\/dt>(.*?)<\/div>/)![1]).toBe('<dd class="v2-num text-base leading-(--lh-text) font-medium text-mono">Not read</dd>')
   })
 
   it('names every rule value for phone rows, in saved rows and in the rows the controller clones', () => {

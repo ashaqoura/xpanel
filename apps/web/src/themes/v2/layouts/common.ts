@@ -55,9 +55,9 @@ export const kpiStrip = (props: KpiStripProps): string =>
   `<section class="v2-kpi-row" aria-label="${escapeHtml(props.label)}"${props.busy ? ' aria-busy="true"' : ''}${hookAttrs(props.hooks)}>${props.items.map(item => kpiCard({ headingLevel: 2, ...item })).join('')}</section>`
 
 /** The layout root: header, notices, lead content (a page-state banner, a query form) and the KPI strip, then the
- *  family body, on the Metronic content grid (20px apart, 30px from the large breakpoint). */
+ *  family body, 32px apart (the standard's section rhythm). */
 export const layoutRoot = (t: Translate, base: PageBaseProps, bodyHtml: string, leadHtml = ''): string =>
-  `<div class="v2-layout grid grid-cols-1 content-start gap-5 lg:gap-7.5"${hookAttrs(base.hooks)}>${pageHeader(t, base.header)}${(base.notices ?? []).map(item => notice(t, item)).join('')}${leadHtml}${base.kpis ? kpiStrip(base.kpis) : ''}${bodyHtml}</div>`
+  `<div class="v2-layout grid grid-cols-1 content-start gap-8"${hookAttrs(base.hooks)}>${pageHeader(t, base.header)}${(base.notices ?? []).map(item => notice(t, item)).join('')}${leadHtml}${base.kpis ? kpiStrip(base.kpis) : ''}${bodyHtml}</div>`
 
 /** The state block for a state other than ready; '' when ready. */
 export function stateBlock(t: Translate, state: LayoutState, slots: StateSlots = {}): string {
@@ -67,8 +67,8 @@ export function stateBlock(t: Translate, state: LayoutState, slots: StateSlots =
   return ''
 }
 
-/** Facts as label-over-value blocks in a responsive grid; `rows` lays them out as the Metronic "General info"
- *  rows instead: the secondary label in a 9rem column at the start, the value beside it. */
+/** Facts as label-over-value blocks in a responsive grid; `rows` stacks them in one column, lined off from each
+ *  other. Either way the value sits 8px directly beneath its label on the same start edge (the project standard). */
 export const factList = (facts: readonly Fact[], label?: string, layout: 'tiles' | 'rows' = 'tiles'): string =>
   `<dl class="${layout === 'rows' ? 'v2-facts v2-facts--rows' : 'v2-facts'}"${label ? ` aria-label="${escapeHtml(label)}"` : ''}>${facts.map(fact => `<div><dt>${escapeHtml(fact.label)}</dt><dd>${fact.valueHtml ?? `<bdi class="v2-num${fact.mono ? ' v2-mono' : ''}" dir="${fact.ltr || fact.mono ? 'ltr' : 'auto'}"${hookAttrs(fact.hooks)}>${escapeHtml(fact.value)}</bdi>`}</dd></div>`).join('')}</dl>`
 
@@ -102,32 +102,31 @@ export const revisionSaveBar = (t: Translate, props: RevisionSaveProps): string 
 export const commitRegion = (label: string, barHtml: string): string =>
   `<section class="v2-commit" aria-label="${escapeHtml(label)}">${barHtml}</section>`
 
-// The Metronic content rhythm: 20px between the parts of a page and between cards, 30px from the large breakpoint;
-// 20px between the fields of a form. Facts are a secondary label over a medium value, or label and value rows.
-export const COMMON_LAYOUT_CSS = `.v2-layout{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:1.25rem;min-width:0}
-.v2-stack{display:flex;flex-direction:column;gap:1.25rem;min-width:0}
-.v2-stack--tight{gap:1rem}
-.v2-aside{flex:1 1 320px;max-width:420px;min-width:0;display:flex;flex-direction:column;gap:1.25rem}
-.v2-grid{display:flex;flex-wrap:wrap;align-items:stretch;gap:1.25rem}
+// The standard's rhythm: 32px between the sections of a page and between cards, 24px between the groups inside a
+// card or a KPI strip, 16px between fields and facts, 8px from a label to its value. Facts are a secondary label
+// (14/22) over a medium value on the same start edge.
+export const COMMON_LAYOUT_CSS = `.v2-layout{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:var(--space-4);min-width:0}
+.v2-stack,.v2-aside{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+.v2-stack--tight{gap:var(--space-3)}
+.v2-aside{flex:1 1 320px;max-width:420px}
+.v2-grid{display:flex;flex-wrap:wrap;align-items:stretch;gap:var(--space-4)}
 .v2-grid__cell{flex:1 1 420px;min-width:0;display:flex;flex-direction:column}
 .v2-grid__cell>*{flex:1 1 auto}
 .v2-grid__cell--full{flex-basis:100%}
-.v2-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));align-items:end;gap:1.25rem}
+.v2-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));align-items:start;gap:var(--space-2)}
 .v2-fields>.v2-switch-row{grid-column:1/-1}
 .v2-fields--row{display:flex;flex-wrap:wrap}
 .v2-fields--row>.v2-field{flex:1 1 160px}
-.v2-fields>.v2-switch-row+.v2-switch-row{padding-top:1.25rem;border-top:1px solid var(--line)}
-.v2-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:1rem 1.25rem}
-.v2-facts>div{display:flex;flex-direction:column;gap:.375rem;min-width:0;font-size:.875rem}
-.v2-facts dt{color:var(--text-2);font-weight:400}
+.v2-fields>.v2-switch-row+.v2-switch-row{padding-top:var(--space-2);border-top:1px solid var(--line)}
+.v2-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:var(--space-2) var(--space-3)}
+.v2-facts>div{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
+.v2-facts dt{font-size:.875rem;line-height:var(--lh-label);color:var(--text-2);font-weight:400}
 .v2-facts dd{color:var(--mono,var(--text));font-weight:500;text-align:start;overflow-wrap:anywhere}
-.v2-facts--rows{display:flex;flex-direction:column;gap:0}
-.v2-facts--rows>div{flex-direction:row;align-items:baseline;gap:.625rem;padding-block:.5rem}
-.v2-facts--rows dt{flex:none;inline-size:9rem}
+.v2-facts--rows{grid-template-columns:minmax(0,1fr)}
+.v2-facts--rows>div+div{padding-top:var(--space-2);border-top:1px solid var(--line)}
 .v2-facts--rows dd{font-weight:400}
 .v2-inset{padding:var(--v2-panel-padding)}
 .v2-card--flush>.v2-card__body>.v2-tabs{padding-inline:var(--v2-panel-padding)}
-.v2-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1rem;padding:.75rem var(--v2-panel-padding);border-top:1px solid var(--line);font-size:.8125rem;color:var(--text-2)}
+.v2-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1rem;padding:.75rem var(--v2-panel-padding);border-top:1px solid var(--line);font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2)}
 @media(max-width:959px){.v2-aside{max-width:none}}
-@media(min-width:1024px){.v2-layout,.v2-stack:not(.v2-stack--tight),.v2-aside,.v2-grid{gap:1.875rem}}
 `

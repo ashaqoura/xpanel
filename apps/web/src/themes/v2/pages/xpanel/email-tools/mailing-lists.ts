@@ -15,7 +15,7 @@ export function renderV2PanelMailingLists(props: PanelSurfaceProps, authority?: 
     facts([{ label: t(msgid('Plan limit')), valueHtml: plan?.caps.mailingLists === undefined ? esc(t(msgid('Not read'))) : technical(plan.caps.mailingLists) }])
     + table('v2-mailing-list-records', title, [t(msgid('Address')), t(msgid('Members')), t(msgid('Moderation')), t(msgid('Archive')), t(msgid('Action'))], unread(t, 5), { 'data-mailing-lists-rows': true })
     + state(t(msgctxt('theme:v2', 'Saved mailing lists have not been read.')), { 'data-mailing-list-status': true })
-    + `<div class="v2-panel-extra__editor" data-mailing-list-form role="group" aria-labelledby="v2-mailing-list-create-heading"><h3 class="text-sm font-semibold text-mono" id="v2-mailing-list-create-heading">${esc(t(msgid('Create mailing list')))}</h3>`
+    + `<div class="v2-panel-extra__editor" data-mailing-list-form role="group" aria-labelledby="v2-mailing-list-create-heading"><h3 class="text-base font-semibold text-mono" id="v2-mailing-list-create-heading">${esc(t(msgid('Create mailing list')))}</h3>`
     + fields(field('mailing-list-name', t(msgid('List name')), input('mailing-list-name', { 'data-ml-name': true }, ' type="text" dir="ltr" maxlength="64" autocomplete="off"', !createAllowed))
       + field('mailing-list-domain', t(msgid('Domain')), select('mailing-list-domain', domainOptions, { 'data-ml-domain': true }, !createAllowed, ' dir="ltr"'))
       + field('mailing-list-moderation', t(msgid('Moderation')), select('mailing-list-moderation', [['members', t(msgid('Members'))], ['open', t(msgid('Open'))], ['moderated', t(msgid('Moderated'))]], { 'data-ml-moderation': true }, !createAllowed))

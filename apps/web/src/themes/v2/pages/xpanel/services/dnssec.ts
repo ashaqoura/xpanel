@@ -8,8 +8,8 @@ type Translate = (message: string) => string
 /** v2 markup for the rows the DNSSEC controller fills. */
 export function v2DnssecClientTemplates(): string {
   return `<template data-xp-template="dnssec-key"><tr><td><bdi dir="ltr" class="v2-mono" data-xp-slot="id"></bdi></td><td data-xp-slot="type"></td><td><bdi dir="ltr" class="v2-mono" data-xp-slot="algorithm"></bdi></td><td><bdi dir="ltr" class="v2-mono" data-xp-slot="tag"></bdi></td><td data-xp-slot="state"></td><td><div class="v2-panel-service__actions" data-xp-slot="actions"></div></td></tr></template>`
-    + `<template data-xp-template="dnssec-action"><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" disabled></button></template>`
-    + `<template data-xp-template="dnssec-rollover"><tr><td><bdi dir="ltr" class="v2-mono" data-xp-slot="keys"></bdi></td><td data-xp-slot="type"></td><td><bdi dir="ltr" class="v2-mono" data-xp-slot="not-before"></bdi></td><td><button type="button" class="v2-btn kt-btn kt-btn-outline kt-btn-sm" data-xp-slot="action" disabled></button></td></tr></template>`
+    + `<template data-xp-template="dnssec-action"><button type="button" class="v2-btn kt-btn kt-btn-outline" disabled></button></template>`
+    + `<template data-xp-template="dnssec-rollover"><tr><td><bdi dir="ltr" class="v2-mono" data-xp-slot="keys"></bdi></td><td data-xp-slot="type"></td><td><bdi dir="ltr" class="v2-mono" data-xp-slot="not-before"></bdi></td><td><button type="button" class="v2-btn kt-btn kt-btn-outline" data-xp-slot="action" disabled></button></td></tr></template>`
     + `<template data-xp-template="dnssec-empty"><tr><td colspan="6" data-xp-slot="message"></td></tr></template>`
 }
 

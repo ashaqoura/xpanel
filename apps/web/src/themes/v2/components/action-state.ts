@@ -17,7 +17,7 @@ export const ACTION_STATE_CSS = `.v2-action-state{display:flex;flex-direction:co
 .v2-action-state__head>strong{font-weight:600;color:var(--mono,var(--text));min-width:0}
 .v2-action-state>p{font-size:.875rem;line-height:1.6;color:var(--text-2)}
 .v2-action-state__metadata{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-2)}
-.v2-action-state__metadata>li{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;min-width:0;font-size:.75rem}
+.v2-action-state__metadata>li{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;min-width:0;font-size:.8125rem}
 .v2-action-state__label{color:var(--muted)}
 .v2-action-state[data-action-state=denied],.v2-action-state[data-action-state=failed]{border-color:color-mix(in oklab,var(--destructive) 10%,transparent);background:color-mix(in oklab,var(--destructive) 5%,var(--surface))}
 .v2-action-state[data-action-state=unavailable],.v2-action-state[data-action-state=conflict]{border-color:var(--warn-line);background:var(--warn-soft)}
