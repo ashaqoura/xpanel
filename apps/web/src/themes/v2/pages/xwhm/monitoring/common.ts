@@ -47,7 +47,11 @@ export const actions = (body: string, end = false): string => `<div class="${end
 export const fields = (body: string): string => `<div class="v2-observation__fields grid gap-4">${body}</div>`
 export const help = (t: Translate, text: string, hooks?: HookAttributes): string => `<p class="v2-muted text-base text-secondary-foreground"${hookAttrs(hooks)}>${esc(t(text))}</p>`
 /** `glyph` names the leading Keenicon; without it a common action takes its usual icon, and '' shows none. */
-export const button = (t: Translate, text: string, hooks?: HookAttributes, enabled = false, primary = false, type: 'button' | 'submit' = 'button', glyph?: string): string => `<button type="${type}" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${lead(text, hooks, glyph)}${esc(t(text))}</button>`
+export const button = (t: Translate, text: string, hooks?: HookAttributes, enabled = false, primary = false, type: 'button' | 'submit' = 'button', glyph?: string): string => {
+  // The repair controller rewrites the start label; inside a label slot the rewrite keeps the leading icon.
+  const mark = lead(text, hooks, glyph), slot = mark && hooks && 'data-whm-repair-start' in hooks
+  return `<button type="${type}" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${mark}${slot ? `<span data-xp-slot="label">${esc(t(text))}</span>` : esc(t(text))}</button>`
+}
 /** A soft destructive action: stop, revoke, remove. */
 export const dangerButton = (t: Translate, text: string, hooks?: HookAttributes, enabled = false, glyph?: string): string => `<button type="button" class="v2-btn v2-btn--danger kt-btn kt-btn-outline kt-btn-destructive"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${lead(text, hooks, glyph)}${esc(t(text))}</button>`
 /** The small outline action of a card header toolbar: read again, refresh. */
@@ -108,11 +112,15 @@ export const typeRole = (selector: string, role: TypeRole, extra = ''): string =
 export const labelInset = (field: string): string => `${field}>label:has(+:is(input:not([type=checkbox],[type=radio],[type=range]),textarea,select,.v2-select,.kt-input-group)){display:block!important;padding-inline-start:var(--v2-control-inset,calc(.75rem + 1px));text-box:trim-end text}
 ${field}>label:has(+.kt-input>i:first-child+input){padding-inline-start:calc(.75rem + 1px + 1.375rem)}
 `
+/** The labels of a filter bar's search box and selects start where the control's text starts. */
+export const filterLabelInset = (s: string): string => `${s} .v2-filter__field>label:has(+:is(.v2-select,.v2-filter__input)){padding-inline-start:var(--v2-control-inset,calc(.75rem + 1px))}
+`
 /** Reading rules shared by the WHM page families: quiet help and status lines, facts with muted labels. Zero specificity, so a family rule wins. */
 /** Plain paragraphs a controller fills with a result, a job line or a record keep the body emphasis. */
 const RESULT_TEXT = ['xp-slot', 'sc-job', 'sm-job', 'sw-job', 'sw-addons-job', 'whm-updates-job', 'whm-jobs-error', 'whm-jobs-failure', 'whm-jobs-verification', 'whm-jobs-log-status', 'whm-php-binary-status', 'whm-repair-preview-summary', 'whm-repair-removals-text', 'whm-tokens-reveal-text', 'web-stats-summary', 'generations-current', 'branding-asset-state', 'np-count', 'ip-pool-count', 'whm-ssh-opaque', 'whm-domain-application', 'whm-domain-removal-reason', 'status-notice', 'ctr-field'].map(hook => `[data-${hook}]`).join(',')
 export const whmPolish = (s: string): string => `${typeRole(`${s} :where(.v2-card__body p:not([class],[role],.v2-notice p,${RESULT_TEXT}))`, 'body', 'color:var(--text-2)')}${typeRole(`${s} :where(p[role=status]:not([data-state=failed],[data-state=error]))`, 'body', 'color:var(--text-2);overflow-wrap:anywhere')}
 ${s} p[role=status]:empty{display:none}
+${filterLabelInset(s)}
 ${s} :where(p:is([role=status],[role=alert]):is([data-state=problem],[data-state=bad],[data-state=invalid])){color:var(--bad)}
 ${s} :where(p[role=status]:is([data-state=ok],[data-state=saved],[data-state=success],[data-state=verified])){color:var(--ok)}
 ${s} :where(.v2-card__body,.v2-card,.v2-observation__groups,.v2-host__groups,.v2-admin-form,.v2-lifecycle__column,.v2-services__panel)>:where(.v2-field,.v2-admin-field,.v2-host__field,.v2-lifecycle__field):not(:has(textarea),.v2-field--row,.v2-admin-field){max-inline-size:30rem}

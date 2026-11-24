@@ -41,7 +41,12 @@ const actionIcon = (hooks: HookAttributes | undefined, primary = false): string 
   const key = hooks ? Object.entries(hooks).map(([name, value]) => `${name}=${String(value)}`).join(' ') : ''
   return key ? (primary ? PRIMARY_ICONS : ACTION_ICONS).find(([pattern]) => pattern.test(key))?.[1] ?? '' : ''
 }
-export const button = (label: string, hooks?: HookAttributes, enabled = false, primary = false): string => `<button type="button" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${actionIcon(hooks, primary)}${escapeHtml(label)}</button>`
+// Buttons whose label a controller rewrites: the text sits in a label slot, so the rewrite keeps the leading icon.
+const RELABELLED = /data-whm-health-run/
+export const button = (label: string, hooks?: HookAttributes, enabled = false, primary = false): string => {
+  const glyph = actionIcon(hooks, primary), slot = glyph && hooks && RELABELLED.test(Object.keys(hooks).join(' '))
+  return `<button type="button" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${enabled ? '' : ' disabled'}>${glyph}${slot ? `<span data-xp-slot="label">${escapeHtml(label)}</span>` : escapeHtml(label)}</button>`
+}
 /** Adds the Metronic control class to the text controls a caller hands to {@link field}; choices and hidden inputs stay as they are. */
 const metronicControl = (html: string): string => html.replace(/<(input|select|textarea)\b([^>]*)>/g, (tag, name: string, attrs: string) => {
   if (name === 'input' && /type="(?:checkbox|radio|hidden)"/.test(attrs)) return tag

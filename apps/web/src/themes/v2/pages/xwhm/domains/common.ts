@@ -7,6 +7,7 @@ import { card } from '../../../components/card.ts'
 import { dataTable, type DataTableRow } from '../../../components/data-table.ts'
 import { formField, type FieldControl } from '../../../components/form-field.ts'
 import { pageHeader } from '../../../components/page-header.ts'
+import { filterLabelInset } from '../monitoring/common.ts'
 
 /** Core supplies route admission and already-filtered collections. These facts never grant API authority. */
 export interface WhmNetworkAuthority extends WhmStoredFactAuthority {
@@ -68,7 +69,7 @@ export function networkPage(t: Translate, route: string, title: string, descript
 }
 
 // A repainted domain row has no tone class: its status pill follows the row's recorded state, as the server row does.
-export const WHM_NETWORK_CSS = `.v2-whm-network,.v2-whm-network__stack{display:flex;flex-direction:column;gap:var(--space-4);min-inline-size:0}
+export const WHM_NETWORK_CSS = `${filterLabelInset('.v2-whm-network')}.v2-whm-network,.v2-whm-network__stack{display:flex;flex-direction:column;gap:var(--space-4);min-inline-size:0}
 .v2-whm-network__groups{display:flex;flex-direction:column;gap:var(--space-3);min-inline-size:0}
 .v2-whm-network__records{display:contents}
 .v2-whm-network tr:has([data-whm-filter-row][data-status=suspended]) .v2-pill--state{background:var(--warn-soft)!important;border-color:var(--warn-line)!important;color:var(--warn)!important}

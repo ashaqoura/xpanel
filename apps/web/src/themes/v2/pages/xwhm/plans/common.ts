@@ -7,7 +7,7 @@ import { card } from '../../../components/card.ts'
 import { pageHeader } from '../../../components/page-header.ts'
 import { dataTable, type DataTableRow } from '../../../components/data-table.ts'
 import { escapeHtml, hookAttrs, type HookAttributes } from '../../../html.ts'
-import { ki, labelInset, typeRole } from '../monitoring/common.ts'
+import { filterLabelInset, ki, labelInset, typeRole } from '../monitoring/common.ts'
 
 /** Capability decisions are projected by core, separately from the page's stored facts. */
 export interface WhmPlanAuthority {
@@ -90,7 +90,7 @@ ${typeRole('.v2-plan-page .v2-card__body p:not([class],[role]),.v2-plan-page p[r
 .v2-plan-facts>div{display:flex;flex-direction:column;gap:8px;min-inline-size:0;padding:8px 16px;border:1px dashed var(--line-strong);border-radius:var(--radius-control);text-align:start}
 .v2-plan-facts dd{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.v2-plan-facts bdi{unicode-bidi:isolate}
 .v2-plan-field{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 16px;min-inline-size:0;text-align:start}
-${labelInset('.v2-plan-field')}${labelInset('.v2-feature-column')}
+${labelInset('.v2-plan-field')}${labelInset('.v2-feature-column')}${filterLabelInset('.v2-plan-filter')}
 .v2-plan-field>:not(.v2-plan-choice,input,select),.v2-plan-field>:is(input,select):not(:has(+.v2-plan-choice)){grid-column:1/-1}
 ${typeRole('.v2-plan-field>p', 'caption', 'color:var(--muted)')}
 .v2-plan-field>label.v2-plan-choice{white-space:nowrap}

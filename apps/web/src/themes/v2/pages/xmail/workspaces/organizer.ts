@@ -109,4 +109,5 @@ export function renderMailCalendarPage(value: MailWorkspaceInput): string {
 
 export const MAIL_ORGANIZER_CSS = `.v2-organizer__calendar{display:grid;gap:1.5rem;min-inline-size:0}
 @media(min-width:1100px){.v2-organizer__calendar:has(>[data-calview-detail]:not([hidden])){grid-template-columns:minmax(0,1fr) minmax(17.5rem,22.5rem);align-items:start}}
+@media(max-width:600px){.v2-organizer__scroll:has(>[data-calview-grid][data-mode=month]){margin-inline:-.5rem}}
 `

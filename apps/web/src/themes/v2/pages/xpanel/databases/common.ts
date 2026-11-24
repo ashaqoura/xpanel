@@ -80,10 +80,12 @@ export interface DbButtonOptions {
   kind?: 'outline' | 'ghost' | 'danger'
   /** Kept for callers; every button keeps the 44px target, so a row button is no smaller. */
   small?: boolean
+  /** The controller rewrites the label: keep it in the label slot so the icon stays. */
+  labelSlot?: boolean
 }
 
 export const dbButton = (label: string, hooks?: HookAttributes, options: DbButtonOptions = {}): string =>
-  `<button type="${options.submit ? 'submit' : 'button'}" class="${options.primary ? BUTTON.primary : BUTTON[options.kind ?? 'outline']}"${options.ariaControls ? ` aria-controls="${escapeHtml(options.ariaControls)}"` : ''}${options.ariaExpanded !== undefined ? ` aria-expanded="${options.ariaExpanded}"` : ''}${hookAttrs(hooks)}${options.disabled ? ' disabled' : ''}>${options.icon ?? ''}${escapeHtml(label)}</button>`
+  `<button type="${options.submit ? 'submit' : 'button'}" class="${options.primary ? BUTTON.primary : BUTTON[options.kind ?? 'outline']}"${options.ariaControls ? ` aria-controls="${escapeHtml(options.ariaControls)}"` : ''}${options.ariaExpanded !== undefined ? ` aria-expanded="${options.ariaExpanded}"` : ''}${hookAttrs(hooks)}${options.disabled ? ' disabled' : ''}>${options.icon ?? ''}${options.labelSlot ? `<span data-xp-slot="label">${escapeHtml(label)}</span>` : escapeHtml(label)}</button>`
 
 export const dbSelect = (selectHtml: string): string =>
   `<span class="v2-select">${selectHtml}</span>`

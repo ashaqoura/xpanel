@@ -131,7 +131,7 @@ export const HOST_PAGES_CSS = `.v2-host,.v2-host__stack{display:flex;flex-direct
 .v2-host__power>div{flex:1 1 0;display:flex;flex-direction:column;gap:.5rem;min-inline-size:0}
 .v2-host__tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.5rem}
 .v2-host__tile{min-inline-size:0}
-.v2-host__tile>dd{font-variant-numeric:tabular-nums;overflow-wrap:break-word}
+.v2-host__tile>dd{font-variant-numeric:tabular-nums;overflow-wrap:break-word;text-align:-webkit-match-parent;text-align:match-parent}
 .v2-host__tile>dd bdi.v2-mono{white-space:nowrap}
 .v2-host__tile>dd.v2-host__tile-note{font-size:.8125rem;font-weight:400;line-height:var(--lh-cap);color:var(--text-2)}
 .v2-host td,.v2-host .v2-mono{font-variant-numeric:tabular-nums}

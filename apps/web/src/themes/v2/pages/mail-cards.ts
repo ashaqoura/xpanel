@@ -12,6 +12,7 @@ export const V2_MAIL_CARD_CSS = `.v2-mail-cards{min-inline-size:0;text-align:sta
 .v2-mail-card{min-inline-size:0}
 .v2-mail-card :is(p,dl,dd){margin:0}
 .v2-mail-card__fields{grid-template-columns:repeat(auto-fit,minmax(min(13.75rem,100%),1fr))}
+.v2-mail-card__fields>:has(textarea){grid-column:1/-1}
 .v2-mail-card__facts{display:grid;gap:1rem;min-inline-size:0}
 .v2-mail-card__facts>div{display:flex;flex-direction:column;align-items:stretch;gap:.5rem;min-inline-size:0;text-align:start}
 .v2-mail-card__facts dd{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}

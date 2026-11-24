@@ -18,7 +18,7 @@ const vendor = join(root, 'apps/web/src/vendor/metronic')
 mkdirSync(vendor, { recursive: true })
 const entry = join(metronic, 'src/css/xpanel.entry.css')
 // Project standards (docs/STANDARDS.md "UI and internationalization" and "Typography and spacing roles"; owner's
-// decision, .tools/metronic/GUIDE.md §11): where Metronic's sizing conflicts with the standard, the standard wins.
+// decision, docs/decisions/2026-11-24-metronic-v2-theme.md): where Metronic's sizing conflicts with the standard, the standard wins.
 // The block sits in KTUI's own `components` layer after the KTUI import, so it beats the KTUI rule of the same
 // specificity, and its min-* sizes clamp every kt size variant (sm, lg, icon) without page edits. It changes only
 // metrics and state contrast; Metronic's palette, radii and component look stay. The --target, --lh-* and

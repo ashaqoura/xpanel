@@ -37,7 +37,7 @@ const SWITCH = { 'v2-observation': 'v2-observation__check flex flex-row items-ce
 const SCROLL = { 'v2-observation': 'v2-observation__scroll kt-scrollable-x-auto', 'v2-panel-settings': 'v2-panel-settings__table kt-scrollable-x-auto' } as const
 const BUTTON = { primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary h-11', outline: 'v2-btn kt-btn kt-btn-outline h-11', ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost h-11', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive h-11' } as const
 // the leading glyph Metronic shows on an action of that kind
-const GLYPHS: Readonly<Record<string, IconName>> = { add: 'plus', 'add-address': 'plus', 'add-current': 'plus', 'new-provider': 'plus', link: 'link', generate: 'refresh' }
+const GLYPHS: Readonly<Record<string, IconName>> = { add: 'plus', 'add-address': 'plus', 'add-current': 'plus', 'new-provider': 'plus', link: 'link', generate: 'refresh', change: 'shield', save: 'check', 'save-provider': 'check' }
 
 const control = (id: string, key: string, type = 'text', extra = ''): string => `<input class="kt-input h-11 text-base" id="${esc(id)}" type="${esc(type)}" data-sec-input="${esc(key)}"${extra} disabled>`
 const field = (ui: Ui, id: string, label: string, body: string, help?: string): string => `<div class="${ROW}"><label class="${ROW_LABEL}" for="${esc(id)}">${esc(ui.t(label))}</label><div class="${ROW_BODY}">${body}${help ? `<p class="${HINT}">${esc(ui.t(help))}</p>` : ''}</div></div>`

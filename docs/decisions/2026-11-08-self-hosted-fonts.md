@@ -18,4 +18,5 @@ Both themes loaded IBM Plex Sans and Mono from `fonts.googleapis.com` and `fonts
 ## Not changed
 
 - The panel sent no Content-Security-Policy then. Its later policy ([2026-11-08-content-security-policy.md](2026-11-08-content-security-policy.md)) allows these fonts with `font-src 'self'`.
+- The v2 theme later added Inter for Latin text and the Keenicons icon font, also served from the panel origin under `/assets/metronic/` ([2026-11-24-metronic-v2-theme.md](2026-11-24-metronic-v2-theme.md)).
 - The design board fixtures (`apps/web/src/board-port/*.fixture.ts`) mirror the approved artboards and are not served as product pages, so they still name the font service. They are excluded from releases.

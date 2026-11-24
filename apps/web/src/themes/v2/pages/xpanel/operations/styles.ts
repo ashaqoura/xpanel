@@ -27,6 +27,7 @@ export const PANEL_OPERATIONS_CSS = `.v2-panel-operations{display:flex;flex-dire
 .v2-panel-operation-facts>div,.v2-panel-operations .v2-tool-card__facts>div{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-1);min-inline-size:0;text-align:start}
 .v2-panel-operation-facts :is(dt,dd),.v2-panel-operations .v2-tool-card__facts :is(dt,dd){overflow-wrap:anywhere;margin:0}
 .v2-panel-operation-facts dt,.v2-panel-operations .v2-tool-card__facts dt{font-size:.875rem;line-height:var(--lh-label);text-box:trim-end text;font-weight:500;color:var(--text-2)}
+.v2-panel-operations:dir(rtl) .v2-tool-card__facts dd[dir=ltr]{text-align:end}
 .v2-panel-operation-facts dd,.v2-panel-operations .v2-tool-card__facts dd{font-size:1rem;line-height:var(--lh-text);text-box:trim-start text;font-weight:500;color:var(--mono,var(--text));font-variant-numeric:tabular-nums}
 .v2-panel-operation-facts bdi{unicode-bidi:isolate}
 .v2-panel-operations .v2-card__body>:is(button,a.v2-btn),.v2-panel-operations [role=tabpanel]>:is(button,a.v2-btn){align-self:flex-start}

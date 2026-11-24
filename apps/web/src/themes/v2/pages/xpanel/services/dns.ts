@@ -21,7 +21,7 @@ export function renderV2DnsPage(props: PanelSurfaceProps, authority: PanelServic
   const disabled = canManage ? '' : ' disabled'
   const zoneOptions = domains.map(domain => `<option value="${escapeHtml(domain.name)}"${domain.id === selected?.id ? ' selected' : ''}>${escapeHtml(domain.name)}</option>`).join('')
   // Board header: the zone picker and Add record. They stay inside the editor scope the controller reads.
-  const zonePicker = `<div class="v2-panel-service__head-field"><label for="v2-dns-zone">${escapeHtml(t('Zone'))}</label>${serviceSelect(`<select class="kt-select max-[959px]:text-base rtl:ps-6 rtl:pe-3" id="v2-dns-zone" data-dns-zone dir="ltr"${disabled}>${zoneOptions}</select>`)}</div>`
+  const zonePicker = `<div class="v2-field v2-panel-service__head-field"><label for="v2-dns-zone">${escapeHtml(t('Zone'))}</label>${serviceSelect(`<select class="kt-select max-[959px]:text-base rtl:ps-6 rtl:pe-3" id="v2-dns-zone" data-dns-zone dir="ltr"${disabled}>${zoneOptions}</select>`)}</div>`
   const heads = [t('Name'), t('Type'), 'TTL', t('Content'), t('Priority'), t('Actions')]
   // Board record filter: each record row names its type through the type select (data-list-field="type").
   const filter = listFilter(t, { id: 'v2-dns-filter', label: t(msgctxt('theme:v2', 'Filter records')), group: t('Record type'), key: 'type', open: canManage,

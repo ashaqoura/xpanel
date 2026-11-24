@@ -4,7 +4,7 @@ const LIVE = 'p[role=status]:not([data-state=failed],[data-state=error],.kt-aler
 
 // Metronic supplies the look of cards, buttons, inputs, badges, alerts, menus and type through the kt-* classes and
 // utilities in the markup. What stays here is structure, bidi and controller state. The shared compose script paints
-// the chips, toggles, feedback and discard confirmation it creates inline, with another theme's tokens: the rules
+// the chips, toggles and feedback it creates inline, with another theme's tokens: the rules
 // for those elements repaint them, so they need !important.
 export const V2_MAIL_CSS =`${R} .v2-page{max-inline-size:none}
 ${V2_MAIL_DYNAMIC_CSS}
@@ -76,12 +76,6 @@ ${R} .v2-mail-tools .kt-menu-arrow>.v2-icon{transition:transform 140ms ease-out}
 .v2-mail-recipient [data-mail-chip]>button:hover{background:var(--line)!important;color:var(--text)!important}
 .v2-mail-compose-body>[data-mail-feedback]:not([hidden]){margin:0!important;padding:1rem!important;border:1px solid var(--warn-line)!important;border-radius:var(--radius-notice)!important;background:var(--warn-soft)!important;color:var(--text)!important;font-size:.875rem!important;line-height:var(--lh-label)!important;overflow-wrap:anywhere}
 .v2-mail-compose-body>[data-mail-feedback][role=alert]{border-color:var(--bad-line)!important;background:var(--bad-soft)!important}
-.v2-mail-compose-footer>[data-mail-discard]:has(>span){padding:0;padding-inline-start:1rem;border:1px solid var(--bad-line);border-radius:var(--radius-notice);background:var(--bad-soft)}
-.v2-mail-compose-footer>[data-mail-discard]>span{font-size:.875rem;line-height:var(--lh-label);color:var(--bad)!important}
-.v2-mail-compose-footer>[data-mail-discard]>:is(button,a):not(.v2-btn){display:inline-flex;align-items:center;justify-content:center;min-block-size:var(--target)!important;min-inline-size:var(--target);padding-inline:1rem;border-radius:var(--radius-control)!important;font-size:1rem!important;line-height:var(--lh-text);font-weight:500;cursor:pointer}
-.v2-mail-compose-footer>[data-mail-discard]>[data-mail-action=discard-cancel]{border:1px solid var(--line-strong)!important;background:var(--surface)!important;color:var(--text)!important}
-.v2-mail-compose-footer>[data-mail-discard]>a{border:1px solid var(--bad)!important;background:var(--surface)!important;color:var(--bad)!important}
-.v2-mail-compose-footer>[data-mail-discard]>a:hover{background:var(--bad)!important;color:var(--surface)!important}
 .v2-mail-compose-footer>.v2-mail-actions>[role=status]{max-inline-size:32ch;font-size:.8125rem;line-height:var(--lh-cap);color:var(--muted);text-align:end;overflow-wrap:anywhere}
 .v2-mail-editor:has(>.v2-mail-editor-body:focus-visible){border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 30%,transparent)}
 .v2-mail-format .v2-btn{border-color:transparent!important;background:transparent!important;color:var(--text-2)!important}

@@ -49,7 +49,7 @@ function bindWhmHome(): void {
       const metronic = document.documentElement.dataset.uiTheme === 'v2'
       const move = (step: number, label: string): HTMLButtonElement => { const button = document.createElement('button'); button.type = 'button'; button.className = metronic ? 'v2-btn kt-btn kt-btn-sm kt-btn-outline' : 'v2-btn'; button.textContent = label; button.disabled = index + step < 0 || index + step >= shown.length; button.addEventListener('click', () => { const next = [...shown]; [next[index], next[index + step]] = [next[index + step]!, next[index]!]; void save({ ...saved, routes: next }) }); return button }
       const remove = document.createElement('button'); remove.type = 'button'; remove.className = metronic ? 'v2-btn kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive' : 'v2-btn'; remove.textContent = t('Remove'); remove.addEventListener('click', () => void save({ ...saved, routes: shown.filter(route => route !== item.dataset.favoriteRoute) }))
-      const actions = document.createElement('span'); actions.className = 'v2-whm-favorites__actions'; actions.append(move(-1, t('Up')), move(1, t('Down')), remove)
+      const actions = document.createElement('span'); actions.className = 'v2-whm-favorites__actions'; actions.append(move(-1, t('Move up')), move(1, t('Move down')), remove)
       item.append(actions)
       return item
     }))

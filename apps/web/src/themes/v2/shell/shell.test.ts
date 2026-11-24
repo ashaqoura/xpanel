@@ -148,7 +148,7 @@ describe('v2 shell', () => {
     // The current page is marked once in the section list and once in the tab row of its section.
     expect(html.match(/data-nav-route="[^"]+" aria-current="page"/g)).toHaveLength(1)
     expect(html.match(/aria-current="page"/g)).toHaveLength(2)
-    expect(html).toMatch(/<a class="kt-menu-link[^"]*" href="\/whm\/accounts" data-nav-route="\/whm\/accounts" aria-current="page"><span class="kt-menu-title">Accounts<\/span><\/a>/)
+    expect(html).toMatch(/<a class="kt-menu-link[^"]*" href="\/whm\/accounts" data-nav-route="\/whm\/accounts" aria-current="page"><span class="kt-menu-title leading-\(--lh-text\)">Accounts<\/span><\/a>/)
     const tabs = /<nav class="v2-navbar[^"]*" aria-label="Accounts">(.*?)<\/nav>/s.exec(html)![1]!
     expect(tabs).toContain('<a class="kt-menu-link" href="/whm/accounts" aria-current="page">')
     expect(tabs.match(/aria-current="page"/g)).toHaveLength(1)
@@ -157,7 +157,7 @@ describe('v2 shell', () => {
       .toEqual([...section.matchAll(/data-nav-route="([^"]+)"/g)].map(match => match[1]))
     expect(tabs).not.toContain('data-nav-route=')
     // The vertical menu: every section is a disclosure with its icon, name and arrow; only the current one is open.
-    expect(html).toMatch(/<li class="kt-menu-item" data-nav-section="accounts"><details open><summary class="kt-menu-link[^"]*"><span class="kt-menu-icon"><i class="v2-icon ki-filled ki-users [^"]*" aria-hidden="true"><\/i><\/span><span class="kt-menu-title">Accounts<\/span><span class="kt-menu-arrow">/)
+    expect(html).toMatch(/<li class="kt-menu-item" data-nav-section="accounts"><details open><summary class="kt-menu-link[^"]*"><span class="kt-menu-icon"><i class="v2-icon ki-filled ki-users [^"]*" aria-hidden="true"><\/i><\/span><span class="kt-menu-title leading-\(--lh-text\)">Accounts<\/span><span class="kt-menu-arrow">/)
     expect(html.match(/<details open><summary class="kt-menu-link/g)).toHaveLength(1)
     expect(html.match(/<details><summary class="kt-menu-link/g)!.length).toBeGreaterThan(5)
     expect(html).not.toContain(' style="')

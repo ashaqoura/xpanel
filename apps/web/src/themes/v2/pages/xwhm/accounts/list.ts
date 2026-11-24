@@ -270,6 +270,7 @@ export function renderV2WhmAccountList(t: Translate, props: WhmSurfaceProps, aut
 /// Structure, bidi and controller states: surfaces, type and spacing come from the Metronic classes in the markup.
 // Rhythm: 8px label to value, 16px between fields, 24px between groups, 32px between sections.
 export const WHM_ACCOUNTS_CSS = `${stateTones('.v2-whm-accounts [data-account-status]', 'data-state', { active: 'ok', suspended: 'warn', terminating: 'bad', 'verification-required': 'warn' })}
+.v2-layout.v2-whm-accounts{gap:1.5rem}
 .v2-whm-accounts__body{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:2rem;min-inline-size:0}
 .v2-whm-accounts__main{display:flex;flex-direction:column;gap:2rem;min-inline-size:0}
 .v2-whm-accounts__list{display:flex;flex-direction:column;min-inline-size:0}
@@ -298,7 +299,13 @@ export const WHM_ACCOUNTS_CSS = `${stateTones('.v2-whm-accounts [data-account-st
 .v2-whm-accounts__table td .v2-mono{overflow-wrap:anywhere}
 @media(min-width:601px){.v2-whm-accounts__quota>span{white-space:nowrap}.v2-whm-accounts__table td.v2-whm-accounts__actions{display:table-cell;text-align:end;white-space:nowrap}.v2-whm-accounts__table td.v2-whm-accounts__actions>*{vertical-align:middle}.v2-whm-accounts__table th:last-child{text-align:end}.v2-whm-accounts__table :is(th,td):first-child{inline-size:3rem}.v2-whm-accounts__table :is(th,td):nth-child(3){inline-size:22%}.v2-whm-accounts__table td:nth-child(3) .v2-whm-accounts__stack>span.v2-mono{overflow-wrap:normal}}
 @media(min-width:601px) and (max-width:1439px){.v2-whm-accounts__table th{white-space:normal}}
-@media(max-width:600px){.v2-whm-accounts__table [data-phone-label]{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;text-align:start}.v2-whm-accounts__table [data-phone-label]::before{content:attr(data-phone-label);font-size:.875rem;line-height:var(--lh-label);color:var(--text-2)}.v2-whm-accounts__table tr>td:first-child{grid-column:auto}.v2-whm-accounts__table tr>td:nth-child(3):not([data-phone-label]){grid-column:1/-1;grid-row:auto;justify-self:start;text-align:start;overflow-wrap:anywhere}.v2-whm-accounts__table tr>td:nth-child(4){grid-column:1/-1}.v2-whm-accounts__table td .v2-whm-accounts__stack{gap:.5rem}.v2-whm-accounts__table tr>td:has([data-account-status]){grid-column:2;grid-row:1;justify-self:end;align-self:center}}
+@media(max-width:600px){.v2-whm-accounts__table [data-phone-label]{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;text-align:start}.v2-whm-accounts__table [data-phone-label]::before{content:attr(data-phone-label);font-size:.875rem;line-height:var(--lh-label);color:var(--text-2)}.v2-whm-accounts__table tr>td:first-child{grid-column:auto}.v2-whm-accounts__table tr>td:nth-child(3):not([data-phone-label]){grid-column:1/-1;grid-row:auto;justify-self:start;text-align:start;overflow-wrap:anywhere}.v2-whm-accounts__table tr>td:nth-child(4){grid-column:1/-1}.v2-whm-accounts__table td .v2-whm-accounts__stack{gap:.5rem}.v2-whm-accounts__table tr>td:has([data-account-status]){grid-column:2;grid-row:1;justify-self:end;align-self:center}
+.v2-whm-accounts .v2-whm-accounts__table:has(td)>thead{position:static;width:auto;height:auto;overflow:visible;clip-path:none}
+.v2-whm-accounts .v2-whm-accounts__table>thead>tr:has(>:first-child [type=checkbox]){display:flex;gap:0;padding:0;border-block-end:1px solid var(--line)}
+.v2-whm-accounts .v2-whm-accounts__table>thead>tr:has(>:first-child [type=checkbox])>th{position:static;display:flex;align-items:center;min-block-size:var(--target)}
+.v2-whm-accounts .v2-whm-accounts__table>thead>tr>th:nth-child(2){flex:1 1 auto}
+.v2-whm-accounts .v2-whm-accounts__table>thead .v2-whm-accounts__selection{margin-inline-start:1rem}
+.v2-whm-accounts .v2-whm-accounts__table>thead>tr:has(>:first-child [type=checkbox])>th:nth-child(n+3){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 .v2-whm-accounts__opener{display:inline-flex;align-items:center;gap:.5rem;max-inline-size:100%;min-inline-size:var(--target);min-block-size:var(--target);padding:0;border:0;background:transparent;color:var(--text);font:inherit;text-align:start;cursor:pointer}
 .v2-whm-accounts__opener>span:last-child{display:flex;flex-direction:column;min-inline-size:0}
 .v2-whm-accounts__opener strong{white-space:nowrap}

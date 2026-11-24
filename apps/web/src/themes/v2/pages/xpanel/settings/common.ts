@@ -77,8 +77,9 @@ export const actionVariant = (hooks: HookAttributes | undefined, primary: boolea
   primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary'
     : hookWords(hooks).split(/\s+/).some(word => DANGER_ACTION.test(word)) ? 'v2-btn kt-btn kt-btn-outline kt-btn-destructive' : 'v2-btn kt-btn kt-btn-outline'
 
-export const button = (label: string, hooks?: HookAttributes, disabled = true, primary = false, hidden = false): string =>
-  `<button type="button" class="${actionVariant(hooks, primary)}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}${hidden ? ' hidden' : ''}>${actionGlyph(hooks)}${esc(label)}</button>`
+/** `glyph` gives a button whose label its controller rewrites a leading icon and the label slot the controller writes into. */
+export const button = (label: string, hooks?: HookAttributes, disabled = true, primary = false, hidden = false, glyph?: string): string =>
+  `<button type="button" class="${actionVariant(hooks, primary)}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}${hidden ? ' hidden' : ''}>${glyph === undefined ? `${actionGlyph(hooks)}${esc(label)}` : `${glyph}<span data-xp-slot="label">${esc(label)}</span>`}</button>`
 export const link = (label: string, href: string, hooks?: HookAttributes): string =>
   `<a class="v2-btn kt-btn kt-btn-outline" href="${esc(href)}"${hookAttrs(hooks)}>${actionGlyph(hooks)}${esc(label)}</a>`
 /** Adds the Metronic control class to the caller's attributes; a caller's own class attribute keeps its names. */
@@ -147,6 +148,7 @@ export const PANEL_SETTINGS_CSS = `${IDENTITY_ROWS_CSS}
 .v2-panel-settings__facts{grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:var(--space-2)}
 .v2-panel-settings__facts>div{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-1);min-inline-size:0;text-align:start}
 .v2-panel-settings__facts dt{font-size:.875rem;line-height:var(--lh-label);text-box:trim-end text;font-weight:500;color:var(--text-2)}
+.v2-panel-settings:dir(rtl) .v2-tool-card__facts dd[dir=ltr]{text-align:end}
 .v2-panel-settings__facts dd,.v2-panel-settings .v2-tool-card__facts dd{font-size:1rem;line-height:var(--lh-text);text-box:trim-start text;font-weight:500;color:var(--mono,var(--text));overflow-wrap:anywhere;text-align:start;font-variant-numeric:tabular-nums}
 .v2-panel-settings__facts[data-rows]{grid-template-columns:minmax(0,1fr)}
 .v2-panel-settings__actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1)}

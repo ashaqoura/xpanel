@@ -57,6 +57,7 @@ export const FILTER_BAR_CSS = `.v2-filter{display:flex;flex-wrap:wrap;align-item
 .v2-card__actions>.v2-filter{padding:0}
 .v2-filter--fields{align-items:flex-end}
 .v2-filter__field{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
+.v2-filter__label{padding-inline:calc(.75rem + 1px);text-box:trim-end text}
 .v2-filter__search{flex:1 1 200px;max-inline-size:22.5rem}
 .v2-filter__select{flex:0 1 180px}
 .v2-filter__group{flex:0 1 auto}

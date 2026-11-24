@@ -25,7 +25,7 @@ describe('V2 WHM account tools', () => {
     const html = render('/whm/accounts/health')
     for (const key of ['count-accounts', 'count-affected', 'count-problems', 'count-unavailable', 'observed-at']) expect(html).toContain(`data-whm-health-${key}>Not read</bdi>`)
     expect(html).toContain('Not verified means the evidence could not be read. It is never counted as healthy.')
-    expect(html).toContain('data-whm-health-run><i class="ki-filled ki-shield-tick" aria-hidden="true"></i>Run checks</button>')
+    expect(html).toContain('data-whm-health-run><i class="ki-filled ki-shield-tick" aria-hidden="true"></i><span data-xp-slot="label">Run checks</span></button>')
     expect(html).not.toContain('data-whm-health-repair')
     expect(html).toContain('data-whm-health-recheck disabled')
     expect(html).toContain('<option value="unavailable">Not fully verified</option>')

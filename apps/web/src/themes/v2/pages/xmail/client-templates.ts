@@ -34,7 +34,7 @@ export function v2MailClientTemplates(kind: string): string {
     case 'calendar-view': return [
       ['calview-row', '<div class="v2-mail-calview__row" role="row"></div>'],
       ['calview-head', '<div class="v2-mail-calview__head flex flex-col gap-1 min-w-0 p-2 border-s border-border bg-muted/50 text-[0.8125rem] leading-(--lh-cap) font-medium text-muted-foreground" role="columnheader"></div>'],
-      ['calview-day', '<div class="v2-mail-calview__day group min-w-0 border-t border-s border-border" role="gridcell"></div>'],
+      ['calview-day', '<div class="v2-mail-calview__day group relative min-w-0 border-t border-s border-border" role="gridcell"><span class="sr-only" data-xp-slot="label"></span></div>'],
       ['calview-week', '<div class="v2-mail-calview__week v2-num px-1 py-2 bg-muted/50 text-center text-[0.8125rem] leading-(--lh-cap) font-medium whitespace-nowrap text-muted-foreground"></div>'],
       ['calview-gutter', '<div class="v2-mail-calview__gutter v2-num bg-muted/50 text-center text-[0.8125rem] leading-(--lh-cap) font-medium whitespace-nowrap text-muted-foreground"></div>'],
       ['calview-timeline', '<div class="v2-mail-calview__timeline"></div>'],
@@ -95,11 +95,11 @@ export const V2_MAIL_DYNAMIC_CSS = `.v2-mail-reading-fragment{display:contents}
 [data-ui-theme="v2"] [data-mail-calendar-view] [data-calview-grid][data-mode=day]{min-inline-size:0}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__row{grid-template-columns:3.5rem repeat(var(--calview-days,7),minmax(0,1fr))}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__day{padding:0;min-block-size:0}
-[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__gutter{display:grid;grid-template-rows:repeat(24,2.5rem);padding:0 .25rem}
+[data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__gutter{display:grid;grid-template-rows:repeat(24,5.5rem);padding:0 .25rem}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day])>.v2-mail-calview__row:first-child{position:sticky;inset-block-start:0;z-index:2;background:var(--surface)}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day])>.v2-mail-calview__row:first-child>.v2-mail-calview__gutter{display:block}
 [data-ui-theme="v2"] [data-calview-grid]:is([data-mode=week],[data-mode=day]) .v2-mail-calview__head>bdi{white-space:nowrap}
-.v2-mail-calview__timeline{position:relative;block-size:60rem;inline-size:100%;background:repeating-linear-gradient(180deg,transparent 0,transparent calc(2.5rem - 1px),var(--line) calc(2.5rem - 1px),var(--line) 2.5rem)}
+.v2-mail-calview__timeline{position:relative;block-size:132rem;inline-size:100%;background:repeating-linear-gradient(180deg,transparent 0,transparent calc(5.5rem - 1px),var(--line) calc(5.5rem - 1px),var(--line) 5.5rem)}
 .v2-mail-calview__timeline>.v2-mail-calview__chip{position:absolute;inset-block-start:var(--calview-top);block-size:var(--calview-height);inset-inline-start:var(--calview-start);inline-size:var(--calview-width);flex-direction:column;flex-wrap:nowrap;align-items:stretch;overflow:hidden;min-block-size:2.75rem;min-inline-size:0;padding-block:.125rem;overflow-wrap:normal}
 .v2-mail-calview__timeline>.v2-mail-calview__chip>*{min-inline-size:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:600px){.v2-mail-calview__long{display:none}.v2-mail-calview__short{display:inline}}

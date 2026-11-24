@@ -285,6 +285,12 @@ ${L}__archive-bar>${L}__field{flex:1 1 13.75rem}
 .v2-upgrade-log__msg{flex:1 1 12.5rem;min-inline-size:0;overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){${L}__choice,${L} details>summary::after,${L} details>summary>i{transition:none}}
 @media(max-width:600px){${phoneRows(`${L} ${L}__table`)}
+${L} ${L}__table>thead:has(>tr>:first-child [type=checkbox]){position:static;display:block;inline-size:auto;block-size:auto;overflow:visible;clip-path:none}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox]){display:flex;border-block-end:1px solid var(--line)}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox])>th{display:flex;align-items:center;min-block-size:var(--target)}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox])>th:nth-child(2){flex:1 1 auto}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox])>th:nth-child(n+3){position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}
+${L} ${L}__table>thead ${L}__choice{align-items:center;min-inline-size:var(--target)}
 ${L}__steps>li:not(:last-child)::after{display:none}${L}__actions>:is(.v2-btn,button){flex:1 1 auto}${L}__summary .v2-tile{display:none}}
 @media(max-width:1000px){${L}__grid{grid-template-columns:minmax(0,1fr)}}
 `

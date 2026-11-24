@@ -2,6 +2,8 @@
 
 This note records the visual system used by the dedicated xPanel, xWHM, and xMail screens, restated as tokens the product can implement. The source artboards are light. The dark theme below is derived from the same navy ink used by the administration rail and code blocks, so dark mode stays in the family instead of introducing a second palette.
 
+These values are the classic theme's (`apps/web/src/tokens.ts`). The v2 theme uses the Metronic palette, shell and Keenicons described in [the Metronic v2 theme decision](../decisions/2026-11-24-metronic-v2-theme.md).
+
 Product accessibility rules still win where they are stricter than the artboard. Hit targets stay 44px, and the page title stays 26px / 34px (Arabic 36px). The artboard used 40px navigation rows and a 22px page title. Those two sizes are the accessibility polish on top of the artboard, not a second design.
 
 ## Colour

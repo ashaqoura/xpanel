@@ -11,7 +11,8 @@ export const SUBGROUP_TITLE = 'text-sm font-medium text-mono'
 export const switchSetting = (props: { titleHtml: string; descriptionHtml?: string; labelHtml?: string; hook: string }): string => {
   const input = `<input type="checkbox" class="kt-switch kt-switch" ${props.hook} disabled>`
   return props.labelHtml
-    ? `<div class="v2-panel-toggle flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4"><div class="flex flex-col gap-2 min-w-0 sm:flex-1">${props.titleHtml}${props.descriptionHtml ? `<p class="text-2sm font-normal text-secondary-foreground">${props.descriptionHtml}</p>` : ''}</div><label class="kt-label flex items-center gap-2 min-h-11 min-w-11 shrink-0 self-start sm:self-auto cursor-pointer"><span class="text-2sm font-normal text-muted-foreground">${props.labelHtml}</span>${input}</label></div>`
+    // Phones: the title and the switch share the first row (the text column dissolves into the grid), the description runs under both.
+    ? `<div class="v2-panel-toggle grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4"><div class="contents sm:flex sm:flex-col sm:gap-2 sm:min-w-0 sm:flex-1">${props.titleHtml}${props.descriptionHtml ? `<p class="col-span-2 text-2sm font-normal text-secondary-foreground">${props.descriptionHtml}</p>` : ''}</div><label class="kt-label col-start-2 row-start-1 justify-self-end flex items-center gap-2 min-h-11 min-w-11 shrink-0 cursor-pointer"><span class="text-2sm font-normal text-muted-foreground">${props.labelHtml}</span>${input}</label></div>`
     : `<label class="v2-panel-toggle flex items-center justify-between gap-4 min-h-11 cursor-pointer"><span class="flex flex-col gap-2 min-w-0">${props.titleHtml}${props.descriptionHtml ? `<span class="text-2sm font-normal text-secondary-foreground">${props.descriptionHtml}</span>` : ''}</span>${input}</label>`
 }
 

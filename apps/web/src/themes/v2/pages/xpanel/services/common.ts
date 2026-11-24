@@ -103,6 +103,8 @@ export const PANEL_SERVICES_CSS = `.v2-panel-service{display:grid;gap:var(--spac
 .v2-panel-service__fields--wide{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
 .v2-panel-service textarea{inline-size:100%;resize:vertical;min-inline-size:0}
 .v2-panel-service .v2-card__body>[role=status]:not([hidden]){font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2);padding:var(--space-1) var(--space-2);border-radius:var(--radius-notice,var(--radius-control));background:var(--sunken)}
+.v2-panel-service .v2-card__body>:is([role=status],[role=alert]):is([data-state=unavailable],[data-state=uncertain],[data-state=invalid],[data-state=stale]):not(:empty,[hidden]){border:1px solid var(--warn-line);background:var(--warn-soft);color:var(--text)}
+.v2-panel-service .v2-card__body>:is([role=status],[role=alert])[data-state=failed]:not(:empty,[hidden]){border:1px solid var(--bad-line);background:var(--bad-soft);color:var(--text)}
 .v2-panel-service__note>.v2-pill{justify-self:start}
 .v2-panel-service__choices{display:flex;flex-wrap:wrap;gap:0 var(--space-3)}
 .v2-panel-service .v2-kpi[data-unread] .v2-kpi__value>:first-child{font-size:1.125rem;line-height:2rem;font-weight:500;color:var(--text-2)}
@@ -127,7 +129,7 @@ export const PANEL_SERVICES_CSS = `.v2-panel-service{display:grid;gap:var(--spac
 .v2-panel-service .v2-steps--inline>.v2-step{flex-basis:150px}
 @media(min-width:901px){.v2-panel-service__editor .v2-table{table-layout:fixed}.v2-panel-service__editor .v2-table th:first-child{inline-size:18%}.v2-panel-service__editor .v2-table th:nth-child(2){inline-size:132px}.v2-panel-service__editor .v2-table th:nth-child(3){inline-size:104px}.v2-panel-service__editor .v2-table th:nth-child(5){inline-size:100px}.v2-panel-service__editor .v2-table th:nth-child(6){inline-size:172px}}
 @media(max-width:640px){.v2-panel-service{--v2-panel-padding:var(--space-2)}}
-@media(max-width:600px){.v2-panel-service__table table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:.25rem var(--space-2);padding:var(--space-1) 0}.v2-panel-service__table table:not(:has(td)) th{background:none}.v2-panel-service__editor .v2-table tr{align-items:end}.v2-panel-service__editor .v2-table td:has(>:is(input,select,.v2-select)){display:flex;flex-direction:column;gap:var(--space-1)}.v2-panel-service__editor .v2-table td>:is(input,select,.v2-select){inline-size:100%}.v2-panel-service__segments{display:flex;inline-size:100%}}
+@media(max-width:600px){.v2-panel-service__table table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:.25rem var(--space-2);padding:var(--space-1) 0}.v2-panel-service__table table:not(:has(td)) th{background:none}.v2-panel-service__editor .v2-table tr{align-items:end}.v2-panel-service__editor .v2-table td:has(>:is(input,select,.v2-select)){display:flex;flex-direction:column;gap:var(--space-1)}.v2-panel-service__editor .v2-table td>:is(input,select,.v2-select){inline-size:100%}.v2-panel-service__segments{display:flex;flex-wrap:wrap;inline-size:100%}.v2-panel-service__segments>*{flex:1 1 auto}}
 @media(max-width:600px){.v2-panel-service .v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-panel-service .v2-kpi-row>.v2-kpi:last-child:nth-child(odd){grid-column:1/-1}}
 ${phoneLabelCss('.v2-panel-service')}
 @media(max-width:1100px){.v2-panel-service__columns,.v2-panel-service__columns--drawer{grid-template-columns:minmax(0,1fr)}}

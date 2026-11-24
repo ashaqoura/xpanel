@@ -41,7 +41,7 @@ ${ROOT}[data-theme="dark"]{color-scheme:dark;\
 --text:#FAFAFA;--text-2:#FAFAFA;--muted:#9F9FA9;\
 --accent:#51A2FF;--accent-fill:#51A2FF;--on-accent:#09090B;--color-blue-600:var(--accent);\
 --ok:#4ADE80;--ok-soft:rgba(34,197,94,.12);--ok-line:rgba(34,197,94,.32);--warn:#FACC15;--warn-soft:rgba(234,179,8,.12);--warn-line:rgba(234,179,8,.32);\
---bad:#F87171;--bad-soft:rgba(239,68,68,.12);--bad-line:rgba(239,68,68,.32);\
+--bad:#F87171;--bad-soft:rgba(239,68,68,.12);--bad-line:rgba(239,68,68,.32);--destructive:#FF6467;--destructive-foreground:#09090B;\
 --code:#09090B;--code-muted:#71717A;--chart-2:#A78BFA;--shadow:0 1px 2px 0 rgba(0,0,0,.4);--scrim:rgba(0,0,0,.6);\
 --mono:color-mix(in oklab,var(--text) 84%,var(--bg))}
 ${ROOT}:lang(ar){--font-sans:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}

@@ -110,9 +110,9 @@ const AVATAR = 'v2-account__avatar flex items-center justify-center shrink-0 siz
 
 /** One page of a section in the vertical menu; the hooks stay on the link and the section item. */
 const pageItem = (route: string, label: string, here: boolean): string =>
-  `<li class="kt-menu-item"><a class="kt-menu-link px-2.5 py-1.5" href="${escapeHtml(route)}" data-nav-route="${escapeHtml(route)}"${here ? ' aria-current="page"' : ''}><span class="kt-menu-title">${escapeHtml(label)}</span></a></li>`
+  `<li class="kt-menu-item"><a class="kt-menu-link px-2.5 py-1.5" href="${escapeHtml(route)}" data-nav-route="${escapeHtml(route)}"${here ? ' aria-current="page"' : ''}><span class="kt-menu-title leading-(--lh-text)">${escapeHtml(label)}</span></a></li>`
 const sectionItem = (id: string, glyph: string, name: string, pagesHtml: string, open: boolean): string =>
-  `<li class="kt-menu-item" data-nav-section="${escapeHtml(id)}"><details${open ? ' open' : ''}><summary class="kt-menu-link gap-2.5 px-2.5 py-1.5"><span class="kt-menu-icon">${icon(catalogIcon(glyph))}</span><span class="kt-menu-title">${escapeHtml(name)}</span><span class="kt-menu-arrow">${CHEV_RIGHT_HTML}</span></summary><ul class="kt-menu flex-col" aria-label="${escapeHtml(name)}">${pagesHtml}</ul></details></li>`
+  `<li class="kt-menu-item" data-nav-section="${escapeHtml(id)}"><details${open ? ' open' : ''}><summary class="kt-menu-link gap-2.5 px-2.5 py-1.5"><span class="kt-menu-icon">${icon(catalogIcon(glyph))}</span><span class="kt-menu-title leading-(--lh-text)">${escapeHtml(name)}</span><span class="kt-menu-arrow">${CHEV_RIGHT_HTML}</span></summary><ul class="kt-menu flex-col" aria-label="${escapeHtml(name)}">${pagesHtml}</ul></details></li>`
 
 function sectionTabs(locale: Translate['locale'], surface: V2Surface, section: NavigationSections[number], current: string): string {
   const name = catalogText(locale, `nav.section.${surface}.${section.id}.name`, section.name)
@@ -298,7 +298,7 @@ const TOGGLING = '.v2-shell:has(.v2-side__collapse:focus)'
 
 export const SHELL_CSS = `[data-ui-theme="v2"] body:has(>.v2-shell){display:flex;flex-direction:column;min-block-size:100dvh}
 [data-ui-theme="v2"] body:has(>.v2-shell)>.v2-shell{min-block-size:0}
-.v2-shell{--v2-header:64px;--v2-rail:280px;--v2-col:var(--v2-rail);--v2-navbar:56px;--v2-gutter:20px;--v2-strip:min(42vw,640px);flex:1 0 auto;display:flex;flex-direction:column;min-inline-size:0;min-block-size:100dvh}
+.v2-shell{--v2-header:64px;--v2-rail:280px;--v2-col:var(--v2-rail);--v2-navbar:56px;--v2-gutter:20px;--v2-strip:min(max(42vw,min(100vw - 520px,540px)),640px);flex:1 0 auto;display:flex;flex-direction:column;min-inline-size:0;min-block-size:100dvh}
 .v2-shell summary{list-style:none;cursor:pointer}
 .v2-shell summary::-webkit-details-marker{display:none}
 .v2-work{display:contents}
@@ -388,7 +388,7 @@ ${TOGGLING}{transition:grid-template-columns .2s ease-out}
 ${TOGGLING} .v2-side__body{transition:margin .2s ease-out,opacity .2s ease-out,visibility 0s}
 ${TOGGLING}[data-sidebar-collapsed="true"] .v2-side__body{transition-delay:0s,0s,.2s}
 }
-@media(min-width:960px) and (max-width:1279px){.v2-live__label,.v2-top__lang>span{${SR}}.v2-search>span{display:none}.v2-search{flex:none}}
+@media(min-width:960px) and (max-width:1279px){.v2-live__label,.v2-top__lang>span{${SR}}.v2-search>span{display:none}.v2-search{flex:none}.v2-ctx__badge{display:none!important}}
 @media(min-width:960px) and (max-width:1535px){.v2-ctx__detail,.v2-ctx__meta,.v2-ctx__meter{display:none}}
 @media(min-width:960px) and (max-width:1679px){.v2-server>.v2-mono{display:none}}
 @media(min-width:1280px){.v2-page,.v2-foot{padding-inline:var(--space-4)}}

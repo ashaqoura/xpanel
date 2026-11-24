@@ -209,19 +209,19 @@ const COMPOSE_SOURCE = `
       group.textContent = ''
       var label = document.createElement('span')
       var metronic = !!(root.closest && root.closest('[data-ui-theme="v2"]'))
-      if (metronic) label.className = 'text-sm font-medium text-destructive'
+      if (metronic) label.className = 'text-sm font-medium text-destructive dark:text-red-500'
       else label.style.cssText = 'font-size:13px;font-weight:600;color:light-dark(#B42318,var(--xp-status-critical-fg))'
       label.textContent = text('data-discard-ask')
       var keep = document.createElement('button')
       keep.type = 'button'
       keep.setAttribute('data-mail-action', 'discard-cancel')
       keep.textContent = text('data-keep')
-      if (metronic) keep.className = 'v2-btn kt-btn kt-btn-sm kt-btn-outline'
+      if (metronic) keep.className = 'v2-btn kt-btn kt-btn-outline'
       else keep.style.cssText = 'min-height:44px;padding:0 12px;border-radius:8px;border:1px solid light-dark(#D0D5DD,var(--xp-text-muted));background:light-dark(#FFFFFF,var(--xp-bg-surface));color:light-dark(#101828,var(--xp-text-primary));font-family:inherit;font-size:13px;font-weight:600'
       var go = document.createElement('a')
       go.href = text('data-inbox-href')
       go.textContent = text('data-discard-go')
-      if (metronic) go.className = 'v2-btn kt-btn kt-btn-sm kt-btn-destructive'
+      if (metronic) go.className = 'v2-btn kt-btn kt-btn-destructive'
       else go.style.cssText = 'min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border-radius:8px;border:1px solid light-dark(#B42318,var(--xp-status-critical-fg));background:light-dark(#B42318,var(--xp-status-critical-fg));color:light-dark(#FFFFFF,var(--xp-text-on-accent));font-size:13px;font-weight:600;text-decoration:none'
       group.appendChild(label)
       group.appendChild(keep)
@@ -236,7 +236,7 @@ const COMPOSE_SOURCE = `
       button.type = 'button'
       button.setAttribute('data-mail-action', 'discard-ask')
       button.textContent = text('data-discard')
-      if (root.closest && root.closest('[data-ui-theme="v2"]')) button.className = 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost kt-btn-destructive'
+      if (root.closest && root.closest('[data-ui-theme="v2"]')) button.className = 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost kt-btn-destructive dark:text-red-500'
       else button.style.cssText = 'min-height:44px;padding:0 14px;border-radius:8px;border:1px solid transparent;background:transparent;color:light-dark(#B42318,var(--xp-status-critical-fg));font-family:inherit;font-size:14px;font-weight:600'
       idle.appendChild(button)
     }

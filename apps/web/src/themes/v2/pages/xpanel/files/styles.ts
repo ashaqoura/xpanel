@@ -9,7 +9,8 @@ const SHEET = ext('csv', 'xls', 'xlsx', 'ods', 'pdf', 'doc', 'docx')
 const FILE_ROW = '.v2-files tr[data-file-kind=file]'
 const STATUS = ':not(:empty,[hidden],[data-state=failed],[data-state=uncertain],[data-state=error])'
 
-export const V2_FILES_CSS = `.v2-files{--v2-files-gap:2rem;display:flex;flex-direction:column;gap:var(--v2-files-gap);min-inline-size:0}
+export const V2_FILES_CSS = `.v2-files .v2-btn--soft-danger:not(:hover){color:color-mix(in oklab,var(--destructive) 80%,var(--text))!important}
+.v2-files{--v2-files-gap:2rem;display:flex;flex-direction:column;gap:var(--v2-files-gap);min-inline-size:0}
 .v2-files :is(.v2-field>p,.v2-field__help),.v2-files[data-file-manager]~* :is(.v2-field>p,.v2-field__help,[role=status]){font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2)}
 .v2-files :is(.v2-num,[data-file-manager-table] td,output,[data-file-detail=size],[data-file-detail=modified],[data-file-detail=mode],[data-xp-slot=bytes]){font-variant-numeric:tabular-nums}
 .v2-file-controls{min-inline-size:0}
