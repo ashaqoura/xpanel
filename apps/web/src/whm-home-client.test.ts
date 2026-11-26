@@ -1,6 +1,7 @@
 /// <reference lib="dom" />
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
+import { scriptMessageKeys, translator } from './i18n.ts'
 import { WHM_HOME_CLIENT_BINDING } from './whm-home-client.ts'
 
 const tick = () => new Promise(resolve => setTimeout(resolve, 0))
@@ -45,5 +46,20 @@ describe('WHM home client reads', () => {
     expect(request).toHaveBeenCalledWith('PUT', '/api/admin/favorites', { routes: [], descriptions: false })
     expect(el('[data-whm-favorites-list]').children).toHaveLength(0)
     expect(el('[data-whm-favorites-empty]').hidden).toBe(false)
+  })
+
+  // "Up" / "Down" are service states; the reorder buttons carry their own action text so Arabic does not read "running" / "stopped".
+  it('labels the reorder buttons as move actions and ships those messages to the page', async () => {
+    boot(path => path === '/api/admin/favorites' ? { routes: ['/whm/plans'], descriptions: false } : { items: [], unread: 0 })
+    await tick()
+    const labels = [...el('[data-whm-favorites-list]').querySelectorAll('button')].map(button => button.textContent)
+    expect(labels).toEqual(['Move up', 'Move down', 'Remove'])
+    const keys = scriptMessageKeys(`<script>${WHM_HOME_CLIENT_BINDING}</script>`)
+    expect(keys).toEqual(expect.arrayContaining(['Move up', 'Move down']))
+    expect(keys).not.toContain('Up')
+    expect(keys).not.toContain('Down')
+    const ar = translator('ar')
+    expect([ar('Move up'), ar('Move down')]).toEqual(['نقل للأعلى', 'نقل للأسفل'])
+    expect([ar('Up'), ar('Down')]).toEqual(['يعمل', 'متوقف'])
   })
 })

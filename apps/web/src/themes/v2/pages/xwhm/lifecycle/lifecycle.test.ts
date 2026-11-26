@@ -68,7 +68,7 @@ describe('v2 transfer workspace', () => {
     const html = renderV2TransferPage({ ...admitted, scope: 'server' })
     expect(html).toContain('data-transfer-scope="server" data-transfer-credentials="read"')
     expect(html).toContain('data-whm-detail-route="/whm/transfers/server"')
-    expect(html).toContain('<div hidden><section class="v2-card"')
+    expect(html).toContain('<div hidden><section class="v2-card')
     expect(html).toContain('Whole-server migration selects every source account and plan.')
   })
 })
@@ -100,7 +100,7 @@ describe('v2 backup workspace', () => {
     const template = /<template data-xp-template="whm-local-archive-row"><tr>(.*?)<\/tr><\/template>/.exec(managed)?.[1] ?? ''
     expect(template).toContain('<bdi class="v2-mono" dir="ltr" data-xp-slot="archive"></bdi>')
     expect(template).toContain('data-xp-slot="bytes"')
-    expect(template).toContain('<a class="v2-btn" href="/whm/backups/files" data-xp-slot="review"></a>')
+    expect(template).toContain('<a class="v2-btn kt-btn kt-btn-outline whitespace-normal text-start" href="/whm/backups/files" data-xp-slot="review"></a>')
     expect(managed).not.toContain('Local archive actions require the guarded preview')
     const forbidden = renderV2BackupsPage({ ...denied, accounts: [account] })
     expect(forbidden).not.toContain('alice')
@@ -277,21 +277,21 @@ describe('backup capability source parity', () => {
 });
 
 describe('v2 lifecycle board regions', () => {
-  const rulesOf = (html: string): string[] => html.match(/<ul class="v2-lifecycle__rules">.*?<\/ul>/gs) ?? []
+  const rulesOf = (html: string): string[] => html.match(/<ul class="v2-lifecycle__rules text-base text-secondary-foreground">.*?<\/ul>/gs) ?? []
 
   it('links the backup pages to each other and to the audit log from the header', () => {
     const backups = renderV2BackupsPage({ ...admitted, locale: 'ar' })
-    expect(backups).toContain('<a class="v2-btn" href="/whm/backups/destinations?lang=ar">')
-    expect(backups).toContain('<a class="v2-btn" href="/whm/audit?lang=ar">')
-    expect(renderV2BackupDestinationsPage(admitted)).toContain('<a class="v2-btn" href="/whm/backups?lang=en">')
+    expect(backups).toContain('<a class="v2-btn kt-btn kt-btn-outline" href="/whm/backups/destinations?lang=ar">')
+    expect(backups).toContain('<a class="v2-btn kt-btn kt-btn-outline" href="/whm/audit?lang=ar">')
+    expect(renderV2BackupDestinationsPage(admitted)).toContain('<a class="v2-btn kt-btn kt-btn-outline" href="/whm/backups?lang=en">')
   })
 
   it('shows the four backup summary tiles unread and the restore rules as a checked list', () => {
     const html = renderV2BackupsPage(admitted)
-    expect(html.match(/<dd data-backup-summary="(?:last|next|local|remote)">Not read<\/dd>/g)).toHaveLength(4)
+    expect(html.match(/<dd class="text-lg leading-8 font-semibold text-mono" data-backup-summary="(?:last|next|local|remote)">Not read<\/dd>/g)).toHaveLength(4)
     expect(html.match(/<span class="v2-tile v2-tile--neutral" aria-hidden="true">/g)).toHaveLength(4)
     expect(rulesOf(html)).toHaveLength(1)
-    expect(rulesOf(html)[0]!.match(/<li><svg\b/g)).toHaveLength(5)
+    expect(rulesOf(html)[0]!.match(/<li><(?:svg|i)\b/g)).toHaveLength(5)
   })
 
   it('keeps one destination editor beside the list and the local archives as a strip after them on the backups page, and strips on its own page', () => {
@@ -310,7 +310,7 @@ describe('v2 lifecycle board regions', () => {
       expect(html).toContain(`id="v2-lifecycle-${key}"`)
     }
     expect(html).not.toContain('aria-current="step"')
-    expect(html).toContain('<a class="v2-btn" href="#v2-lifecycle-transfer-import">')
+    expect(html).toContain('<a class="v2-btn kt-btn kt-btn-outline" href="#v2-lifecycle-transfer-import">')
     expect(renderV2TransferPage({ ...admitted, scope: 'server' })).not.toContain('href="#v2-lifecycle-transfer-import"')
   })
 
@@ -319,7 +319,7 @@ describe('v2 lifecycle board regions', () => {
     const rollback = html.slice(html.indexOf('id="v2-lifecycle-upgrade-rollback"'), html.indexOf('id="v2-lifecycle-upgrade-boundaries"'))
     expect(rollback).toContain('<bdi dir="ltr" data-upgrade-fact="snapshot-dir">Not read</bdi>')
     expect(html.match(/data-upgrade-fact="snapshot-dir"/g)).toHaveLength(1)
-    expect(html).toContain('<a class="v2-btn" href="#v2-lifecycle-upgrade-history">')
+    expect(html).toContain('<a class="v2-btn kt-btn kt-btn-outline" href="#v2-lifecycle-upgrade-history">')
     expect(html).toContain('id="v2-lifecycle-upgrade-history"')
     const steps = html.match(/<ol class="v2-lifecycle__steps"[^>]*>.*?<\/ol>/s)?.[0] ?? ''
     expect(steps.match(/<li>/g)).toHaveLength(6)
@@ -334,7 +334,7 @@ describe('v2 lifecycle board regions', () => {
       const template = runs.split(`<template data-xp-template="whm-backup-${kind}-row"><tr>`)[1]?.split('</tr></template>')[0] ?? ''
       expect([...template.matchAll(/data-xp-slot="([a-z]+)"/g)].map(match => match[1])).toEqual(slots)
     }
-    expect(runs).toContain('<button type="button" class="v2-btn" data-xp-slot="action" disabled></button>')
+    expect(runs).toContain('<button type="button" class="v2-btn kt-btn kt-btn-outline" data-xp-slot="action" disabled></button>')
     expect(html.split('data-xp-template="whm-backup-runs-row"')).toHaveLength(2)
   })
 
@@ -343,12 +343,12 @@ describe('v2 lifecycle board regions', () => {
     expect(saved).toContain('data-phone-value="4"')
     expect(saved).toMatch(/style="--c1:&#39;\p{Script=Arabic}/u)
     const transfer = renderV2TransferPage(admitted)
-    expect(transfer).toContain('<table class="v2-lifecycle__table" style="--c1:&#39;Select&#39;;--c2:&#39;Account&#39;;--c3:&#39;Plan&#39;;--c4:&#39;Disk&#39;;--c5:&#39;Databases&#39;;--c6:&#39;Mailboxes&#39;;--c7:&#39;Conflict&#39;;--c8:&#39;Resolution&#39;" data-phone-value="1" data-phone-name="2">')
+    expect(transfer).toContain('<table class="v2-lifecycle__table kt-table" style="--c1:&#39;Select&#39;;--c2:&#39;Account&#39;;--c3:&#39;Plan&#39;;--c4:&#39;Disk&#39;;--c5:&#39;Databases&#39;;--c6:&#39;Mailboxes&#39;;--c7:&#39;Conflict&#39;;--c8:&#39;Resolution&#39;" data-phone-value="1" data-phone-name="2">')
     const templates = parseMarkup(transfer).filter(node => node.template >= 0)
     expect(templates.length).toBeGreaterThan(0)
     expect(templates.some(node => node.attrs.has('style'))).toBe(false)
     expect(transfer).toContain('<div data-transfer-review-results style="--c1:&#39;Source account&#39;')
-    expect(renderV2UpgradePage(admitted)).toContain('<table class="v2-lifecycle__table" style="--c1:&#39;Check&#39;;--c2:&#39;Result&#39;;--c3:&#39;Observed&#39;" data-phone-value="2">')
+    expect(renderV2UpgradePage(admitted)).toContain('<table class="v2-lifecycle__table kt-table" style="--c1:&#39;Check&#39;;--c2:&#39;Result&#39;;--c3:&#39;Observed&#39;" data-phone-value="2">')
   })
 
   it('mounts backup pending-changes bar, account policy table, restore points, transfer build preview and upgrade progress/log hooks', () => {

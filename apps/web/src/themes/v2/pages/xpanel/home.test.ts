@@ -144,7 +144,7 @@ describe('v2 account home', () => {
 
   it('gives the shared filter native group disclosures and a preauthored clear action', () => {
     const html = renderV2PanelHome(props())
-    expect(html).toContain('<details class="v2-home-tool-group" open data-home-accordion data-home-collapse-below="600"')
+    expect(html).toContain('<details class="v2-home-tool-group kt-card" open data-home-accordion data-home-collapse-below="600"')
     expect(html.match(/data-home-filter(?:\s|>)/g)).toHaveLength(1)
     expect(html).toContain('data-home-filter-clear')
     expect(html).toContain('data-home-empty-title')
@@ -165,7 +165,7 @@ describe('v2 account home', () => {
     const row = nodes.find(node => node.tag === 'tr' && node.parent === nodes.indexOf(body))!
     const cells = nodes.filter(node => node.tag === 'td' && node.parent === nodes.indexOf(row))
     expect(cells).toHaveLength(5)
-    expect(nodes.some(node => node.attrs.get('class') === 'v2-home-site__root v2-mono' && under(nodes, node, cells[0]!))).toBe(true)
+    expect(nodes.some(node => node.attrs.get('class')?.startsWith('v2-home-site__root v2-mono') && under(nodes, node, cells[0]!))).toBe(true)
     expect(nodes.some(node => node.attrs.get('class') === 'v2-home-site__mark' && under(nodes, node, cells[0]!))).toBe(true)
   })
 
@@ -187,14 +187,14 @@ describe('v2 account home', () => {
       for (const tool of ownTools) {
         const direct = nodes.filter(node => node.parent === nodes.indexOf(tool))
         expect(direct.map(node => node.attrs.get('class'))).toEqual([
-          expect.stringContaining('v2-home-tool__tile'), 'v2-home-tool__label', 'v2-home-tool__hint v2-num',
+          expect.stringContaining('v2-home-tool__tile'), 'v2-home-tool__label text-sm leading-(--lh-label) font-medium text-mono', 'v2-home-tool__hint v2-num text-[0.8125rem] leading-(--lh-cap) text-muted-foreground',
         ])
       }
     }
     expect(nodes.filter(node => node.attrs.has('data-tool'))).toHaveLength(baseline.filter(node => node.attrs.has('data-tool')).length)
     expect(nodes.find(node => node.attrs.get('data-tool-capability') === 'backup')?.attrs.has('disabled')).toBe(true)
     expect(V2_PANEL_HOME_CSS).toContain('.v2-panel-home .v2-home-tool-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))')
-    expect(V2_PANEL_HOME_CSS).toContain('.v2-panel-home .v2-home-tool-group{display:block;min-inline-size:0;padding:var(--space-2) 12px 12px')
+    expect(V2_PANEL_HOME_CSS).toContain('.v2-panel-home .v2-home-tool-group{min-inline-size:0}')
     expect(V2_PANEL_HOME_CSS).toContain('.v2-panel-home .v2-home-tool-grid{display:flex;flex-direction:column')
   })
 
@@ -277,7 +277,7 @@ describe('v2 home registered personal navigation', () => {
   it.each(['en', 'ar'] as const)('keeps authorized personal links available without qualifying native tools in %s', locale => {
     const html = renderV2PanelHome(props({ locale, catalog: unverified }))
     const nodes = parseMarkup(html)
-    const currentLanguageHint = '<span class="v2-home-tool__hint v2-num">' + (locale === 'en' ? 'English' : 'العربية') + '</span>'
+    const currentLanguageHint = '<span class="v2-home-tool__hint v2-num text-[0.8125rem] leading-(--lh-cap) text-muted-foreground">' + (locale === 'en' ? 'English' : 'العربية') + '</span>'
     expect(html).toContain(currentLanguageHint)
     for (const id of personalIds) {
       const item = nodes.find(node => node.attrs.get('data-tool-capability') === id)!

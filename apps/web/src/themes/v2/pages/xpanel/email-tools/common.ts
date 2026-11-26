@@ -3,7 +3,6 @@ import { localeDirection, type Locale, type Translate } from '../../../../../i18
 import { normalizeAsciiDigits } from '../../../../../display-format.ts'
 import { card, notice, pageHeader } from '../../../components/index.ts'
 import { escapeHtml, hookAttrs, type HookAttributes } from '../../../html.ts'
-import { icon } from '../../../icons.ts'
 import { v2Messages } from '../../../messages.ts'
 import { phoneLabelCss, phoneLabels } from '../settings/common.ts'
 import { mailCardsFor } from '../../../../../mail-cards.ts'
@@ -38,29 +37,60 @@ export function emailContext(props: PanelSurfaceProps, authority: PanelEmailAuth
   return { locale, t, account, canManage, domains, mailboxes, plan, factsReadable }
 }
 
-export const button = (label: string, hooks?: HookAttributes, disabled = true, primary = false): string =>
-  `<button type="button" class="v2-btn${primary ? ' v2-btn--primary' : ''}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${esc(label)}</button>`
+/** Keenicons the v2 icon set lacks. Inside a button the button sizes the glyph. */
+export const mailGlyph = {
+  trash: '<i class="ki-filled ki-trash" aria-hidden="true"></i>',
+  key: '<i class="ki-filled ki-key" aria-hidden="true"></i>',
+  send: '<i class="ki-filled ki-paper-plane" aria-hidden="true"></i>',
+  upload: '<i class="ki-filled ki-exit-up" aria-hidden="true"></i>',
+  play: '<i class="ki-filled ki-rocket" aria-hidden="true"></i>',
+  older: '<i class="ki-filled ki-double-left-arrow v2-flip" aria-hidden="true"></i>',
+  newest: '<i class="ki-filled ki-double-right-arrow v2-flip" aria-hidden="true"></i>',
+  allow: '<i class="ki-filled ki-shield-tick" aria-hidden="true"></i>',
+} as const
+
+/** The button hierarchy of a card: one primary, outline for the rest, ghost to step back, soft red to remove. */
+const BUTTON = {
+  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary',
+  outline: 'v2-btn kt-btn kt-btn-outline',
+  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost',
+  danger: 'v2-btn v2-btn--soft-danger kt-btn kt-btn-outline kt-btn-destructive',
+} as const
+
+export interface PanelButtonLook {
+  /** Leading glyph markup: `icon(...)` of the v2 set or a {@link mailGlyph}. */
+  icon?: string
+  kind?: 'outline' | 'ghost' | 'danger'
+  /** Kept for callers; every button keeps the 44px target, so a row button is no smaller. */
+  small?: boolean
+}
+
+export const button = (label: string, hooks?: HookAttributes, disabled = true, primary = false, look: PanelButtonLook = {}): string =>
+  `<button type="button" class="${primary ? BUTTON.primary : BUTTON[look.kind ?? 'outline']}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${look.icon ?? ''}${esc(label)}</button>`
 export const actions = (body: string): string => `<div class="v2-panel-extra__actions">${body}</div>`
+/** The closing actions of a form or card: stepping back first, the primary action at the end. */
+export const endActions = (body: string): string => `<div class="v2-panel-extra__actions justify-end">${body}</div>`
 export const fields = (body: string): string => `<div class="v2-panel-extra__fields">${body}</div>`
 export function field(id: string, label: string, control: string, help?: string): string {
   const described = help && !control.includes('aria-describedby=')
     ? control.replace(/<(input|select|textarea)\b/, `<$1 aria-describedby="${esc(id)}-help"`) : control
-  return `<div class="v2-field"><label for="${esc(id)}">${esc(label)}</label>${described}${help ? `<p id="${esc(id)}-help" class="v2-field__help">${esc(help)}</p>` : ''}</div>`
+  return `<div class="v2-field"><label class="kt-form-label" for="${esc(id)}">${esc(label)}</label>${described}${help ? `<p id="${esc(id)}-help" class="v2-field__help kt-form-description">${esc(help)}</p>` : ''}</div>`
 }
 export const input = (id: string, hooks?: HookAttributes, extra = '', disabled = true): string =>
-  `<input id="${esc(id)}"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}>`
+  `<input class="kt-input" id="${esc(id)}"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}>`
 export const area = (id: string, hooks?: HookAttributes, extra = '', disabled = true): string =>
-  `<textarea id="${esc(id)}"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}></textarea>`
+  `<textarea class="kt-textarea" id="${esc(id)}"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}></textarea>`
 export const select = (id: string, options: readonly (readonly [string, string])[], hooks?: HookAttributes, disabled = true, extra = '', selectedValue?: string): string =>
-  `<span class="v2-select"><select id="${esc(id)}"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}>${options.map(([value, label]) => `<option value="${esc(value)}"${value === selectedValue ? ' selected' : ''}>${esc(label)}</option>`).join('')}</select>${icon('chevDown', 16)}</span>`
+  `<span class="v2-select"><select class="${extra.includes('dir="ltr"') ? 'kt-select rtl:ps-6 rtl:pe-3' : 'kt-select'}" id="${esc(id)}"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}>${options.map(([value, label]) => `<option value="${esc(value)}"${value === selectedValue ? ' selected' : ''}>${esc(label)}</option>`).join('')}</select></span>`
 export const check = (id: string, label: string, hooks?: HookAttributes, disabled = true, checked = false, extra = ''): string =>
-  `<label class="v2-panel-extra__check" for="${esc(id)}"><input id="${esc(id)}" type="checkbox"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}${checked ? ' checked' : ''}><span>${esc(label)}</span></label>`
+  `<label class="v2-panel-extra__check" for="${esc(id)}"><input class="kt-checkbox kt-checkbox-sm" id="${esc(id)}" type="checkbox"${hookAttrs(hooks)}${extra}${disabled ? ' disabled' : ''}${checked ? ' checked' : ''}><span>${esc(label)}</span></label>`
+/** Label above value on the same start edge. */
 export const facts = (rows: readonly { label: string; valueHtml: string; hooks?: HookAttributes }[]): string =>
-  `<dl class="v2-panel-extra__facts">${rows.map(row => `<div><dt>${esc(row.label)}</dt><dd${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
+  `<dl class="v2-panel-extra__facts">${rows.map(row => `<div><dt class="text-secondary-foreground">${esc(row.label)}</dt><dd class="text-mono"${hookAttrs(row.hooks)}>${row.valueHtml}</dd></div>`).join('')}</dl>`
 export const section = (id: string, title: string, bodyHtml: string, hooks?: HookAttributes, actionsHtml?: string): string =>
   card({ title, titleId: `${id}-heading`, bodyHtml, ...(hooks ? { hooks } : {}), ...(actionsHtml ? { actionsHtml } : {}) })
 export const table = (id: string, label: string, columns: readonly string[], bodyHtml: string, hooks?: HookAttributes, headHooks?: HookAttributes): string =>
-  `<div class="v2-panel-extra__table" role="region" tabindex="0" aria-label="${esc(label)}"><table id="${esc(id)}" class="v2-table"${phoneLabels(columns)}><caption class="v2-sr">${esc(label)}</caption><thead${hookAttrs(headHooks)}><tr>${columns.map(column => `<th scope="col">${esc(column)}</th>`).join('')}</tr></thead><tbody${hookAttrs(hooks)}>${bodyHtml}</tbody></table></div>`
+  `<div class="v2-panel-extra__table kt-scrollable-x-auto" role="region" tabindex="0" aria-label="${esc(label)}"><table id="${esc(id)}" class="v2-table kt-table align-middle"${phoneLabels(columns)}><caption class="v2-sr">${esc(label)}</caption><thead${hookAttrs(headHooks)}><tr>${columns.map(column => `<th scope="col">${esc(column)}</th>`).join('')}</tr></thead><tbody${hookAttrs(hooks)}>${bodyHtml}</tbody></table></div>`
 export const unread = (t: Translate, columns: number): string => `<tr><td colspan="${columns}">${esc(t(msgid('Nothing has been read.')))}</td></tr>`
 export const state = (message: string, hooks?: HookAttributes): string => `<p data-state="unread" role="status"${hookAttrs(hooks)}>${esc(message)}</p>`
 export const header = (t: Translate, route: string, title: string, description: string): string =>
@@ -72,74 +102,72 @@ export function page(locale: Locale, route: string, bodyHtml: string, hooks?: Ho
   return `<section class="v2-panel-extra" lang="${esc(locale)}" dir="${localeDirection(locale)}" data-v2-panel-page="${esc(route)}"${hookAttrs(hooks)}>${bodyHtml}</section>`
 }
 
-/** Shared by these account email and observation pages; no global layout or token changes. */
-export const PANEL_ADDITIONAL_CSS = `.v2-panel-extra{display:flex;flex-direction:column;gap:var(--space-4);min-inline-size:0}
-.v2-panel-extra h1{font-size:26px;line-height:1.2}
-.v2-panel-extra .v2-card h2{font-size:16px;line-height:1.3}
-.v2-panel-extra :is(h2,h3,h4,p,dl,dd,ul,ol,pre){margin:0}
-.v2-panel-extra .v2-field{gap:var(--space-1)}
-.v2-panel-extra .v2-field>label,.v2-panel-extra__field>label,.v2-panel-extra .v2-label{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600;text-box-trim:trim-end;text-box-edge:text}
-.v2-panel-extra .v2-field>:is(p,.v2-field__help){font-size:13px;line-height:1.5;color:var(--muted)}
-.v2-panel-extra .v2-btn{min-inline-size:44px;min-block-size:44px;transition-property:background-color,border-color,color,box-shadow,opacity,transform;transition-duration:140ms;transition-timing-function:ease-out}
-.v2-panel-extra .v2-card,.v2-panel-extra .v2-card__body{gap:var(--space-3)}
-.v2-panel-extra__groups,.v2-panel-extra__editor,.v2-panel-extra fieldset{display:grid;gap:var(--space-3);min-inline-size:0}
-.v2-panel-extra>[data-filter-workspace]{gap:var(--space-4)}
-.v2-panel-extra [data-filter-editor] [data-filter-group]{display:grid;gap:var(--space-2);min-inline-size:0}
-.v2-panel-extra__handoff{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-1);min-inline-size:0}
-.v2-panel-extra fieldset{padding:0;border:0}
-.v2-panel-extra legend{padding:0;margin-block-end:var(--space-2);font-weight:600}
-.v2-panel-extra__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--space-2);min-inline-size:0}
-.v2-panel-extra__actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
-.v2-panel-extra__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:var(--space-2);min-inline-size:0}
-.v2-panel-extra__facts>div{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0;text-align:start}
+// The email pages stack every label above its control or value; the observation pages that share these helpers keep
+// their own grids, so the email-only rules are scoped to the email routes.
+const MAIL = '.v2-panel-extra[data-v2-panel-page^="/email/"]'
+const STATUS = ':not(:empty,[hidden],[data-state=failed],[data-state=error])'
+
+/** Shared by these account email and observation pages; no global layout or token changes. Layout only: colors,
+ *  radii, control and button looks come from the Metronic classes in the markup. Spacing follows the standard
+ *  rhythm: 32px between sections, 24px between groups, 16px between fields, 8px label to value. */
+export const PANEL_ADDITIONAL_CSS = `.v2-panel-extra{--v2-extra-gap:2rem;display:flex;flex-direction:column;gap:var(--v2-extra-gap);min-inline-size:0}
+.v2-panel-extra .v2-field>p{font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2)}
+.v2-panel-extra .v2-card__body{gap:1.5rem}
+.v2-panel-extra__groups,.v2-panel-extra__editor,.v2-panel-extra fieldset{display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem;min-inline-size:0}
+.v2-panel-extra>.v2-panel-extra__groups{gap:var(--v2-extra-gap)}
+.v2-panel-extra [data-filter-editor] [data-filter-group]{display:grid;gap:1rem;min-inline-size:0}
+.v2-panel-extra__handoff{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;min-inline-size:0}
+.v2-panel-extra fieldset{margin:0;padding:0;border:0}
+.v2-panel-extra legend{margin-block-end:.5rem;padding:0;font-size:.875rem;line-height:var(--lh-label);font-weight:600;color:var(--mono,var(--text))}
+.v2-panel-extra__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1rem;min-inline-size:0}
+.v2-panel-extra__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.v2-panel-extra__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:1rem 1.5rem;min-inline-size:0}
+.v2-panel-extra__facts>div{display:flex;flex-direction:column;gap:.5rem;min-inline-size:0;text-align:start}
+.v2-panel-extra__facts dt{font-size:.875rem;line-height:var(--lh-label);font-weight:500;text-box-trim:trim-end;text-box-edge:text}.v2-panel-extra__facts dd{text-box-trim:trim-start;text-box-edge:text}
 .v2-panel-extra__facts :is(dt,dd){text-align:start;overflow-wrap:anywhere}
-.v2-panel-extra__facts dt,.v2-panel-extra legend{text-box-trim:trim-end;text-box-edge:text}
-.v2-panel-extra__facts dd{font-size:13px;text-box-trim:trim-start;text-box-edge:text}
-.v2-panel-extra__facts dt{font-size:12px;color:var(--muted)}
 .v2-panel-extra :is(.v2-num,.v2-panel-extra__facts dd,td,time,[data-filter-count],[data-quarantine-total],[data-quarantine-score]){font-variant-numeric:tabular-nums}
-.v2-panel-extra__check{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target)}
+.v2-panel-extra__check{display:flex;align-items:center;gap:.5rem;min-block-size:var(--target);color:var(--text)}
 .v2-panel-extra__check>input{margin-block:0;flex:none}
-.v2-panel-extra__table{overflow:auto;min-inline-size:0;max-inline-size:100%;border:1px solid var(--line);border-radius:12px}
-.v2-panel-extra .v2-card p{font-size:13px;line-height:1.6}.v2-panel-extra .v2-card :is(h3,legend){font-size:14px}
-.v2-panel-extra .v2-card p[role=status]:not(:empty,[hidden],[data-state=failed]){padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--subtle);color:var(--text-2)}
-.v2-panel-extra__table td[colspan]{padding-block:var(--space-3);color:var(--muted);font-size:13px;text-align:center}
-.v2-panel-extra__table :is(th,td){padding:12px 16px;text-align:start;vertical-align:top}
-.v2-panel-extra__list{list-style:none;padding:0;display:grid;gap:var(--space-3);min-inline-size:0}
-.v2-panel-extra__list>li,.v2-panel-extra__preview{padding:var(--v2-panel-padding);border:1px solid var(--line);border-radius:12px;display:grid;gap:var(--space-2);min-inline-size:0}
-.v2-panel-extra__split{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:var(--space-3);align-items:stretch;min-inline-size:0}
-.v2-panel-extra__split>.v2-card{height:100%}
-.v2-panel-extra__scope{display:grid;gap:var(--space-1);padding-inline-start:20px}
+.v2-panel-extra__table{overflow:auto;min-inline-size:0;max-inline-size:100%;border:1px solid var(--line);border-radius:var(--radius-notice)}
+.v2-panel-extra .v2-card__body>p:not([role],[class]),.v2-panel-extra .v2-card__body>:is(form,div)>p:not([role],[class]){color:var(--text-2)}
+.v2-panel-extra .v2-card p[role=status]${STATUS}{padding:1rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken);color:var(--text)}
+.v2-panel-extra__table td[colspan]{padding-block:1.5rem;color:var(--muted);text-align:center}
+.v2-panel-extra__table :is(th,td){text-align:start}
+.v2-panel-extra__table tbody :is(td,th):first-child:not([colspan]){font-weight:500;color:var(--mono,var(--text))}
+.v2-panel-extra__table td .v2-panel-extra__actions{gap:.5rem}
+.v2-panel-extra__list{display:grid;gap:1rem;min-inline-size:0}
+.v2-panel-extra__list>li{padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius-notice);display:grid;gap:1rem;min-inline-size:0}
+.v2-panel-extra__scope{display:grid;gap:.5rem;padding-inline-start:1.5rem}
 .v2-panel-extra :is(p,dd){overflow-wrap:anywhere}
 .v2-panel-extra :is(input,select,.v2-select,textarea){min-inline-size:0;max-inline-size:100%}
 .v2-panel-extra :is(input,select,textarea)[dir=ltr]{text-align:var(--v2-control-align,start)}
-.v2-panel-extra textarea{inline-size:100%;resize:vertical;min-block-size:96px}
+.v2-panel-extra textarea{inline-size:100%;resize:vertical;min-block-size:6rem}
 .v2-panel-extra pre{white-space:pre-wrap;overflow-wrap:anywhere;max-inline-size:100%;min-inline-size:0;text-align:start}
-.v2-panel-extra pre.v2-panel-extra__raw{direction:ltr;white-space:pre;overflow:auto;padding:var(--space-2);background:var(--code);color:var(--code-text);border-radius:12px}
-.v2-panel-extra [role=status][data-state=uncertain]{padding:var(--space-2);border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:12px}
+.v2-panel-extra pre.v2-panel-extra__raw{direction:ltr;white-space:pre;overflow:auto;padding:1rem;background:var(--code);color:var(--code-text);border-radius:var(--radius-notice);font-size:.8125rem;line-height:var(--lh-cap)}
+.v2-panel-extra .v2-card p[role=status]:is([data-state=unavailable],[data-state=invalid])${STATUS}{border-color:var(--warn-line);background:var(--warn-soft)}
+.v2-panel-extra [role=status][data-state=uncertain]{padding:1rem;border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:var(--radius-notice)}
 .v2-panel-extra :is(p,ol,pre):empty{display:none}
-.v2-panel-extra .v2-mail-card__scroll{border:1px solid var(--line);border-radius:12px}
-.v2-panel-extra input[type=file]{inline-size:100%;min-block-size:var(--target);padding:6px;border:1px dashed var(--line-strong);border-radius:12px;background:var(--subtle);font-size:13px;color:var(--text-2)}
-.v2-panel-extra input[type=file]::file-selector-button{margin-inline-end:12px;min-block-size:var(--target);padding:0 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-weight:600;cursor:pointer}
+.v2-panel-extra .v2-mail-card__scroll{border:1px solid var(--line);border-radius:var(--radius-notice)}
 .v2-panel-extra [data-email-disk-usage] .v2-card__body>.v2-btn{align-self:flex-start}
-.v2-panel-extra [data-email-disk-usage] [role=region]{overflow:auto;min-inline-size:0;border:1px solid var(--line);border-radius:12px}
-.v2-panel-extra [data-email-disk-usage] table{inline-size:100%;border-collapse:collapse;font-size:13px}
-.v2-panel-extra [data-email-disk-usage] :is(th,td){padding:12px 16px;text-align:start}.v2-panel-extra [data-email-disk-usage] thead{background:var(--subtle)}.v2-panel-extra [data-email-disk-usage] tbody td{border-block-start:1px solid var(--line)}
-.v2-panel-extra [data-email-disk-usage] td[colspan]{padding-block:var(--space-3);color:var(--muted);text-align:center}
-.v2-panel-extra [data-email-disk-usage] th>.v2-btn{min-inline-size:44px;min-block-size:44px;padding:0 8px;justify-content:flex-start;border:0;background:none;box-shadow:none;font-size:12px;font-weight:600;color:var(--muted)}
+.v2-panel-extra [data-email-disk-usage] [role=region]{overflow:auto;min-inline-size:0;border:1px solid var(--line);border-radius:var(--radius-notice)}
+.v2-panel-extra [data-email-disk-usage] :is(th,td){text-align:start}
+.v2-panel-extra [data-email-disk-usage] td[colspan]{padding-block:1.5rem;color:var(--muted);text-align:center}
+.v2-panel-extra [data-email-disk-usage] th>.v2-btn{margin-inline-start:-.625rem}
 .v2-panel-extra [hidden]{display:none}
 .v2-panel-extra:dir(rtl) *,[data-ui-theme="v2"] [dir=rtl] .v2-panel-extra *{letter-spacing:0}
-@media(prefers-reduced-motion:reduce){.v2-panel-extra .v2-btn{transition-duration:0ms}}
-@media(max-width:900px){.v2-panel-extra__split{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:640px){.v2-panel-extra .v2-card:not(.v2-card--flush){padding:var(--space-2)}}
-@media(max-width:600px){.v2-panel-extra__fields{grid-template-columns:minmax(0,1fr)}.v2-panel-extra__facts{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-panel-extra .v2-table thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}.v2-panel-extra :is(.v2-mail-card__scroll,.v2-table-wrap):has(tbody:empty){display:none}.v2-panel-extra__actions>button{flex:1 1 auto}.v2-panel-extra__table{border:0;border-block-start:1px solid var(--line);border-radius:0}.v2-panel-extra__groups[data-account-quarantine] .v2-panel-extra__actions>button{max-inline-size:100%;white-space:normal}}
-.v2-panel-extra__stack{display:grid;gap:var(--space-1)}.v2-panel-extra__stack--wide{gap:var(--space-2)}.v2-panel-extra__field{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0}
+${MAIL} .v2-card__body{container-type:inline-size}
+${MAIL} .v2-panel-extra__fields{grid-template-columns:minmax(0,1fr)}
+${MAIL} .v2-field{min-inline-size:0}
+${MAIL} .v2-field>*{min-inline-size:0}
+${MAIL} .v2-field>:is(input,select,textarea,.v2-select){inline-size:100%}
+@media(max-width:600px){.v2-panel-extra__list>li{padding:1rem}.v2-panel-extra__fields{grid-template-columns:minmax(0,1fr)}.v2-panel-extra__facts{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-panel-extra .v2-table thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}.v2-panel-extra :is(.v2-mail-card__scroll,.v2-table-wrap):has(tbody:empty){display:none}.v2-panel-extra__actions>button{flex:1 1 auto}.v2-panel-extra__table{border:0;border-block-start:1px solid var(--line);border-radius:0}.v2-panel-extra__actions>button{max-inline-size:100%;min-block-size:var(--target);block-size:auto!important;white-space:normal!important;text-align:center}}
+.v2-panel-extra__stack{display:grid;gap:.25rem}.v2-panel-extra__stack--wide{display:flex;flex-wrap:wrap;gap:.5rem}.v2-panel-extra__field{display:flex;flex-direction:column;gap:.5rem;min-inline-size:0}
 ${phoneLabelCss('.v2-panel-extra')}
-@media(max-width:600px){.v2-panel-extra table:not(:has(td)) thead{position:static;inline-size:auto;block-size:auto;clip-path:none}.v2-panel-extra table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:4px var(--space-2);padding:var(--space-1) 0}.v2-panel-extra table:not(:has(td)) th{padding:0;background:none}}
+@media(max-width:600px){.v2-panel-extra table:not(:has(td)) thead{position:static;inline-size:auto;block-size:auto;clip-path:none}.v2-panel-extra table:not(:has(td)) thead tr{display:flex;flex-wrap:wrap;gap:.25rem 1rem;padding:.5rem 0}.v2-panel-extra table:not(:has(td)) th{padding:0;background:none}}
 @media(min-width:601px){.v2-panel-extra #v2-email-archive-records{table-layout:fixed;inline-size:100%}.v2-panel-extra #v2-email-archive-records td>:is(select,.v2-select,input:not([type=checkbox])){inline-size:100%;min-inline-size:0}.v2-panel-extra #v2-email-archive-records th:nth-child(1){inline-size:17%}.v2-panel-extra #v2-email-archive-records th:nth-child(2){inline-size:24%}.v2-panel-extra #v2-email-archive-records th:nth-child(3){inline-size:8%}.v2-panel-extra #v2-email-archive-records th:nth-child(4){inline-size:8%}.v2-panel-extra #v2-email-archive-records th:nth-child(5){inline-size:11%}.v2-panel-extra #v2-email-archive-records th:nth-child(6){inline-size:13%}.v2-panel-extra #v2-email-archive-records th:nth-child(7){inline-size:19%}}
-@media(max-width:600px){.v2-panel-extra #v2-email-archive-records{display:block;min-inline-size:0!important}.v2-panel-extra #v2-email-archive-records>thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}.v2-panel-extra #v2-email-archive-records>tbody{display:block}.v2-panel-extra #v2-email-archive-records>tbody>tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);padding:var(--space-2);border-block-start:1px solid var(--line)}.v2-panel-extra #v2-email-archive-records>tbody>tr:first-child{border-block-start:0}.v2-panel-extra #v2-email-archive-records>tbody>tr>td{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-1);min-inline-size:0;padding:0;border:0}.v2-panel-extra #v2-email-archive-records>tbody>tr>td:is(:first-child,:last-child,[colspan]),.v2-panel-extra #v2-email-archive-records>tbody>tr>td:nth-child(2){grid-column:1/-1}.v2-panel-extra #v2-email-archive-records td>:is(select,.v2-select,input:not([type=checkbox])){inline-size:100%}.v2-panel-extra #v2-email-archive-records td::before{margin:0!important}}
+@media(max-width:600px){.v2-panel-extra #v2-email-archive-records{display:block;min-inline-size:0!important}.v2-panel-extra #v2-email-archive-records>thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}.v2-panel-extra #v2-email-archive-records>tbody{display:block}.v2-panel-extra #v2-email-archive-records>tbody>tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;padding:1rem}.v2-panel-extra #v2-email-archive-records>tbody>tr>td{display:flex;flex-direction:column;align-items:flex-start;gap:.375rem;min-inline-size:0;padding:0;border:0}.v2-panel-extra #v2-email-archive-records>tbody>tr>td:is(:first-child,:last-child,[colspan]),.v2-panel-extra #v2-email-archive-records>tbody>tr>td:nth-child(2){grid-column:1/-1}.v2-panel-extra #v2-email-archive-records td>:is(select,.v2-select,input:not([type=checkbox])){inline-size:100%}.v2-panel-extra #v2-email-archive-records td::before{margin:0!important}}
 .v2-panel-extra #v2-address-books td>input:not([type=checkbox]),.v2-panel-extra #v2-task-lists td>input:not([type=checkbox]){inline-size:100%;min-inline-size:0}
-@media(max-width:600px){.v2-panel-extra :is(#v2-address-books,#v2-task-lists){display:block;min-inline-size:0!important}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody{display:block}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody>tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-1) var(--space-2);padding:var(--space-2);border-block-start:1px solid var(--line);border-block-end:0}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody>tr>td{display:flex;flex-direction:column;align-items:stretch;gap:4px;min-inline-size:0;padding:0;border:0}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody>tr>td:is(:first-child,:nth-child(2),[colspan]){grid-column:1/-1}.v2-panel-extra #v2-dav-principals dl{grid-template-columns:minmax(0,1fr)!important}}
-
-.v2-panel-extra #v2-email-archive-records td .v2-btn{white-space:normal}
+@media(max-width:600px){.v2-panel-extra :is(#v2-address-books,#v2-task-lists){display:block;min-inline-size:0!important}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody{display:block}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody>tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem 1rem;padding:1rem}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody>tr>td{display:flex;flex-direction:column;align-items:stretch;gap:.25rem;min-inline-size:0;padding:0;border:0}.v2-panel-extra :is(#v2-address-books,#v2-task-lists)>tbody>tr>td:is(:first-child,:nth-child(2),[colspan]){grid-column:1/-1}.v2-panel-extra #v2-dav-principals dl{grid-template-columns:minmax(0,1fr)!important}}
+.v2-panel-extra #v2-email-archive-records td .v2-btn{white-space:normal;block-size:auto;padding-block:.25rem}
 .v2-panel-extra [data-quarantine-inspect]{align-self:flex-start;justify-self:start;inline-size:auto}
 `

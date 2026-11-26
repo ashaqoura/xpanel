@@ -379,6 +379,7 @@ function bindWhmMetering(askDialog?: (input: { title: string; body: string; conf
           input.type = 'text'; input.inputMode = 'numeric'; input.dir = 'ltr'; input.autocomplete = 'off'; input.value = typeof item.limitMb === 'number' && item.source === 'account' ? String(item.limitMb) : ''
           input.placeholder = t('Package value'); input.setAttribute('aria-label', t('Disk limit of {username} (MiB)', { username: item.username }))
           box.type = 'checkbox'; box.checked = item.source === 'account' && item.limitMb === 'unlimited'; input.disabled = box.checked; text.textContent = t('Unlimited'); label.append(box, text)
+          if (document.documentElement.dataset.uiTheme === 'v2') { input.className = 'kt-input kt-input-sm w-32'; box.className = 'kt-checkbox kt-checkbox-sm'; label.className = 'kt-label' }
           box.addEventListener('change', () => { input.disabled = box.checked })
           apply.type = 'button'; apply.className = refresh.className; apply.textContent = t('Save')
           apply.addEventListener('click', () => { void save(item, input.value, box.checked) })

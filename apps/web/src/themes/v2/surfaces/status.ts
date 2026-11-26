@@ -4,11 +4,26 @@ import { alternateLocales } from '../../../i18n.ts'
 import { statusPageCopy } from '../../../models/status-page.ts'
 import type { StatusPageModel, ThemeViewProps } from '../../contract.ts'
 import { escapeHtml } from '../html.ts'
+import { icon } from '../icons.ts'
 import { v2Messages } from '../messages.ts'
 import { renderV2Shell } from '../shell/shell.ts'
 
 const PRODUCTS = { xpanel: 'xPanel', xwhm: 'xWHM', xmail: 'xMail' } as const
 const HOMES = { xpanel: '/home', xwhm: '/whm', xmail: '/mail/inbox' } as const
+// Complete literal class lists: the soft circle and the status badge of each tone, and the glyph of each status.
+const TONE = {
+  primary: { circle: 'flex items-center justify-center size-20 mb-8 rounded-full bg-primary/10 text-primary', badge: 'kt-badge kt-badge-primary kt-badge-outline mb-3' },
+  warning: { circle: 'flex items-center justify-center size-20 mb-8 rounded-full bg-yellow-500/10 text-yellow-500', badge: 'kt-badge kt-badge-warning kt-badge-outline mb-3' },
+  destructive: { circle: 'flex items-center justify-center size-20 mb-8 rounded-full bg-destructive/10 text-destructive', badge: 'kt-badge kt-badge-destructive kt-badge-outline mb-3' },
+} as const
+const LOOK: Readonly<Record<number, { tone: keyof typeof TONE; glyph: string }>> = {
+  400: { tone: 'primary', glyph: 'ki-filled ki-question-2 text-4xl' },
+  403: { tone: 'warning', glyph: 'ki-filled ki-lock text-4xl' },
+  404: { tone: 'primary', glyph: 'ki-filled ki-search-list text-4xl' },
+  421: { tone: 'warning', glyph: 'ki-filled ki-disconnect text-4xl' },
+  500: { tone: 'destructive', glyph: 'ki-filled ki-information-2 text-4xl' },
+  503: { tone: 'destructive', glyph: 'ki-filled ki-wrench text-4xl' },
+}
 
 /** Keeps appearance and account routing context on same-listener navigation only. */
 function statusHref(href: string | undefined, model: StatusPageModel): string | undefined {
@@ -27,10 +42,12 @@ export function renderV2Status(props: StatusPageModel & ThemeViewProps): string 
   const workspace = statusHref(props.workspaceHref, props)
   const retry = (props.status === 500 || props.status === 503) ? statusHref(props.retryHref, props) : undefined
   const contact = (props.status === 403 || props.status === 404) ? publicContactEmail(props.supportEmail) : undefined
-  const actions = `${workspace ? `<a class="v2-btn v2-btn--primary" href="${escapeHtml(workspace)}">${escapeHtml(t('Back to workspace'))}</a>` : ''}${retry ? `<a class="v2-btn" href="${escapeHtml(retry)}">${escapeHtml(t('Try again'))}</a>` : ''}${!props.signedIn && props.status !== 421 && !workspace ? `<a class="v2-btn v2-btn--primary" href="${escapeHtml(statusHref('/login', props)!)}">${escapeHtml(t('Sign in'))}</a>` : ''}`
-  const body = `<section class="v2-status-card v2-card" data-status-page="${props.status}" role="alert" aria-labelledby="v2-status-title"><p class="v2-status-code v2-num"><bdi dir="ltr">${props.status}</bdi></p><h1 id="v2-status-title">${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.explanation)}</p>${props.notice ? `<p data-status-notice>${escapeHtml(props.notice)}</p>` : ''}${contact ? `<p>${escapeHtml(t('Write to'))} <a href="mailto:${escapeHtml(contact)}"><bdi dir="ltr">${escapeHtml(contact)}</bdi></a>.</p>` : ''}<div class="v2-status-actions">${actions}</div></section>`
+  const look = LOOK[props.status] ?? LOOK[404]!
+  const actions = `${workspace ? `<a class="v2-btn v2-btn--primary kt-btn kt-btn-primary h-11 text-base" href="${escapeHtml(workspace)}">${icon('home', 16)}${escapeHtml(t('Back to workspace'))}</a>` : ''}${retry ? `<a class="v2-btn kt-btn kt-btn-outline h-11 text-base" href="${escapeHtml(retry)}">${icon('refresh', 16)}${escapeHtml(t('Try again'))}</a>` : ''}${!props.signedIn && props.status !== 421 && !workspace ? `<a class="v2-btn v2-btn--primary kt-btn kt-btn-primary h-11 text-base" href="${escapeHtml(statusHref('/login', props)!)}">${icon('user', 16)}${escapeHtml(t('Sign in'))}</a>` : ''}`
+  // Metronic's error page: a glyph in a soft circle where the illustration stands, the status as a badge, then title, text and actions.
+  const body = `<section class="v2-status-card v2-card flex flex-col items-center justify-center w-full max-w-[640px] mx-auto gap-0 px-5 py-10 lg:py-20 border-0 rounded-none bg-transparent shadow-none text-center" data-status-page="${props.status}" role="alert" aria-labelledby="v2-status-title"><span class="${TONE[look.tone].circle}" aria-hidden="true"><i class="${look.glyph}"></i></span><p class="v2-status-code v2-num ${TONE[look.tone].badge}"><bdi dir="ltr">${props.status}</bdi></p><h1 id="v2-status-title" class="mb-2 text-[26px] leading-[34px] rtl:leading-9 font-semibold text-mono text-center">${escapeHtml(copy.title)}</h1><p class="max-w-[520px] text-base leading-6 rtl:leading-[26px] font-normal text-secondary-foreground text-center">${escapeHtml(copy.explanation)}</p>${props.notice ? `<p class="kt-alert kt-alert-light kt-alert-primary mt-6 text-start" data-status-notice><span class="kt-alert-icon text-primary">${icon('info', 18)}</span><span class="kt-alert-title">${escapeHtml(props.notice)}</span></p>` : ''}${contact ? `<p class="mt-2 text-sm font-normal text-secondary-foreground">${escapeHtml(t('Write to'))} <a class="kt-link inline-flex items-center min-h-11" href="mailto:${escapeHtml(contact)}"><bdi dir="ltr">${escapeHtml(contact)}</bdi></a>.</p>` : ''}<div class="v2-status-actions flex flex-wrap items-center justify-center gap-2 mt-8 empty:hidden">${actions}</div></section>`
   if (!props.visibility) {
-    return `<div class="v2-status-standalone" data-surface="${props.surface}"><header class="v2-status-header"><strong dir="ltr">${escapeHtml(brandingProductName(props.branding, PRODUCTS[props.surface]))}</strong>${props.hostname ? `<bdi dir="ltr" class="v2-mono">${escapeHtml(props.hostname)}</bdi>` : ''}</header><main id="main-content" class="v2-status-main" tabindex="-1">${body}</main></div>`
+    return `<div class="v2-status-standalone flex flex-col min-h-dvh bg-background text-foreground" data-surface="${props.surface}"><header class="v2-status-header flex flex-wrap items-center justify-between gap-2 min-h-16 px-4 lg:px-10 py-2"><strong class="text-lg font-semibold leading-none text-mono" dir="ltr">${escapeHtml(brandingProductName(props.branding, PRODUCTS[props.surface]))}</strong>${props.hostname ? `<bdi dir="ltr" class="v2-mono text-[13px] leading-5 text-muted-foreground">${escapeHtml(props.hostname)}</bdi>` : ''}</header><main id="main-content" class="v2-status-main flex grow items-center justify-center p-4 sm:p-6" tabindex="-1">${body}</main></div>`
   }
   return renderV2Shell(t, {
     branding: props.branding, surface: props.surface, activeRoute: props.path,
@@ -45,10 +62,5 @@ export function renderV2Status(props: StatusPageModel & ThemeViewProps): string 
   })
 }
 
-export const V2_STATUS_CSS = `.v2-status-card{display:flex;flex-direction:column;gap:var(--space-2);inline-size:min(100%,680px);margin-inline:auto;padding:var(--space-4);border-color:var(--line-strong);box-shadow:0 12px 32px rgba(7,14,26,.1),0 2px 6px rgba(7,14,26,.05)}
-.v2-status-code{align-self:flex-start;padding:4px 12px;border-radius:var(--radius-chip);border:1px solid var(--accent-line);background:var(--accent-soft);font:600 24px/1.2 var(--font-mono);color:var(--accent)}
-.v2-status-card>p:not(.v2-status-code){color:var(--text-2);line-height:1.6}
-.v2-status-card [data-status-notice]{padding:12px var(--space-2);border-radius:var(--radius-control);border:1px solid var(--line);background:var(--subtle);font-size:13px}
-.v2-status-actions{display:flex;flex-wrap:wrap;gap:var(--space-1);padding-block-start:var(--space-1)}.v2-status-actions:empty{display:none}
-.v2-status-standalone{display:flex;flex-direction:column;min-block-size:100dvh;background:var(--bg)}.v2-status-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2);min-block-size:68px;padding:12px clamp(16px,3vw,32px);background:var(--surface);border-block-end:1px solid var(--line)}.v2-status-header>strong{font-size:18px;letter-spacing:-.01em}.v2-status-header>.v2-mono{font-size:13px;color:var(--muted)}.v2-status-main{flex:1;display:grid;align-content:center;padding:var(--space-4) var(--space-3)}
-@media(max-width:600px){.v2-status-card{padding:var(--space-3) var(--space-2)}.v2-status-main{padding:var(--space-3) var(--space-2)}}`
+/** The Metronic error-page look is carried by the classes in the markup; this keeps the code readable in both directions. */
+export const V2_STATUS_CSS = `.v2-status-card{min-inline-size:0}.v2-status-code bdi{unicode-bidi:isolate}`

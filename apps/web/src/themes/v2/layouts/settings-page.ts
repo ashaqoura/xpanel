@@ -1,4 +1,4 @@
-// Settings family (TplSettings): sections of fields beside a current-vs-proposed review, ending in the apply bar
+// Settings family (TplSettings): Metronic settings cards (labels above their controls) beside a current-vs-proposed review, ending in the apply bar
 // (configuration generations: tests, next generation, rollback target) or a revision-checked save.
 
 import type { Translate } from '../../../i18n.ts'
@@ -15,7 +15,9 @@ export interface SettingsSection {
   title: string
   titleId: string
   description?: string
-  /** Fields sit in a responsive grid 16px apart; switches take a whole row. */
+  /** Fields 16px apart, each label 8px above its control and the hint under the control (the project standard; the
+   *  Metronic label column is withdrawn); a switch row is its label and description opposite the switch, lined off
+   *  from the next. */
   fields?: readonly SettingsField[]
   /** Kit markup after the fields, such as a threshold scale. */
   bodyHtml?: string
@@ -48,7 +50,7 @@ const field = (item: SettingsField): string => item.kind === 'switch' ? switchRo
 
 export const settingsSection = (section: SettingsSection): string => card({
   title: section.title, titleId: section.titleId, description: section.description, actionsHtml: section.actionsHtml, hooks: section.hooks,
-  bodyHtml: `${section.fields?.length ? `<div class="v2-fields">${section.fields.map(field).join('')}</div>` : ''}${section.bodyHtml ?? ''}`,
+  bodyHtml: `${section.fields?.length ? `<div class="v2-fields grid grid-cols-1 gap-4">${section.fields.map(field).join('')}</div>` : ''}${section.bodyHtml ?? ''}`,
 })
 
 export function settingsPage(t: Translate, props: SettingsPageProps): string {

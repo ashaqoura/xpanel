@@ -25,7 +25,7 @@ describe('V2 WHM account tools', () => {
     const html = render('/whm/accounts/health')
     for (const key of ['count-accounts', 'count-affected', 'count-problems', 'count-unavailable', 'observed-at']) expect(html).toContain(`data-whm-health-${key}>Not read</bdi>`)
     expect(html).toContain('Not verified means the evidence could not be read. It is never counted as healthy.')
-    expect(html).toContain('data-whm-health-run>Run checks</button>')
+    expect(html).toContain('data-whm-health-run><i class="ki-filled ki-shield-tick" aria-hidden="true"></i><span data-xp-slot="label">Run checks</span></button>')
     expect(html).not.toContain('data-whm-health-repair')
     expect(html).toContain('data-whm-health-recheck disabled')
     expect(html).toContain('<option value="unavailable">Not fully verified</option>')
@@ -51,7 +51,7 @@ describe('V2 WHM account tools', () => {
   it('retains bilingual announcement authoring, named audience selectors and owner previews', () => {
     const html = render('/whm/accounts/announcements')
     expect(html.match(/data-xp-template="account-announcement-notice-/g)).toHaveLength(3)
-    expect(html).toContain('class="v2-notice v2-notice--warn v2-account-announcement"')
+    expect(html).toMatch(/class="v2-notice v2-notice--warn v2-account-announcement[ "]/)
     expect(html).not.toContain('class="xp-account-announcement')
     const nodes = parseMarkup(html)
     for (const name of ['title-en', 'body-en', 'title-ar', 'body-ar', 'severity', 'audience', 'plan', 'reseller', 'usernames', 'starts', 'ends']) {

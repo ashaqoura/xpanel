@@ -1,4 +1,5 @@
 import { attr, escapeHtml, hookAttrs, type HookAttributes, type Tone } from '../html.ts'
+import { BAR_FILL, BAR_TRACK } from './kpi-card.ts'
 
 export interface MeterScale {
   /** The measured value and its scale, in the unit of the check (load, percent, days). */
@@ -50,35 +51,36 @@ export function meter(props: MeterProps): string {
   // An unlimited or unread quantity has no value to report: its empty track stays decorative.
   const aria = value === undefined ? 'aria-hidden="true"'
     : `role="meter" aria-label="${escapeHtml(props.label)}" aria-valuenow="${clamp(value, min, max)}" aria-valuemin="${min}" aria-valuemax="${max}" aria-valuetext="${escapeHtml(valueText)}"`
-  const fill = `<span class="v2-bar__fill v2-bar--${tone}" style="inline-size:${value === undefined ? '0%' : at(value, min, max)}"></span>`
+  const fill = `<span class="${BAR_FILL[tone]}" style="inline-size:${value === undefined ? '0%' : at(value, min, max)}"></span>`
   const tick = (kind: 'warn' | 'bad', mark: number | undefined): string => mark === undefined ? '' : `<span class="v2-meter__tick v2-meter__tick--${kind}" style="inset-inline-start:${at(mark, min, max)}"></span>`
   const track = props.untracked ? `<div class="v2-meter__untracked">${escapeHtml(props.untracked)}</div>`
-    : scale ? `<div class="v2-meter__track" ${aria}><div class="v2-bar">${fill}</div>${tick('warn', scale.warn)}${tick('bad', scale.bad)}</div><div class="v2-meter__scale v2-num" aria-hidden="true"><span>${escapeHtml(scale.minText)}</span><span>${escapeHtml(scale.maxText)}</span></div>`
-    : `<div class="v2-bar" ${aria}>${fill}</div>`
+    : scale ? `<div class="v2-meter__track" ${aria}><div class="${BAR_TRACK[tone]}">${fill}</div>${tick('warn', scale.warn)}${tick('bad', scale.bad)}</div><div class="v2-meter__scale v2-num" aria-hidden="true"><span>${escapeHtml(scale.minText)}</span><span>${escapeHtml(scale.maxText)}</span></div>`
+    : `<div class="${BAR_TRACK[tone]}" ${aria}>${fill}</div>`
   const parts = props.valueText.split(' / ')
   const shown = parts.length === 2 ? parts.map(part => `<bdi>${escapeHtml(part)}</bdi>`).join(' / ') : escapeHtml(props.valueText)
   const unit = props.unit ? `<span class="v2-meter__unit">${escapeHtml(props.unit)}</span>` : ''
   return `<div class="v2-meter${scale || props.untracked ? ' v2-meter--scale' : ''}"${hookAttrs(props.hooks)}><div class="v2-meter__row"><span class="v2-meter__label">${escapeHtml(props.label)}</span><span class="v2-meter__value v2-num"><span${attr('class', [parts.length === 2 ? 'v2-meter__pair' : '', scale ? toneClass : ''].filter(Boolean).join(' ') || undefined)}>${shown}</span>${unit}</span></div>${track}${props.note ? `<span class="v2-meter__note v2-num${toneClass ? ` ${toneClass}` : ''}">${escapeHtml(props.note)}</span>` : ''}</div>`
 }
 
-export const METER_CSS = `.v2-meter{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
-.v2-meter__row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-1);font-size:13px}
-.v2-meter__value{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;color:var(--text-2)}
+// Metronic progress row: a medium label opposite its secondary value over the 4px kt-progress track.
+export const METER_CSS = `.v2-meter{display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.v2-meter__row{display:flex;align-items:baseline;justify-content:space-between;gap:.625rem;font-size:.875rem}
+.v2-meter__value{display:inline-flex;align-items:baseline;gap:.375rem;white-space:nowrap;color:var(--text-2)}
 .v2-meter__value>span,.v2-meter__scale>span{unicode-bidi:plaintext}
 .v2-meter__value>.v2-meter__pair{unicode-bidi:isolate}
-.v2-meter__unit{font-size:12px;color:var(--muted)}
-.v2-meter__label{font-weight:600}
-.v2-meter__note{font-size:12px;color:var(--muted)}
-.v2-meter--scale{gap:10px}
-.v2-meter--scale .v2-meter__row{gap:12px}
-.v2-meter--scale .v2-meter__value>:first-child{font-size:16px;font-weight:600;color:var(--text)}
+.v2-meter__unit{font-size:.8125rem;color:var(--muted)}
+.v2-meter__label{font-weight:500;color:var(--mono,var(--text))}
+.v2-meter__note{font-size:.8125rem;color:var(--muted)}
+.v2-meter--scale{gap:.625rem}
+.v2-meter--scale .v2-meter__row{gap:.75rem}
+.v2-meter--scale .v2-meter__value>:first-child{font-size:1rem;font-weight:600;color:var(--mono,var(--text))}
 .v2-meter--scale .v2-meter__value>.v2-text--warn{color:var(--warn)}
 .v2-meter--scale .v2-meter__value>.v2-text--bad{color:var(--bad)}
 .v2-meter__track{position:relative;height:18px}
-.v2-meter__track>.v2-bar{position:absolute;inset-inline:0;top:6px}
+.v2-meter__track>.v2-bar{top:7px}
 .v2-meter__tick{position:absolute;top:0;width:2px;height:18px;margin-inline-start:-1px;border-radius:1px}
-.v2-meter__tick--warn{background:var(--warn)}
-.v2-meter__tick--bad{background:var(--bad)}
-.v2-meter__scale{display:flex;justify-content:space-between;gap:var(--space-1);font-size:11px;color:var(--muted)}
-.v2-meter__untracked{display:flex;align-items:center;min-height:36px;padding:0 12px;border-radius:var(--radius-chip);border:1px dashed var(--line-strong);font-size:12px;color:var(--muted)}
+.v2-meter__tick--warn{background:var(--color-yellow-500,var(--warn))}
+.v2-meter__tick--bad{background:var(--destructive)}
+.v2-meter__scale{display:flex;justify-content:space-between;gap:.5rem;font-size:.8125rem;color:var(--muted)}
+.v2-meter__untracked{display:flex;align-items:center;min-height:2.125rem;padding:0 .75rem;border-radius:var(--radius-control);border:1px solid var(--line);background:color-mix(in oklab,var(--kt-muted) 40%,transparent);font-size:.8125rem;color:var(--text-2)}
 `

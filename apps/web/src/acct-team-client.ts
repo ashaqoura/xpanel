@@ -119,7 +119,7 @@ function bindAccountTeam(askDialog: ((options: Record<string, unknown>) => Promi
       editing = null
       for (const control of Object.values(inputs)) { control.value = ''; control.removeAttribute('aria-invalid') }
       for (const role of roles) role.checked = false
-      heading.textContent = t('Add team member'); save.textContent = t('Add team member'); cancel.hidden = true
+      heading.textContent = t('Add team member'); (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Add team member'); cancel.hidden = true
       lock(busy)
     }
     const edit = (member: AccountTeamMember): void => {
@@ -127,7 +127,7 @@ function bindAccountTeam(askDialog: ((options: Record<string, unknown>) => Promi
       inputs.username!.value = member.username; inputs.contactEmail!.value = member.contactEmail; inputs.notes!.value = member.notes
       inputs.expiresAt!.value = member.expiresAt ? member.expiresAt.slice(0, 16) : ''; inputs.expiryReason!.value = member.expiryReason ?? ''
       for (const role of roles) role.checked = member.roles.includes(role.value as AccountTeamRole)
-      heading.textContent = t('Edit team member'); save.textContent = t('Save changes'); cancel.hidden = false; saveStatus.hidden = true
+      heading.textContent = t('Edit team member'); (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Save changes'); cancel.hidden = false; saveStatus.hidden = true
       lock(busy); inputs.contactEmail!.focus()
     }
     // The secret leaves the page when the owner is done with it; it is never stored in the browser.

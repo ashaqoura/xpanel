@@ -12,6 +12,10 @@ const CORE_MODULES = new Set(['read-only-frame.ts',
   'models/action-state.ts', 'models/status-page.ts', 'models/svc-panels.ts', 'models/web-stats.ts', 'models/dnssec.ts', 'models/reseller-allocation.ts', 'models/reseller-usage.ts', 'models/theme-surface.ts', 'models/dav-client-guide.ts', 'display-name.ts', 'account-notices.ts', 'mail-home-groups.ts',
   // Theme-agnostic self-hosted font faces: both themes load the same IBM Plex stylesheet.
   'vendor/plex.ts',
+  // The Metronic stylesheet and icon font the v2 document links before its own layered styles.
+  'vendor/metronic.ts',
+  // Content-hashed same-origin page scripts (the head script that restores the saved sidebar state).
+  'page-scripts.ts',
   // Theme-agnostic compose behaviour: every theme emits the same script and the copy it reads.
   'mail-compose-editor-client.ts'
 ])

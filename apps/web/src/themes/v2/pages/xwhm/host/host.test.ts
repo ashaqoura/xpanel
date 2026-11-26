@@ -107,7 +107,7 @@ describe('v2 host page authorization and observations', () => {
     expect(pool).toContain('data-php-action="discard-pool"')
     expect(pool).toContain('<dt>Process manager</dt><dd><span data-whm-php-pool-fact="mode">Not read</span></dd>')
     expect(pool.match(/data-whm-php-pool-fact="(?:maxChildren|processIdleTimeoutSec|startServers|minSpareServers|maxSpareServers|maxRequests)">Not read<\/span>/g)).toHaveLength(6)
-    expect(pool.match(/class="v2-php-mode"/g)).toHaveLength(3)
+    expect(pool.match(/class="v2-php-mode kt-card gap-2 p-4 shadow-none"/g)).toHaveLength(3)
   })
 
   it('renders staged firewall ruleset diff, lockout verdict, and apply step states when supplied', () => {
@@ -169,29 +169,29 @@ describe('v2 host page authorization and observations', () => {
   it('lays the firewall out as the board: guard notice, switch beside the ruleset, counted tabs and a review state', () => {
     const rule = { id: 'r1', kind: 'port' as const, action: 'accept' as const, protocol: 'tcp' as const, port: '8443', source: null, forwardTo: null, list: null, comment: '', enabled: true }
     const html = renderV2WhmFirewall({ ...root, firewallRules: [rule] })
-    expect(html).toMatch(/class="v2-notice v2-notice--info"[^>]*>[\s\S]*trusted session address/)
+    expect(html).toMatch(/class="v2-notice v2-notice--info[^"]*"[^>]*>[\s\S]*trusted session address/)
     expect(html).toContain('<div class="v2-host__power" data-whm-firewall-policy')
-    expect(html).toMatch(/data-whm-firewall-tab="port" disabled>Ports<span class="v2-count v2-num">1<\/span>/)
+    expect(html).toMatch(/data-whm-firewall-tab="port" disabled>Ports<span class="v2-count v2-num kt-badge kt-badge-sm kt-badge-outline rounded-\[30px\]">1<\/span>/)
     expect(html).toMatch(/data-whm-firewall-tab="banned" disabled>Temporary blocks<\/button>/)
     expect(html).toContain('href="#v2-host-firewall-create-heading"')
     expect(html).toContain('id="v2-host-firewall-create-heading"')
     // Without a qualified read no count is shown on any tab and the review stays unread.
     const unread = renderV2WhmFirewall({ ...root, catalog: [], firewallRules: [rule] })
     expect(unread).not.toContain('v2-count')
-    expect(unread).toMatch(/Review pending changes<\/h2><\/div><div class="v2-card__actions"><span class="v2-pill[^"]*"[^>]*>(?:<[^>]+>)*Not read/)
+    expect(unread).toMatch(/Review pending changes<\/h2><\/div><div class="v2-card__actions[^"]*"><span class="v2-pill[^"]*"[^>]*>(?:<[^>]+>)*Not read/)
   })
 
   it('fills the ruleset tiles from supplied props only and leaves enforcement unread', () => {
     const rule = { id: 'r1', kind: 'port' as const, action: 'accept' as const, protocol: 'tcp' as const, port: '8443', source: null, forwardTo: null, list: null, comment: '', enabled: true }
     const html = renderV2WhmFirewall({ ...root, firewallRules: [rule], generationId: 7, generationActivatedAt: '2026-10-22T11:45:00Z', adminSessionIp: '192.0.2.3', serverSettings: { panelPort: 2087, sshPort: 2222, backendPort: 8080 } as HostPageProps['serverSettings'] })
-    const tile = (label: string): string => html.match(new RegExp(`<div class="v2-host__tile"><dt>${label}</dt>(.*?)</div>`))![1]!
+    const tile = (label: string): string => html.match(new RegExp(`<div class="v2-host__tile [^"]*"><dt class="text-sm leading-\\(--lh-label\\) text-secondary-foreground">${label}</dt>(.*?)</div>`))![1]!
     expect(tile('Generation')).toContain('Applied at <bdi class="v2-num" dir="ltr">2026-10-22 11:45 UTC</bdi>')
     expect(tile('Management ports')).toMatch(/2087<\/bdi> xWHM.*2222<\/bdi> SSH/)
     expect(tile('Saved rules')).toContain('>1</bdi>')
-    for (const label of ['Enforcement', 'Input policy', 'Temporary blocks']) expect(tile(label)).toBe('<dd class="v2-num">Not read</dd>')
+    for (const label of ['Enforcement', 'Input policy', 'Temporary blocks']) expect(tile(label)).toBe('<dd class="v2-num text-base leading-(--lh-text) font-medium text-mono">Not read</dd>')
     const bare = renderV2WhmFirewall(root)
     expect(bare).not.toContain('v2-host__tile-note')
-    expect(bare.match(/<div class="v2-host__tile"><dt>Management ports<\/dt>(.*?)<\/div>/)![1]).toBe('<dd class="v2-num">Not read</dd>')
+    expect(bare.match(/<div class="v2-host__tile [^"]*"><dt class="text-sm leading-\(--lh-label\) text-secondary-foreground">Management ports<\/dt>(.*?)<\/div>/)![1]).toBe('<dd class="v2-num text-base leading-(--lh-text) font-medium text-mono">Not read</dd>')
   })
 
   it('names every rule value for phone rows, in saved rows and in the rows the controller clones', () => {

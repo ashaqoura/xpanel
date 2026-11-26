@@ -44,7 +44,7 @@ function bindServiceUsers(askDialog: ((input: Record<string, unknown>) => Promis
     }
     const reset = (): void => {
       editing = null; local.value = ''; local.disabled = false; domain.disabled = false; password.value = ''; password.type = 'password'; email.checked = true; ftp.checked = false; webdisk.checked = false; readonly.checked = false; quota.value = '1024'; dir.value = 'public_html'; cancel.hidden = true
-      save.textContent = t('Create user')
+      ;(save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Create user')
     }
     const cell = (value: string, technical = false): HTMLTableCellElement => { const td = document.createElement('td'); if (technical) { const bdi = document.createElement('bdi'); bdi.dir = 'ltr'; bdi.textContent = value; td.append(bdi) } else td.textContent = value; return td }
     const button = (label: string, run: () => void): HTMLElement => { const node = cloneClientTemplate(clientTemplate(root, 'service-user-action'), 'button', ['label']); clientTemplateSlot(node, 'label').textContent = label; node.addEventListener('click', run); return node }
@@ -72,7 +72,7 @@ function bindServiceUsers(askDialog: ((input: Record<string, unknown>) => Promis
       if (![...domain.options].some(option => option.textContent === user.login.slice(at + 1))) domain.append(new Option(user.login.slice(at + 1), ''))
       domain.value = [...domain.options].find(option => option.textContent === user.login.slice(at + 1))?.value ?? ''
       password.value = ''; email.checked = user.services.email; ftp.checked = user.services.ftp; webdisk.checked = user.services.webdisk; readonly.checked = user.webdiskReadOnly === true
-      quota.value = String(user.mailboxQuotaMb); dir.value = user.ftpDir; cancel.hidden = false; save.textContent = t('Save changes'); local.scrollIntoView?.({ block: 'center' })
+      quota.value = String(user.mailboxQuotaMb); dir.value = user.ftpDir; cancel.hidden = false; (save.querySelector('[data-xp-slot="label"]') ?? save).textContent = t('Save changes'); local.scrollIntoView?.({ block: 'center' })
     }
     const remove = async (user: ServiceUserRow): Promise<void> => {
       if (typeof askDialog !== 'function' || await askDialog({ title: t('Delete {login}?', { login: user.login }), body: t('The login stops working for every service. Its mailbox and all its messages are deleted. This cannot be undone.'), confirm: t('Delete user'), danger: true }) !== true) return

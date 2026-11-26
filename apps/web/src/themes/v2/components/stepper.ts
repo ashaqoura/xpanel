@@ -38,30 +38,28 @@ const NOW = ':is([data-step-status=current],[data-step-status=running])'
 // Stacked: marker and rail on one grid row, the text under them. Inline: one flex row per step.
 const IN = '.v2-steps--inline>.v2-step'
 export const STEPPER_CSS = `.v2-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(140px,100%),1fr));gap:var(--space-2) 0}
-.v2-step{min-width:0;display:grid;grid-template-columns:28px 1fr;align-items:center;gap:var(--space-1)}
-.v2-step__dot{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line-strong);color:var(--muted);font-size:13px;font-weight:600}
-.v2-step__text{grid-row:2;grid-column:1/-1;display:flex;flex-direction:column;min-width:0;padding-inline-end:12px}
-.v2-step__label{font-size:13px;font-weight:600;color:var(--muted)}
-.v2-step__sub{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.v2-step{min-width:0;display:grid;grid-template-columns:2rem 1fr;align-items:center;gap:var(--space-1)}
+.v2-step__dot{flex:none;display:flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.8125rem;font-weight:600}
+.v2-step__text{grid-row:2;grid-column:1/-1;display:flex;flex-direction:column;min-width:0;padding-inline-end:.75rem}
+.v2-step__label{font-size:.875rem;font-weight:500;color:var(--text-2)}
+.v2-step__sub{font-size:.8125rem;color:var(--text-2);overflow-wrap:anywhere}
 .v2-step__rail{grid-row:1;grid-column:2;height:2px;border-radius:1px;background:var(--line)}
 .v2-step:last-child>.v2-step__rail{visibility:hidden}
 .v2-steps--inline{display:flex;flex-wrap:wrap}
 ${IN}{flex:1 1 132px;display:flex;gap:var(--space-1)}
 ${IN}>.v2-step__text{gap:2px;padding:0}
-${IN} .v2-step__label{font-size:14px;font-weight:500;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;text-overflow:ellipsis}
+${IN} .v2-step__label{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;text-overflow:ellipsis}
 ${IN}>.v2-step__rail{flex:1 1 auto;min-width:var(--space-1);margin-inline-end:var(--space-1);background:var(--line-strong)}
 ${IN}:last-child>.v2-step__rail{display:none}
-.v2-step${DONE} .v2-step__dot{box-shadow:inset 0 0 0 1px var(--ok-line);background:var(--ok-soft);color:var(--ok)}
-${IN}${DONE} .v2-step__dot,${IN}[data-step-status=failed] .v2-step__dot{box-shadow:none}
+.v2-step${DONE} .v2-step__dot{background:var(--color-green-500,var(--ok));color:#fff}
 .v2-step${DONE} .v2-step__label{color:var(--text)}
-.v2-step${DONE}>.v2-step__rail{background:var(--ok)}
+.v2-step${DONE}>.v2-step__rail{background:var(--color-green-500,var(--ok))}
 ${IN}${DONE} .v2-step__sub{color:var(--ok)}
-.v2-step${NOW} .v2-step__dot{box-shadow:0 0 0 3px var(--accent-soft);background:var(--accent-fill);color:var(--on-accent)}
-.v2-step${NOW} .v2-step__label{color:var(--accent)}
-${IN}${NOW} .v2-step__label{font-weight:600;color:var(--text)}
+.v2-step${NOW} .v2-step__dot{background:var(--accent-fill);color:var(--on-accent)}
+.v2-step${NOW} .v2-step__label{color:var(--mono,var(--text))}
 ${IN}${NOW} .v2-step__sub{color:var(--accent)}
-.v2-step[data-step-status=failed] .v2-step__dot{box-shadow:inset 0 0 0 1px var(--bad-line);background:var(--bad-soft);color:var(--bad)}
-.v2-step[data-step-status=failed] :is(.v2-step__label,.v2-step__sub){color:var(--bad)}
+.v2-step[data-step-status=failed] .v2-step__dot{background:var(--destructive);color:var(--destructive-foreground)}
+.v2-step[data-step-status=failed] :is(.v2-step__label,.v2-step__sub){color:var(--destructive)}
 @media(max-width:600px){${IN}{flex-basis:100%}}
 .v2-step__m{display:none}
 .v2-step__m--run{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-inline-end-color:transparent;animation:v2-spin .9s linear infinite}

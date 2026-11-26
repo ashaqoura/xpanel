@@ -26,8 +26,8 @@ export interface PageHeaderProps {
 }
 
 const crumb = (item: Crumb, last: boolean): string =>
-  `<li>${last ? `<span aria-current="page">${escapeHtml(item.label)}</span>`
-    : `${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>` : `<span>${escapeHtml(item.label)}</span>`}${icon('chevRight', 14)}`}</li>`
+  `<li class="kt-breadcrumb-item">${last ? `<span class="kt-breadcrumb-page" aria-current="page">${escapeHtml(item.label)}</span>`
+    : `${item.href ? `<a class="kt-breadcrumb-link" href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>` : `<span>${escapeHtml(item.label)}</span>`}${icon('chevRight', 14)}`}</li>`
 
 export function pageHeader(t: Translate, props: PageHeaderProps): string {
   const stamp = props.stamp
@@ -36,22 +36,24 @@ export function pageHeader(t: Translate, props: PageHeaderProps): string {
   const aside = stamp || props.actionsHtml ? `<div class="v2-page-head__actions">${stamp}${props.actionsHtml ?? ''}</div>` : ''
   const title = `<h1${attr('id', props.titleId)}>${escapeHtml(props.title)}</h1>`
   return `<header class="v2-page-head"${attr('data-route', props.route)}${hookAttrs(props.hooks)}>
-<nav class="v2-crumbs" aria-label="${escapeHtml(t('Breadcrumb'))}"><ol>${props.breadcrumb.map((item, index) => crumb(item, index === props.breadcrumb.length - 1)).join('')}</ol></nav>
+<nav class="v2-crumbs" aria-label="${escapeHtml(t('Breadcrumb'))}"><ol class="kt-breadcrumb">${props.breadcrumb.map((item, index) => crumb(item, index === props.breadcrumb.length - 1)).join('')}</ol></nav>
 <div class="v2-page-head__row"><div class="v2-page-head__text">${props.status ? `<div class="v2-page-head__title">${title}${statusPill(props.status)}</div>` : title}${props.description ? `<p>${escapeHtml(props.description)}</p>` : ''}</div>${aside}</div>
 </header>`
 }
 
-export const PAGE_HEADER_CSS = `.v2-page-head{display:flex;flex-direction:column;gap:6px}
-.v2-crumbs{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-1);min-height:22px}
-.v2-crumbs ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.v2-crumbs li{display:inline-flex;align-items:center;gap:6px}
-.v2-crumbs a{display:inline-flex;align-items:center;min-height:var(--target);min-inline-size:var(--target);margin-block:-11px;color:var(--muted);text-decoration:none}
-.v2-crumbs a:hover{color:var(--text)}
-.v2-crumbs [aria-current="page"]{color:var(--text-2);font-weight:500}
-.v2-page-head__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px var(--space-3)}
-.v2-page-head__text{display:flex;flex-direction:column;gap:var(--space-1);min-width:0;max-width:84ch}
-.v2-page-head__title{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1) 10px}
-.v2-page-head__text p{font-size:13px;color:var(--muted);line-height:1.5}
-.v2-page-head__actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.v2-page-head__status{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px}
+// The Metronic page toolbar: the page heading (26/34, medium) over its secondary description, the actions 10px apart
+// at the end. The trail is a kt-breadcrumb; the ol rule keeps a trail written without that class in line. Trail links
+// keep a 44px target whose extra height overlaps the band instead of growing it.
+export const PAGE_HEADER_CSS = `.v2-page-head{display:flex;flex-direction:column;gap:.5rem}
+.v2-crumbs ol{list-style:none;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:.375rem;font-size:.875rem;line-height:var(--lh-label);color:var(--muted)}
+.v2-crumbs li{display:inline-flex;align-items:center;gap:.375rem}
+.v2-crumbs a{display:inline-flex;align-items:center;min-block-size:var(--target);min-inline-size:var(--target);margin-block:-.6875rem;color:var(--text-2);font-weight:400}
+.v2-crumbs a:hover{color:var(--accent)}
+.v2-crumbs [aria-current="page"]{color:var(--mono,var(--text))}
+.v2-page-head__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.625rem 1.25rem}
+.v2-page-head__text{display:flex;flex-direction:column;gap:.5rem;min-width:0;max-width:84ch}
+.v2-page-head__title{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .625rem}
+.v2-page-head__text p{color:var(--text-2)}
+.v2-page-head__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem}
+.v2-page-head__status{display:flex;flex-direction:column;align-items:flex-end;gap:.125rem;font-size:.8125rem;line-height:var(--lh-cap)}
 `

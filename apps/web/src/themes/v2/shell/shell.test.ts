@@ -46,6 +46,23 @@ describe('v2 shell', () => {
     expect(html.match(/<main\b/g)).toHaveLength(1)
     expect(html.match(/id="xp-sidebar"/g)).toHaveLength(1)
     expect(html.match(/id="xp-cmdk-modal"/g)).toHaveLength(1)
+    // Surface-owned navigation fills the same sidebar and has no section tab row.
+    expect(html).toContain('data-shell-nav="surface"')
+    expect(html).not.toContain('class="v2-navbar')
+    expect(html).toContain('<div class="v2-side__body"><nav data-mail-folders>Folders</nav></div>')
+    expect(html).toContain('<div class="v2-ctx__controls"><select data-authorized-domain>')
+  })
+
+  it('keeps the context summary and footer links available', () => {
+    const html = shell('en', {
+      context: { label: 'Server', title: 'srv1.xpanel.test', badge: 'Root', detail: '192.0.2.1', status: { tone: 'ok', label: 'Active' },
+        meters: [{ label: 'Disk', valueText: '40%', percent: 40 }], meta: ['1.2.3'] },
+      footerLinks: [{ label: 'Open <xMail>', href: '/mail/inbox', external: true }],
+    })
+    expect(html).toMatch(/<section class="v2-ctx" aria-label="Server">.*?<bdi class="v2-mono v2-ctx__name[^"]*" dir="ltr">srv1\.xpanel\.test<\/bdi>.*?>Root<\/span>.*?192\.0\.2\.1.*?Active.*?Disk.*?40%.*?style="inline-size:40%".*?<bdi dir="ltr">1\.2\.3<\/bdi>.*?<\/section>/s)
+    expect(html.match(/<section class="v2-ctx"/g)).toHaveLength(1)
+    expect(html).toMatch(/<footer class="v2-foot[^"]*"><nav class="v2-foot__links[^"]*"><a class="[^"]*" href="\/mail\/inbox">Open &lt;xMail&gt;<i class="v2-icon ki-filled ki-exit-right-corner text-sm leading-none" aria-hidden="true"><\/i>/)
+    expect(shell()).not.toContain('<footer')
   })
 
   it('escapes configured product identity in desktop and phone navigation', () => {
@@ -71,15 +88,24 @@ describe('v2 shell', () => {
     expect(SHELL_CSS).toMatch(/\.v2-search\{[^}]*min-width:0/)
   })
 
+  it('collapses the desktop rail from the root attribute the head script restores before the first paint', () => {
+    // The saved collapsed state applies from the root attribute the head script sets before the first paint.
+    expect(SHELL_CSS).toContain('[data-ui-theme="v2"][data-sidebar-collapsed="true"] .v2-shell{--v2-col:var(--v2-gutter)}')
+    expect(SHELL_CSS).toContain('[data-ui-theme="v2"][data-sidebar-collapsed="true"] .v2-shell>.v2-side>.v2-side__body{')
+    expect(SHELL_CSS).toContain('[data-ui-theme="v2"]:not([data-sidebar-collapsed="true"]) .v2-navbar{display:none}')
+    // Restoring never animates: the slide is reserved for a press of the toggle.
+    expect(SHELL_CSS).not.toMatch(/\[data-sidebar-collapsed="true"\][^{]*\{[^}]*transition:/)
+  })
+
   it('keeps the element shapes the runtime relies on', () => {
     const html = shell()
     expect(html).toMatch(/<aside class="v2-side" id="xp-sidebar" data-xp-sidebar tabindex="-1" aria-label="xWHM navigation">/)
     expect(html).toMatch(/data-action="toggle-mobile-nav" aria-controls="xp-sidebar" aria-expanded="false"/)
     expect(html).toMatch(/<button type="button" class="v2-backdrop" data-action="close-mobile-nav" data-xp-nav-backdrop hidden tabindex="-1" aria-label="[^"]+"><\/button>/)
-    expect(html).toMatch(/<details class="v2-tools" open data-xp-toolbar-options><summary class="v2-btn">/)
+    expect(html).toMatch(/<details class="v2-tools" open data-xp-toolbar-options><summary class="v2-tools__toggle kt-btn kt-btn-outline h-11">/)
     expect(html).toMatch(/<main id="main-content" class="v2-main" tabindex="-1">/)
     expect(html.match(/<main\b/g)).toHaveLength(1)
-    expect(html).toContain('<a class="v2-skip" href="#main-content">Skip to content</a>')
+    expect(html).toContain('<a class="v2-skip kt-btn kt-btn-primary h-11" href="#main-content">Skip to content</a>')
     expect(html).toMatch(/data-ws-indicator="disconnected" role="status"/)
     expect(shell('en', { realtimeEnabled: false })).toMatch(/data-ws-indicator="unavailable" role="status" aria-label="Live updates off"/)
     expect(html).toMatch(/data-action="open-cmdk" aria-keyshortcuts="Control\+K Meta\+K"/)
@@ -87,9 +113,15 @@ describe('v2 shell', () => {
     expect(html).not.toContain('data-action="open-activity-drawer"')
     expect(html).not.toContain('class="v2-top__badge')
     expect(html).toContain('data-generation-chip="142"')
-    expect(html).toMatch(/<a class="v2-btn v2-top__lang" href="\/whm\/accounts\?lang=ar" lang="ar" hreflang="ar" data-lang-switch="ar">/)
+    expect(html).toMatch(/<a class="v2-top__lang kt-btn kt-btn-ghost h-11 min-w-11" href="\/whm\/accounts\?lang=ar" lang="ar" hreflang="ar" data-lang-switch="ar">/)
     expect(html).toContain('data-theme-toggle="light" aria-label="Light theme"')
-    expect(html).toMatch(/<details class="v2-account" data-user-menu>.*data-security-link="true".*<button type="button" class="v2-menu__item v2-menu__item--danger" data-action="logout">Sign out<\/button>/s)
+    expect(html).toMatch(/<details class="v2-account" data-user-menu>.*data-security-link="true".*<button type="button" class="v2-menu__item v2-menu__item--danger kt-btn kt-btn-outline justify-center w-full h-11" data-action="logout">Sign out<\/button>/s)
+    expect(html).toMatch(/data-action="toggle-sidebar-collapse" aria-controls="xp-sidebar" aria-expanded="true" aria-label="Toggle sidebar"/)
+    expect(html).toMatch(/<div class="v2-shell" data-xp-activity-shell data-surface="xwhm" data-shell-nav="catalog" data-session-actor="xwhm:root">/)
+    expect(html).toMatch(/<div class="v2-nav v2-nav--favorites" data-whm-favorites-nav hidden><h2 class="v2-nav__label">.*?<span>Favorites<\/span><\/h2><ul class="kt-menu flex-col" aria-label="Favorites"><\/ul><\/div>/)
+    expect(html).toMatch(/data-whm-bell data-unread="false" aria-label="Notifications">.*?data-whm-bell-count aria-hidden="true" hidden><\/span><\/a>/)
+    expect(html).toContain('<aside id="xp-ops-dock" class="v2-ops-dock" data-xp-ops-dock role="region" aria-label="Activity &amp; Jobs" hidden></aside>')
+    expect(html).toMatch(/<div class="v2-work" data-xp-shell-content>/)
     expect(shell('en', { account: { signedIn: false, signInHref: '/login' } })).not.toContain('data-action="logout"')
   })
 
@@ -102,7 +134,7 @@ describe('v2 shell', () => {
     }
     expect(html).toMatch(/<div id="xp-cmdk-modal"[^>]* hidden role="dialog" aria-modal="true" aria-labelledby="xp-cmdk-title">/)
     expect(html).toMatch(/<input id="xp-cmdk-input" type="search" data-xp-filter-input="true" data-cmdk-search="true" role="combobox"[^>]*aria-controls="xp-cmdk-results"/)
-    expect(html).toMatch(/<a id="xp-cmdk-option-0"[^>]*role="option" aria-selected="false" tabindex="-1">.*<strong>Accounts<\/strong>/)
+    expect(html).toMatch(/<a id="xp-cmdk-option-0"[^>]*role="option" aria-selected="false" tabindex="-1">.*<strong[^>]*>Accounts<\/strong>/)
     expect(html).toMatch(/<div id="xp-activity-drawer"[^>]* data-xp-drawer="activity" hidden role="dialog" aria-modal="true" aria-labelledby="xp-activity-drawer-title">/)
     expect(html).toMatch(/<section id="xp-reconcile-banner"[^>]* data-reconcile-banner="true" data-generation-id="143" data-reconcile-status="running" aria-labelledby="xp-reconcile-title">/)
     for (const stage of ['render', 'test', 'switch', 'reload', 'verify']) expect(html).toMatch(new RegExp(`data-step-status="pending" data-stage="${stage}"`))
@@ -110,12 +142,25 @@ describe('v2 shell', () => {
 
   it('builds collapsible sections from the role-filtered catalog with the current route marked', () => {
     const html = shell()
-    const routes = [...html.matchAll(/<a href="([^"]+)" data-nav-route="([^"]+)"/g)]
+    const routes = [...html.matchAll(/<a class="kt-menu-link[^"]*" href="([^"]+)" data-nav-route="([^"]+)"/g)]
     expect(routes.length).toBeGreaterThan(10)
     for (const [, href, route] of routes) expect(href).toBe(route)
-    expect(html.match(/aria-current="page"/g)).toHaveLength(1)
-    expect(html).toContain('<a href="/whm/accounts" data-nav-route="/whm/accounts" aria-current="page">')
-    expect(html).toMatch(/<details open><summary>[^]*?<span>Accounts<\/span>/)
+    // The current page is marked once in the section list and once in the tab row of its section.
+    expect(html.match(/data-nav-route="[^"]+" aria-current="page"/g)).toHaveLength(1)
+    expect(html.match(/aria-current="page"/g)).toHaveLength(2)
+    expect(html).toMatch(/<a class="kt-menu-link[^"]*" href="\/whm\/accounts" data-nav-route="\/whm\/accounts" aria-current="page"><span class="kt-menu-title leading-\(--lh-text\)">Accounts<\/span><\/a>/)
+    const tabs = /<nav class="v2-navbar[^"]*" aria-label="Accounts">(.*?)<\/nav>/s.exec(html)![1]!
+    expect(tabs).toContain('<a class="kt-menu-link" href="/whm/accounts" aria-current="page">')
+    expect(tabs.match(/aria-current="page"/g)).toHaveLength(1)
+    const section = /<li class="kt-menu-item" data-nav-section="accounts">(.*?)<\/details><\/li>/s.exec(html)![1]!
+    expect([...tabs.matchAll(/<a class="kt-menu-link" href="([^"]+)"/g)].map(match => match[1]))
+      .toEqual([...section.matchAll(/data-nav-route="([^"]+)"/g)].map(match => match[1]))
+    expect(tabs).not.toContain('data-nav-route=')
+    // The vertical menu: every section is a disclosure with its icon, name and arrow; only the current one is open.
+    expect(html).toMatch(/<li class="kt-menu-item" data-nav-section="accounts"><details open><summary class="kt-menu-link[^"]*"><span class="kt-menu-icon"><i class="v2-icon ki-filled ki-users [^"]*" aria-hidden="true"><\/i><\/span><span class="kt-menu-title leading-\(--lh-text\)">Accounts<\/span><span class="kt-menu-arrow">/)
+    expect(html.match(/<details open><summary class="kt-menu-link/g)).toHaveLength(1)
+    expect(html.match(/<details><summary class="kt-menu-link/g)!.length).toBeGreaterThan(5)
+    expect(html).not.toContain(' style="')
     expect(routes.every(([, , route]) => route!.startsWith('/whm'))).toBe(true)
     // An account owner never sees xWHM pages, and nothing is listed without visibility.
     const ownerHtml = shell('en', { surface: 'xpanel', activeRoute: '/home', homeHref: '/home', visibility: owner })
@@ -128,7 +173,7 @@ describe('v2 shell', () => {
     const html = shell('ar')
     expect(html).toMatch(/[؀-ۿ]/)
     expect(html).not.toMatch(/[٠-٩۰-۹]/)
-    expect(html).toContain('class="v2-icon v2-nav__chev v2-flip"')
+    expect(html).toContain('class="v2-icon v2-nav__chev ki-filled ki-right text-sm leading-none v2-flip"')
     const document = renderV2Document({ htmlAttributes: 'lang="ar" dir="rtl" data-theme="light"', htmlAttributeSuffix: ' data-ui-theme="v2"', faviconHref: '/favicon.svg', headHtml: '', title: 'x', bodyHtml: html })
     expect(document).toContain('<html lang="ar" dir="rtl" data-theme="light" data-ui-theme="v2">')
   })
@@ -137,15 +182,15 @@ describe('v2 shell', () => {
     const unqualifiedCatalog = tools.map((tool): CatalogTool => ({ ...tool, delivery: { ...tool.delivery, status: 'researched' } }))
     const before = JSON.stringify({ tools, unqualifiedCatalog })
     const html = shell(locale, { surface: 'xpanel', activeRoute: '/home', homeHref: '/home', visibility: owner, catalog: unqualifiedCatalog })
-    const sections = [...html.matchAll(/<li data-nav-section="([^"]+)">/g)].map(match => match[1])
+    const sections = [...html.matchAll(/<li class="kt-menu-item" data-nav-section="([^"]+)">/g)].map(match => match[1])
     expect(sections).toEqual(['general', 'email', 'files', 'databases', 'domains', 'metrics', 'security', 'software', 'advanced', 'preferences'])
     for (const route of ['/home', '/resources', '/email/accounts', '/files/manager', '/databases/mariadb', '/domains', '/metrics/traffic', '/security/account', '/software/php', '/advanced/cron', '/preferences']) {
       expect(canOpenRegisteredRoute(route, owner), route).toBe(true)
       expect(html, route).toContain(`data-nav-route="${route}"`)
     }
     expect(html).toContain('data-nav-route="/home" aria-current="page"')
-    expect(html).toContain('<li data-nav-section="general"><details open>')
-    expect(html).toContain('<li data-nav-section="files"><details>')
+    expect(html).toContain('<li class="kt-menu-item" data-nav-section="general"><details open>')
+    expect(html).toContain('<li class="kt-menu-item" data-nav-section="files"><details>')
     expect(html).not.toContain('data-navigation-empty="true"')
     expect(html).not.toContain('data-nav-route="/whm')
     expect(html).not.toContain('data-nav-route="/mail/')

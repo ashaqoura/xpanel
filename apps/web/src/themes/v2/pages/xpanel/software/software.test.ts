@@ -83,7 +83,7 @@ describe('V2 account software page styles', () => {
 
   it('keeps the .htaccess save controls in the apply bar and styles its page classes', () => {
     const html = renderV2PanelHtaccessPage({ ...props, activeRoute: '/software/htaccess' }, manage)
-    expect(html).toMatch(/<section class="v2-card v2-panel-ht-apply"[^>]*><p role="status" data-state="unread" data-htaccess-status[^>]*>[^<]+<\/p><div class="v2-panel-settings__actions"><button[^>]*data-htaccess-discard[^>]*>[^<]+<\/button><button[^>]*data-htaccess-save[^>]*>/)
+    expect(html).toMatch(/<section class="v2-card v2-panel-ht-apply kt-card [^"]*"[^>]*><p role="status" data-state="unread" data-htaccess-status[^>]*>[^<]+<\/p><div class="v2-panel-settings__actions"><button[^>]*data-htaccess-discard[^>]*>[^<]+<\/button><button[^>]*data-htaccess-save[^>]*>/)
     const classes = pageClasses(html, /^v2-panel-ht-/)
     expect(classes.size).toBeGreaterThan(4)
     for (const name of classes) expect(PANEL_HTACCESS_CSS, name).toContain(`.${name}`)

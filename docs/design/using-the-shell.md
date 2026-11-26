@@ -1,6 +1,6 @@
 # Using the shell
 
-New pages should look like the existing ones without a private stylesheet. Render them through the shared shell and the classes in `apps/web/src/tokens.ts`. The token values and the reasons for the 44px targets and 26px page title are in [artifact-design-system.md](artifact-design-system.md).
+New pages should look like the existing ones without a private stylesheet. Render them through the shared shell and the classes in `apps/web/src/tokens.ts`. The token values and the reasons for the 44px targets and 26px page title are in [artifact-design-system.md](artifact-design-system.md). This page describes the classic theme; v2 pages use the `kt-*` components and the shell in `apps/web/src/themes/v2/` ([Metronic v2 theme](../decisions/2026-11-24-metronic-v2-theme.md)).
 
 ## Page shape
 

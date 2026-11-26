@@ -223,7 +223,7 @@ function createFilePresentation(root:HTMLElement,copy:(text:string)=>string,size
     const action=browse?(single?.kind==='directory'?'directory':'open'):'restore'
     const available=single?rowFor(single)?.querySelector<HTMLButtonElement>('[data-file-workspace-action="'+action+'"]'):undefined
     const second=single?rowFor(single)?.querySelector<HTMLButtonElement>('[data-file-workspace-action="'+(browse?'chmod':'purge')+'"]'):undefined
-    primary.textContent=copy(browse?(single?.kind==='directory'?msgctxt('file-workspace-client','Open'):msgctxt('file-workspace-client','Edit')):'Restore')
+    ;(primary.querySelector('[data-xp-slot="label"]') ?? primary).textContent = copy(browse?(single?.kind==='directory'?msgctxt('file-workspace-client','Open'):msgctxt('file-workspace-client','Edit')):'Restore')
     secondary.textContent=copy(browse?'Permissions':'Delete for good…')
     primary.disabled=locked||!available||available.disabled;secondary.disabled=locked||!second||second.disabled
     copyPath.disabled=locked||!single||typeof navigator.clipboard?.writeText!=='function'

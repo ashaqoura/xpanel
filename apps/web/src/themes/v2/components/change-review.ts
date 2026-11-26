@@ -63,10 +63,18 @@ export interface ChangeReviewProps {
   hooks?: HookAttributes
 }
 
+// The Metronic "light" panels of the review: a muted box for the current values, a primary-tinted one for the
+// proposed values. Complete literal class lists, so the stylesheet build keeps every utility.
+const SIDE = 'v2-review__side flex flex-col gap-2.5 grow basis-64 min-w-0 rounded-lg border border-border bg-muted/40 p-4'
+const SIDE_PROPOSED = 'v2-review__side v2-review__side--proposed flex flex-col gap-2.5 grow basis-64 min-w-0 rounded-lg border border-primary/10 bg-primary/5 p-4'
+const BOX = 'v2-review__box flex flex-col gap-1.5 grow basis-0 min-w-0 rounded-md border border-border bg-muted/40 p-3'
+const BOX_PROPOSED = 'v2-review__box v2-review__box--proposed flex flex-col gap-1.5 grow basis-0 min-w-0 rounded-md border border-primary/10 bg-primary/5 p-3'
+const KICKER = 'text-xs font-medium text-secondary-foreground'
+
 const facts = (rows: readonly ReviewRow[], side: 'current' | 'proposed'): string =>
-  `<dl>${rows.map(row => {
+  `<dl class="flex flex-col gap-4">${rows.map(row => {
     const changed = side === 'proposed' && row.current !== row.proposed
-    return `<div><dt>${escapeHtml(row.label)}</dt><dd${changed ? ' class="v2-review__changed"' : ''}><bdi class="v2-num${row.mono ? ' v2-mono' : ''}" dir="${row.mono ? 'ltr' : 'auto'}">${escapeHtml(row[side])}</bdi></dd></div>`
+    return `<div class="flex flex-col gap-1 min-w-0"><dt class="text-xs text-secondary-foreground">${escapeHtml(row.label)}</dt><dd class="${changed ? 'v2-review__changed text-sm font-semibold text-mono text-start break-words' : 'text-sm font-normal text-foreground text-start break-words'}"><bdi class="v2-num${row.mono ? ' v2-mono' : ''}" dir="${row.mono ? 'ltr' : 'auto'}">${escapeHtml(row[side])}</bdi></dd></div>`
   }).join('')}</dl>`
 
 // One per-field row. Without a row it is the `review-row` template: core fills its text slots, sets data-xp-field and
@@ -74,36 +82,39 @@ const facts = (rows: readonly ReviewRow[], side: 'current' | 'proposed'): string
 function fieldRow(t: Translate, currentLabel: string, row?: ReviewRow): string {
   const slot = (name: string, value: string | undefined, cls: string): string =>
     `<span class="${cls}" data-xp-slot="${name}"${row && !value ? ' data-empty' : ''}>${escapeHtml(value ?? '')}</span>`
-  const value = 'v2-num v2-mono'
   const undo = row && !row.field ? ''
-    : `<button type="button" class="v2-btn v2-btn--ghost v2-review__undo" data-xp-action="undo"${row ? ` data-xp-field="${escapeHtml(row.field!)}" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Undo the change to {field}'), { field: row.label }))}"` : ''}>${escapeHtml(t('Undo'))}</button>`
-  return `<li class="v2-review__row" data-state="${row?.invalid ? 'invalid' : 'changed'}"><div class="v2-review__row-head">${slot('name', row?.label, 'v2-review__name')}${undo}</div><div class="v2-review__pair"><div class="v2-review__box"><span>${escapeHtml(currentLabel)}</span>${slot('current', row?.current, value)}</div>${icon('arrow', 16)}<div class="v2-review__box v2-review__box--proposed"><span>${escapeHtml(t('Proposed'))}</span>${slot('proposed', row?.proposed, value)}</div></div>${slot('details', row?.detail, 'v2-review__detail v2-mono')}</li>`
+    : `<button type="button" class="v2-btn v2-btn--ghost v2-review__undo kt-btn kt-btn-sm kt-btn-ghost" data-xp-action="undo"${row ? ` data-xp-field="${escapeHtml(row.field!)}" aria-label="${escapeHtml(t(msgctxt('theme:v2', 'Undo the change to {field}'), { field: row.label }))}"` : ''}>${escapeHtml(t('Undo'))}</button>`
+  return `<li class="v2-review__row flex flex-col gap-2" data-state="${row?.invalid ? 'invalid' : 'changed'}"><div class="v2-review__row-head flex items-center justify-between gap-2.5">${slot('name', row?.label, 'v2-review__name text-sm font-medium text-mono')}${undo}</div><div class="v2-review__pair flex items-stretch gap-2"><div class="${BOX}"><span class="${KICKER}">${escapeHtml(currentLabel)}</span>${slot('current', row?.current, 'v2-num v2-mono text-sm break-words')}</div>${icon('arrow', 16)}<div class="${BOX_PROPOSED}"><span class="text-xs font-medium text-primary">${escapeHtml(t('Proposed'))}</span>${slot('proposed', row?.proposed, 'v2-num v2-mono text-sm font-semibold break-words')}</div></div>${slot('details', row?.detail, 'v2-review__detail v2-mono text-xs text-secondary-foreground break-words')}</li>`
 }
 
 export function changeReview(t: Translate, props: ChangeReviewProps): string {
   const currentLabel = props.currentLabel ?? t('Current')
   const rollback = props.rollbackGeneration === undefined ? ''
-    : `<p class="v2-review__note">${escapeHtml(t(msgctxt('theme:v2', 'Generation {generation} stays on disk as the rollback target. If a test fails, generation {generation} stays live and nothing is reloaded.'), { generation: props.rollbackGeneration }))}</p>`
+    : `<p class="v2-review__note text-xs text-secondary-foreground">${escapeHtml(t(msgctxt('theme:v2', 'Generation {generation} stays on disk as the rollback target. If a test fails, generation {generation} stays live and nothing is reloaded.'), { generation: props.rollbackGeneration }))}</p>`
   const impact = props.impact
-    ? `<div class="v2-notice v2-notice--warn v2-review__impact" role="note">${icon('alert')}<p><strong>${escapeHtml(props.impact.lead)}</strong> ${escapeHtml(props.impact.text)}</p></div>` : ''
-  const head = `${props.meta ? `<span class="v2-review__meta v2-num">${escapeHtml(props.meta)}</span>` : ''}${props.status ? statusPill({ ...props.status, live: true }) : ''}`
+    ? `<div class="v2-notice v2-notice--warn v2-review__impact kt-alert kt-alert-light kt-alert-warning grow basis-80 min-w-0" role="note">${icon('alert')}<p><strong>${escapeHtml(props.impact.lead)}</strong> ${escapeHtml(props.impact.text)}</p></div>` : ''
+  const head = `${props.meta ? `<span class="v2-review__meta v2-num text-sm text-muted-foreground">${escapeHtml(props.meta)}</span>` : ''}${props.status ? statusPill({ ...props.status, live: true }) : ''}`
   const compare = props.layout === 'fields'
-    ? `<ul class="v2-review__rows"${hookAttrs(props.rowsHooks)}>${props.rows.map(row => fieldRow(t, currentLabel, row)).join('')}</ul>${props.emptyText ? `<p class="v2-review__empty v2-num">${escapeHtml(props.emptyText)}</p>` : ''}${xpTemplate('review-row', fieldRow(t, currentLabel))}`
-    : `<div class="v2-review__compare"><div class="v2-review__side"><h3>${escapeHtml(currentLabel)}</h3>${facts(props.rows, 'current')}</div>${icon('arrow', 20)}<div class="v2-review__side v2-review__side--proposed"><h3>${escapeHtml(t('Proposed'))}</h3>${facts(props.rows, 'proposed')}</div></div>`
+    ? `<ul class="v2-review__rows flex flex-col gap-5 empty:hidden"${hookAttrs(props.rowsHooks)}>${props.rows.map(row => fieldRow(t, currentLabel, row)).join('')}</ul>${props.emptyText ? `<p class="v2-review__empty v2-num text-sm text-secondary-foreground">${escapeHtml(props.emptyText)}</p>` : ''}${xpTemplate('review-row', fieldRow(t, currentLabel))}`
+    : `<div class="v2-review__compare flex flex-wrap items-stretch gap-2.5"><div class="${SIDE}"><h3 class="${KICKER}">${escapeHtml(currentLabel)}</h3>${facts(props.rows, 'current')}</div>${icon('arrow', 20)}<div class="${SIDE_PROPOSED}"><h3 class="text-xs font-medium text-primary">${escapeHtml(t('Proposed'))}</h3>${facts(props.rows, 'proposed')}</div></div>`
   const gate = props.tests.length || rollback || impact
-    ? `<div class="v2-review__gate">${props.tests.length || rollback ? `<div class="v2-review__tests">${props.tests.length ? `<h3>${escapeHtml(t(msgctxt('theme:v2', 'Before the switch')))}</h3><ol>${props.tests.map(test => `<li><code>${escapeHtml(test.command)}</code>${test.purpose ? ` ${escapeHtml(test.purpose)}` : ''}</li>`).join('')}</ol>` : ''}${rollback}</div>` : ''}${impact}</div>` : ''
-  const steps = props.steps ? `<ul class="v2-review__steps" aria-label="${escapeHtml(props.steps.label)}">${props.steps.items.map(step => `<li>${icon(step.icon, 16)}<span>${escapeHtml(step.text)}</span></li>`).join('')}</ul>` : ''
+    ? `<div class="v2-review__gate flex flex-wrap items-start gap-5 rounded-lg border border-border bg-muted/40 p-4">${props.tests.length || rollback ? `<div class="v2-review__tests flex flex-col gap-2.5 grow basis-96 min-w-0">${props.tests.length ? `<h3 class="text-sm font-semibold text-mono">${escapeHtml(t(msgctxt('theme:v2', 'Before the switch')))}</h3><ol>${props.tests.map(test => `<li><code>${escapeHtml(test.command)}</code>${test.purpose ? ` ${escapeHtml(test.purpose)}` : ''}</li>`).join('')}</ol>` : ''}${rollback}</div>` : ''}${impact}</div>` : ''
+  const steps = props.steps ? `<ul class="v2-review__steps grid gap-2.5 sm:grid-cols-2" aria-label="${escapeHtml(props.steps.label)}">${props.steps.items.map(step => `<li class="flex gap-2.5 rounded-lg border border-border p-3.5 text-sm">${icon(step.icon, 16)}<span class="min-w-0 break-words">${escapeHtml(step.text)}</span></li>`).join('')}</ul>` : ''
   const actions = props.actions
-    ? `<div class="v2-review__actions"><button type="button" class="v2-btn"${hookAttrs(props.actions.back.hooks)}>${escapeHtml(props.actions.back.label ?? t(msgctxt('theme:v2', 'Back to editing')))}</button><button type="button" class="v2-btn v2-btn--primary"${hookAttrs(props.actions.save.hooks)}>${escapeHtml(props.actions.save.label ?? t('Save settings'))}</button></div>` : ''
-  return `<section class="v2-card v2-review"${attr('id', props.id)} aria-labelledby="${escapeHtml(props.titleId)}"${hookAttrs(props.hooks)}>
-<div class="v2-card__head"><div class="v2-card__title"><h2 id="${escapeHtml(props.titleId)}">${escapeHtml(props.title)}</h2>${props.description ? `<p>${escapeHtml(props.description)}</p>` : ''}</div>${head}</div>
-${compare}
-${gate}${steps}${actions}${props.applyBarHtml ?? ''}
+    ? `<div class="v2-review__actions flex flex-wrap justify-end gap-2.5"><button type="button" class="v2-btn kt-btn kt-btn-outline"${hookAttrs(props.actions.back.hooks)}>${escapeHtml(props.actions.back.label ?? t(msgctxt('theme:v2', 'Back to editing')))}</button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${hookAttrs(props.actions.save.hooks)}>${escapeHtml(props.actions.save.label ?? t('Save settings'))}</button></div>` : ''
+  return `<section class="v2-card v2-review kt-card"${attr('id', props.id)} aria-labelledby="${escapeHtml(props.titleId)}"${hookAttrs(props.hooks)}>
+<div class="v2-card__head kt-card-header"><div class="v2-card__title"><h2 id="${escapeHtml(props.titleId)}">${escapeHtml(props.title)}</h2>${props.description ? `<p>${escapeHtml(props.description)}</p>` : ''}</div>${head ? `<div class="v2-card__actions kt-card-toolbar">${head}</div>` : ''}</div>
+<div class="v2-card__body kt-card-content">${compare}
+${gate}${steps}${actions}${props.applyBarHtml ?? ''}</div>
 </section>`
 }
 
 // The bar's state dot follows data-state on the bar root ("pending" or "clean"), which core updates with the count.
 export const APPLY_DOT = '<span class="v2-apply__dot" aria-hidden="true"></span>'
+/** The save bar surface: a kt-card row with the state at the start and the actions at the end. */
+export const APPLY_BAR = 'v2-apply kt-card flex-row flex-wrap items-center justify-between gap-2.5 px-5 py-3.5'
+export const APPLY_TEXT = 'v2-apply__text flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-secondary-foreground'
+export const APPLY_ACTIONS = 'v2-apply__actions flex flex-wrap items-center gap-2.5 ms-auto'
 
 export interface ApplyBarProps {
   pendingCount: number
@@ -118,59 +129,23 @@ export interface ApplyBarProps {
 }
 
 export function applyBar(t: Translate, props: ApplyBarProps): string {
-  const tests = props.tests?.length ? ` <span class="v2-apply__tests">${props.tests.map(test => `<code>${escapeHtml(test)}</code>`).join(' ')}</span>` : ''
+  const tests = props.tests?.length ? ` <span class="v2-apply__tests inline-flex flex-wrap gap-1">${props.tests.map(test => `<code class="kt-badge kt-badge-sm kt-badge-outline">${escapeHtml(test)}</code>`).join(' ')}</span>` : ''
   const generation = props.nextGeneration !== undefined && props.rollbackGeneration !== undefined
     ? `<span>${escapeHtml(t(msgctxt('theme:v2', 'Applies as generation {next}; generation {current} stays as the rollback target'), { next: props.nextGeneration, current: props.rollbackGeneration }))}</span>` : ''
-  return `<div class="v2-apply" data-state="${props.pendingCount ? 'pending' : 'clean'}"${hookAttrs(props.hooks)}><p class="v2-apply__text v2-num" role="status">${APPLY_DOT}<strong>${escapeHtml(t(msgctxt('theme:v2', '{count, plural, one {# pending change} other {# pending changes}}'), { count: props.pendingCount }))}</strong> <span>${escapeHtml(t(msgctxt('theme:v2', 'Tests run before the switch')))}${tests ? ':' : ''}</span>${tests}${generation}</p><span class="v2-apply__actions"><button type="button" class="v2-btn"${hookAttrs(props.discard)}>${escapeHtml(t('Discard'))}</button><button type="button" class="v2-btn v2-btn--primary"${hookAttrs(props.apply)}>${escapeHtml(t(msgctxt('theme:v2', 'Review and apply')))}</button></span></div>`
+  return `<div class="${APPLY_BAR}" data-state="${props.pendingCount ? 'pending' : 'clean'}"${hookAttrs(props.hooks)}><p class="${APPLY_TEXT} v2-num" role="status">${APPLY_DOT}<strong>${escapeHtml(t(msgctxt('theme:v2', '{count, plural, one {# pending change} other {# pending changes}}'), { count: props.pendingCount }))}</strong> <span>${escapeHtml(t(msgctxt('theme:v2', 'Tests run before the switch')))}${tests ? ':' : ''}</span>${tests}${generation}</p><span class="${APPLY_ACTIONS}"><button type="button" class="v2-btn kt-btn kt-btn-outline"${hookAttrs(props.discard)}>${escapeHtml(t('Discard'))}</button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${hookAttrs(props.apply)}>${escapeHtml(t(msgctxt('theme:v2', 'Review and apply')))}</button></span></div>`
 }
 
-// The review takes the accent line while it holds pending rows or its in-review actions, as on the boards.
-export const CHANGE_REVIEW_CSS = `.v2-review:has(.v2-review__rows>li,>.v2-review__actions),.v2-apply[data-state="pending"]{border-color:var(--accent-line)}
-.v2-review>.v2-card__head{align-items:baseline}
-.v2-review__meta{font-size:13px;color:var(--muted)}
-.v2-review__compare{display:flex;flex-wrap:wrap;align-items:stretch;gap:var(--space-1) 12px}
-.v2-review__compare>.v2-icon,.v2-review__pair>.v2-icon{align-self:center;color:var(--muted)}
-.v2-review__side,.v2-review__box{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-2);border-radius:var(--radius-notice);background:var(--subtle);border:1px solid var(--line)}
-.v2-review__side h3{font-size:12px;color:var(--muted)}
-.v2-review__side--proposed,.v2-review__box--proposed{background:var(--accent-soft);border-color:var(--accent-line)}
-.v2-review__side--proposed h3{color:var(--accent)}
-.v2-review__side dl{display:flex;flex-direction:column;gap:var(--space-2)}
-.v2-review__side dl>div{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
-.v2-review__side dt{font-size:12px;color:var(--muted)}
-.v2-review__side dd{font-size:13px;text-align:start;overflow-wrap:anywhere}
-.v2-review__changed{font-weight:600}
-.v2-review__rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-2)}
-.v2-review__rows:not(:empty)+.v2-review__empty{display:none}
-.v2-review__empty{font-size:13px;line-height:1.6;color:var(--muted)}
-.v2-review__row{display:flex;flex-direction:column;gap:var(--space-1)}
-.v2-review__row-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-1)}
-.v2-review__name{font-size:13px;font-weight:600}
-.v2-review__undo{padding:0 var(--space-1);font-size:13px}
-.v2-review__pair{display:flex;align-items:stretch;gap:var(--space-1)}
-.v2-review__box{flex-basis:0;border-radius:var(--radius-control)}
-.v2-review__box>:first-child{font-size:12px;color:var(--muted)}
-.v2-review__box>:last-child{font-size:13px;overflow-wrap:anywhere}
-.v2-review__box--proposed>:last-child{font-weight:600}
-.v2-review__row[data-state=invalid] .v2-review__box--proposed>:last-child{color:var(--bad)}
-.v2-review__detail{font-size:12px;color:var(--text-2);overflow-wrap:anywhere}
-.v2-review__detail[data-empty]{display:none}
-.v2-review__gate{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-2) var(--space-3);padding:var(--space-2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--subtle)}
-.v2-review__tests{flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:var(--space-1)}
-.v2-review__tests ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.55;color:var(--text-2)}
-.v2-review__tests code{font-size:12px;color:var(--text)}
-.v2-review__note{font-size:12px;color:var(--muted);line-height:1.6}
-.v2-review__impact{flex:1 1 360px;min-width:0}
-.v2-review__steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px}
-.v2-review__steps>li{display:flex;gap:10px;padding:12px 14px;border-radius:var(--radius-control);border:1px solid var(--line);background:var(--subtle);font-size:13px;line-height:1.6}
-.v2-review__steps .v2-icon{margin-top:3px;color:var(--accent)}
-.v2-review__steps span{min-width:0;overflow-wrap:anywhere}
-.v2-review__actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:12px}
-.v2-apply{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2);padding:12px;padding-inline-start:20px;border-radius:var(--radius-notice);background:var(--subtle);border:1px solid var(--line)}
-.v2-apply__text{display:flex;flex-wrap:wrap;align-items:center;gap:4px var(--space-1);font-size:13px;color:var(--text-2)}
-.v2-apply__text strong{color:var(--text);font-weight:600}
-.v2-apply__dot{display:inline-block;width:8px;height:8px;margin-inline-end:8px;border-radius:50%;background:var(--muted);vertical-align:middle}
-.v2-apply[data-state="pending"] .v2-apply__dot{background:var(--warn)}
-.v2-apply__tests{display:inline-flex;flex-wrap:wrap;gap:4px}
-.v2-apply__tests code{padding:0 6px;border-radius:6px;background:var(--sunken);font-size:12px}
-.v2-apply__actions{display:inline-flex;flex-wrap:wrap;gap:var(--space-1);margin-inline-start:auto}
+// The review and the bars are Metronic cards laid out with utilities. These rules hold only what follows the state
+// core sets: the accent line while changes are pending, the pending dot, an invalid proposed value and the slots
+// that hide while empty.
+export const CHANGE_REVIEW_CSS = `.v2-review:has(.v2-review__rows>li,.v2-review__actions),.v2-apply[data-state="pending"]{border-color:var(--accent-line)!important}
+.v2-review :is(.v2-review__compare,.v2-review__pair)>.v2-icon{align-self:center;color:var(--muted)}
+.v2-review__rows:not(:empty)+.v2-review__empty,.v2-review__detail[data-empty]{display:none}
+.v2-review__row[data-state=invalid] .v2-review__box--proposed>:last-child{color:var(--destructive)}
+.v2-review__tests ol{padding-inline-start:1.25rem;list-style:decimal;display:flex;flex-direction:column;gap:.375rem;font-size:.8125rem;line-height:1.55;color:var(--text-2)}
+.v2-review__tests code{font-size:.8125rem;color:var(--text)}
+.v2-review__steps .v2-icon{margin-block-start:.125rem;color:var(--accent)}
+.v2-apply__text strong{color:var(--mono,var(--text));font-weight:600}
+.v2-apply__dot{flex:none;width:.5rem;height:.5rem;border-radius:50%;background:var(--muted)}
+.v2-apply[data-state="pending"] .v2-apply__dot{background:var(--color-yellow-500,var(--warn))}
 `

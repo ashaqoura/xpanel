@@ -91,8 +91,11 @@ describe('v2 account files pages', () => {
     const html = renderV2FilesPage(v2Messages.translator('ar'), { surface: { account, files: [] }, canManage: true })
     expect(html).toContain('<bdi dir="ltr" class="v2-mono" data-file-home-path>/home/alice</bdi>')
     expect(V2_FILES_CSS).toContain('text-align:start')
-    expect(V2_FILES_CSS).toContain('gap:var(--space-2)')
-    expect(V2_FILES_CSS).toContain('gap:var(--space-3)')
+    // Spacing follows the standard rhythm: 32px between sections, 24px groups, 16px fields, 8px label gaps; no pixel gaps.
+    expect(V2_FILES_CSS).toContain('--v2-files-gap:2rem')
+    expect(V2_FILES_CSS).toContain('gap:1.5rem')
+    expect(V2_FILES_CSS).toContain('gap:1rem')
+    expect(V2_FILES_CSS).not.toMatch(/gap:[0-9.]+px/)
     expect(html).not.toMatch(/[\u0660-\u0669\u06f0-\u06f9]/)
   })
 })

@@ -12,14 +12,14 @@ describe('v2 WHM activity board regions', () => {
     const html = render('/whm/audit', { ...admitted, auditEntries: [] })
     const header = html.slice(0, html.indexOf('<section class="v2-card"'))
     expect(header).toContain('data-audit-export')
-    expect(header.match(/<a class="v2-btn" download="xpanel-audit-page\.(?:csv|json)"/g)).toHaveLength(2)
+    expect(header.match(/<a class="v2-btn kt-btn kt-btn-outline" download="xpanel-audit-page\.(?:csv|json)"/g)).toHaveLength(2)
     expect(html.match(/data-audit-export/g)).toHaveLength(1)
     expect(render('/whm/audit', { observationAuthority: { canRead: false, canManage: false }, auditEntries: [] })).not.toContain('data-audit-export')
   })
 
   it('tones each audit outcome from the recorded outcome and never from its label', () => {
     const html = render('/whm/audit', { ...admitted, auditEntries: [entry('a', 'ok'), entry('b', 'denied'), entry('c', 'failed'), entry('d', 'other')] as WhmObservationInput['auditEntries'] })
-    const tones = [...html.matchAll(/<tr data-audit-id="([a-d])">.*?<span class="v2-pill v2-pill--(\w+)">/gs)].map(match => `${match[1]}:${match[2]}`)
+    const tones = [...html.matchAll(/<tr data-audit-id="([a-d])">.*?<span class="v2-pill v2-pill--(\w+)[^"]*">/gs)].map(match => `${match[1]}:${match[2]}`)
     expect(tones).toEqual(['a:ok', 'b:warn', 'c:bad', 'd:neutral'])
   })
 
@@ -89,7 +89,7 @@ describe('v2 WHM activity board regions', () => {
 
   it('counts the entries of the supplied page and stays silent without a read', () => {
     const page = (ids: string[]): string => render('/whm/audit', { ...admitted, auditEntries: ids.map(id => entry(id, 'ok')) as WhmObservationInput['auditEntries'] })
-    expect(page(['a', 'b'])).toContain('<p class="v2-muted" data-audit-count>2 entries on this page</p>')
+    expect(page(['a', 'b'])).toContain('<p class="text-[13px] leading-(--lh-cap) text-secondary-foreground" data-audit-count>2 entries on this page</p>')
     expect(page(['a'])).toContain('data-audit-count>1 entry on this page</p>')
     expect(render('/whm/audit')).not.toContain('data-audit-count')
   })
@@ -107,8 +107,8 @@ describe('v2 WHM activity board regions', () => {
   it('keeps the jobs empty and failure blocks hidden until the controller reveals them', () => {
     const html = render('/whm/jobs')
     expect(html).toContain('<div class="v2-state v2-state--empty" data-whm-jobs-empty hidden>')
-    expect(html).toContain('<div class="v2-notice v2-notice--bad" data-whm-jobs-outcome hidden>')
-    expect(html).toMatch(/<p data-whm-jobs-failure><\/p><p data-whm-jobs-error><\/p>/)
+    expect(html).toContain('<div class="v2-notice v2-notice--bad kt-alert kt-alert-light kt-alert-destructive" data-whm-jobs-outcome hidden>')
+    expect(html).toMatch(/<p class="kt-alert-description" data-whm-jobs-failure><\/p><p class="kt-alert-description" data-whm-jobs-error><\/p>/)
   })
 
   it('lays the three unread support manifest lists out in one group', () => {

@@ -306,7 +306,12 @@ describe('v2 account database family', () => {
     }
     expect(PANEL_DATABASES_CSS).not.toMatch(/(?:^|[;{\s])(?:left|right)\s*:/)
     expect(PANEL_DATABASES_CSS).not.toMatch(/text-align:(?:left|right)/)
-    expect(PANEL_DATABASES_CSS).toContain('gap:var(--space-1)')
+    // Spacing follows the standard rhythm: 32px between sections, 24px groups, 16px fields, 8px label gaps; no pixel gaps.
+    expect(PANEL_DATABASES_CSS).toContain('--v2-db-gap:2rem')
+    expect(PANEL_DATABASES_CSS).toContain('gap:1.5rem')
+    expect(PANEL_DATABASES_CSS).toContain('gap:1rem')
+    expect(PANEL_DATABASES_CSS).not.toContain('14rem')
+    expect(PANEL_DATABASES_CSS).not.toMatch(/gap:[0-9.]+px/)
     expect(PANEL_DATABASES_CSS).toContain('text-align:var(--v2-control-align,start)')
   })
 

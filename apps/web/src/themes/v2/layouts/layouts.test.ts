@@ -122,27 +122,29 @@ describe('v2 page layouts', () => {
 
   it('build the page top and root hooks of every layout', () => {
     for (const html of [list(), settings({ kind: 'revision', bar: { pendingCount: 1, revision: 'r1', discard: {}, save: {} } }), custom('ready'), dashboard(), wizard(), log(), editor(true), matrix()]) {
-      expect(html).toMatch(/^<div class="v2-layout" data-[a-z-]+-workspace><header class="v2-page-head"(?: data-route="[^"]+")?>/)
+      expect(html).toMatch(/^<div class="v2-layout grid grid-cols-1 content-start gap-8" data-[a-z-]+-workspace><header class="v2-page-head"(?: data-route="[^"]+")?>/)
       expect(count(html, /<h1>/)).toBe(1)
       expect(html).toContain('<nav class="v2-crumbs" aria-label="Breadcrumb">')
     }
     const top = list()
-    expect(top).toMatch(/<section class="v2-kpi-row" aria-label="Tokens"><article class="v2-kpi">\s*<div class="v2-kpi__head"><h2>/)
-    expect(top).toMatch(/<span>Section<\/span><svg class="v2-icon v2-flip"/)
+    expect(top).toMatch(/<section class="v2-kpi-row" aria-label="Tokens"><article class="v2-kpi kt-card">\s*<div class="v2-kpi__head"><h2>/)
+    expect(top).toMatch(/<span>Section<\/span><i class="v2-icon [^"]*v2-flip"/)
   })
 
   it('list: filters, table, bulk bar, pagination, drawers and the row and menu templates', () => {
     const html = list()
-    expect(html).toContain('<section class="v2-card v2-card--flush" aria-labelledby="list-title">')
+    expect(html).toContain('<section class="v2-card v2-card--flush kt-card" aria-labelledby="list-title">')
+    expect(html).toContain('<div class="v2-card__body kt-card-table">')
     expect(html).toContain('<p role="status" data-list-status>Tokens</p>')
     for (const hook of ['data-quick="all"', 'data-list-search', 'data-list-clear', 'data-bulk="revoke"', 'data-bulk-clear', 'data-select-all', 'data-list-rows', 'data-row="alice"', 'data-page-next', 'data-drawer-close']) expect(html, hook).toContain(` ${hook}`)
     expect(html).toMatch(/role="region" aria-label="Bulk actions" hidden/)
-    expect(html).toContain('<div class="v2-split" data-xp-drawer-host><div class="v2-stack v2-stack--tight"><div class="v2-notice v2-notice--info" role="status">')
-    expect(html).toContain('<aside class="v2-drawer" id="tok-form" aria-labelledby="tok-form-title">')
-    expect(html).toContain('<template data-xp-template="list-row"><tr><td class="v2-table__check"><input type="checkbox" aria-label="" data-xp-action="select" data-row-select></td><td><span data-xp-slot="name"></span></td><td><span data-xp-slot="state"></span></td><td class="v2-table__actions"><span data-xp-slot="menu"></span></td></tr></template>')
+    expect(html).toContain('<div class="v2-split" data-xp-drawer-host><div class="v2-stack v2-stack--tight"><div class="v2-notice v2-notice--info kt-alert kt-alert-light kt-alert-primary" role="status">')
+    expect(html).toContain('<aside class="v2-drawer kt-card" id="tok-form" aria-labelledby="tok-form-title">')
+    expect(html).toContain('<template data-xp-template="list-row"><tr><td class="v2-table__check"><input type="checkbox" class="kt-checkbox kt-checkbox-sm" aria-label="" data-xp-action="select" data-row-select></td><td><span data-xp-slot="name"></span></td><td><span data-xp-slot="state"></span></td><td class="v2-table__actions text-end"><span data-xp-slot="menu"></span></td></tr></template>')
     expect(html).toMatch(/<template data-xp-template="row-menu"><span class="v2-menu"><button[^>]*aria-haspopup="menu"[^>]*data-xp-action="menu">.*role="menu".*data-xp-action="revoke"/s)
-    expect(html).toMatch(/<template data-xp-template="tok-detail"><aside class="v2-drawer" id="tok-detail"/)
-    expect(html).toContain('<span class="v2-num" aria-live="polite">Tokens</span>')
+    expect(html).toMatch(/<template data-xp-template="tok-detail"><aside class="v2-drawer kt-card" id="tok-detail"/)
+    // The list footer is a Metronic card footer: the announced count at the start, the bounds note at the end.
+    expect(html).toContain('<div class="v2-foot kt-card-footer flex-wrap justify-between gap-2.5 text-sm text-secondary-foreground"><span class="v2-num font-medium" aria-live="polite">Tokens</span><span>Tokens</span></div>')
   })
 
   it('list: empty, no-match, loading and error states come from the kit blocks', () => {
@@ -155,28 +157,29 @@ describe('v2 page layouts', () => {
     expect(loading).toContain('aria-busy="true"')
     expect(loading).toContain('data-table-state="loading"')
     const failed = list({ list: { ...base, state: 'error', error: { lead: 'Not read.', retry: { 'data-retry': true } } } })
-    expect(failed).toMatch(/<div class="v2-state v2-state--error" role="alert">.*data-retry>/s)
+    expect(failed).toMatch(/<div class="v2-state v2-state--error kt-alert kt-alert-light kt-alert-destructive" role="alert"><i class="v2-icon ki-filled ki-cross-circle [^"]*" aria-hidden="true"><\/i><div class="v2-state__body [^"]*"><p><strong>Not read.<\/strong><\/p><button type="button" class="v2-btn kt-btn kt-btn-sm kt-btn-outline" data-retry>/)
     expect(failed).toContain('data-row="alice"')
   })
 
   it('settings: field sections, the review aside and the apply bar or the revision-checked save', () => {
     const applied = settings({ kind: 'apply', review: fieldReview('Spam'), bar: { pendingCount: 2, tests: ['rspamadm configtest'], nextGeneration: 143, rollbackGeneration: 142, discard: { 'data-discard': true }, apply: { 'data-apply': true } } })
-    expect(applied).toContain('<section class="v2-card" aria-labelledby="filtering">')
-    expect(applied).toContain('<div class="v2-fields"><label class="v2-switch-row" for="sw">')
-    expect(applied).toContain('name="score"')
-    expect(applied).toMatch(/<aside class="v2-aside" aria-label="Review changes"><section class="v2-card v2-review" aria-labelledby="review-title">/)
+    expect(applied).toContain('<section class="v2-card kt-card" aria-labelledby="filtering">')
+    // One column of fields 16px apart: a switch row, then a field whose label sits above its control.
+    expect(applied).toContain('<div class="v2-fields grid grid-cols-1 gap-4"><label class="v2-switch-row flex items-center justify-between gap-5 cursor-pointer" for="sw">')
+    expect(applied).toMatch(/<div class="v2-field kt-form-item"><label for="score" class="kt-form-label">Spam filters<\/label><input id="score" name="score" class="kt-input [^"]*" data-setting="score" type="text" value="Spam filters"><\/div><\/div><\/div><\/section>/)
+    expect(applied).toMatch(/<aside class="v2-aside" aria-label="Review changes"><section class="v2-card v2-review kt-card" aria-labelledby="review-title">/)
     // Per-field rows: current beside proposed, each with Undo carrying the field it restores.
-    expect(applied).toContain('<ul class="v2-review__rows" data-review-rows><li class="v2-review__row" data-state="changed"><div class="v2-review__row-head"><span class="v2-review__name" data-xp-slot="name">Spam</span><button type="button" class="v2-btn v2-btn--ghost v2-review__undo" data-xp-action="undo" data-xp-field="score" aria-label="Undo the change to Spam">Undo</button></div>')
-    expect(applied).toContain('<div class="v2-review__box"><span>Current · gen 142</span><span class="v2-num v2-mono" data-xp-slot="current">7</span></div>')
-    expect(applied).toContain('<span>Proposed</span><span class="v2-num v2-mono" data-xp-slot="proposed">6</span>')
-    expect(applied).toContain('<span class="v2-review__detail v2-mono" data-xp-slot="details" data-empty></span>')
+    expect(applied).toMatch(/<ul class="v2-review__rows [^"]*" data-review-rows><li class="v2-review__row [^"]*" data-state="changed"><div class="v2-review__row-head [^"]*"><span class="v2-review__name [^"]*" data-xp-slot="name">Spam<\/span><button type="button" class="v2-btn v2-btn--ghost v2-review__undo kt-btn kt-btn-sm kt-btn-ghost" data-xp-action="undo" data-xp-field="score" aria-label="Undo the change to Spam">Undo<\/button><\/div>/)
+    expect(applied).toMatch(/<div class="v2-review__box [^"]*"><span class="[^"]*">Current · gen 142<\/span><span class="v2-num v2-mono [^"]*" data-xp-slot="current">7<\/span><\/div>/)
+    expect(applied).toMatch(/<div class="v2-review__box v2-review__box--proposed [^"]*"><span class="[^"]*">Proposed<\/span><span class="v2-num v2-mono [^"]*" data-xp-slot="proposed">6<\/span>/)
+    expect(applied).toMatch(/<span class="v2-review__detail v2-mono [^"]*" data-xp-slot="details" data-empty><\/span>/)
     expect(applied).toMatch(/data-state="invalid">.*data-xp-field="allow".*data-xp-slot="details">\+ a@example.com</s)
-    expect(applied).toContain('<p class="v2-review__empty v2-num">Spam</p><template data-xp-template="review-row"><li class="v2-review__row" data-state="changed">')
-    expect(applied).toMatch(/<template data-xp-template="review-row">.*<button type="button" class="v2-btn v2-btn--ghost v2-review__undo" data-xp-action="undo">Undo<\/button>.*<\/template>/s)
+    expect(applied).toMatch(/<p class="v2-review__empty v2-num [^"]*">Spam<\/p><template data-xp-template="review-row"><li class="v2-review__row [^"]*" data-state="changed">/)
+    expect(applied).toMatch(/<template data-xp-template="review-row">.*<button type="button" class="v2-btn v2-btn--ghost v2-review__undo kt-btn kt-btn-sm kt-btn-ghost" data-xp-action="undo">Undo<\/button>.*<\/template>/s)
     expect(applied).toContain('Generation 142 stays on disk as the rollback target.')
-    expect(applied).toMatch(/<section class="v2-commit" aria-label="Apply changes"><div class="v2-apply" data-state="pending"><p class="v2-apply__text v2-num" role="status"><span class="v2-apply__dot" aria-hidden="true"><\/span><strong>2 pending changes<\/strong>/)
+    expect(applied).toMatch(/<section class="v2-commit" aria-label="Apply changes"><div class="v2-apply kt-card [^"]*" data-state="pending"><p class="v2-apply__text [^"]* v2-num" role="status"><span class="v2-apply__dot" aria-hidden="true"><\/span><strong>2 pending changes<\/strong>/)
     expect(applied).toContain('Applies as generation 143; generation 142 stays as the rollback target')
-    expect(applied).toMatch(/data-discard>Discard<\/button><button type="button" class="v2-btn v2-btn--primary" data-apply>/)
+    expect(applied).toMatch(/data-discard>Discard<\/button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-apply>/)
     expect(applied).toMatch(/role="alertdialog" aria-modal="true" aria-labelledby="discard-title" hidden/)
     const saved = settings({ kind: 'revision', bar: { pendingCount: 1, revision: 'r-41', discard: { 'data-discard': true }, save: { 'data-save': true } } })
     expect(saved).toContain('<section class="v2-commit" aria-label="Save changes">')
@@ -190,8 +193,8 @@ describe('v2 page layouts', () => {
 
   it('custom: a section grid with the not-installed, error, loading and empty states', () => {
     const missing = custom('not-installed')
-    expect(missing).toMatch(/<div class="v2-notice v2-notice--warn" role="status">.*<strong>Virus scanner<\/strong>/s)
-    expect(missing).toContain('<div class="v2-grid"><div class="v2-grid__cell"><section class="v2-card" aria-labelledby="engine">')
+    expect(missing).toMatch(/<div class="v2-notice v2-notice--warn kt-alert kt-alert-light kt-alert-warning" role="status">.*<strong>Virus scanner<\/strong>/s)
+    expect(missing).toContain('<div class="v2-grid"><div class="v2-grid__cell"><section class="v2-card kt-card" aria-labelledby="engine">')
     expect(missing).toContain('<div class="v2-grid__cell v2-grid__cell--full">')
     expect(layouts.customPage(t, { header: header(), state: 'not-installed', sections: [] })).toContain('<strong>Not installed</strong>')
     expect(custom('error')).toMatch(/role="alert".*data-retry>.*v2-grid/s)
@@ -205,11 +208,11 @@ describe('v2 page layouts', () => {
     expect(html).toMatch(/aria-labelledby="cpu">.*<svg role="img" aria-label="Server health"/s)
     expect(html).toContain('<figure class="v2-chart v2-chart--bars" dir="ltr">')
     expect(html).toContain('<ul class="v2-status-list" aria-live="polite" data-check-list><li class="v2-status-item" data-state="bad" data-check="disk">')
-    expect(html).toMatch(/<h3>Server health<\/h3><span class="v2-pill v2-pill--bad">/)
+    expect(html).toMatch(/<h3>Server health<\/h3><span class="v2-pill v2-pill--bad kt-badge kt-badge-outline kt-badge-destructive rounded-\[30px\]">/)
     expect(html).toContain('<template data-xp-template="status-item"><li class="v2-status-item" data-state="neutral"><span class="v2-tile v2-tile--state" aria-hidden="true">')
     expect(html).toContain('<h3 data-xp-slot="name"></h3><span class="v2-pill v2-pill--state"><span class="v2-pill__dot" aria-hidden="true"></span><span data-xp-slot="state"></span></span></div><p data-xp-slot="message"></p></div><p class="v2-status-item__metric v2-num" data-xp-slot="item"></p>')
     // Threshold meters: the measured value on its scale with warning and problem ticks, readable as a meter.
-    expect(html).toMatch(/<section class="v2-card" aria-labelledby="meters-title">.*<ul class="v2-legend" aria-label="Legend">.*Measured value.*Warning tick.*Problem tick/s)
+    expect(html).toMatch(/<section class="v2-card kt-card" aria-labelledby="meters-title">.*<ul class="v2-legend" aria-label="Legend">.*Measured value.*Warning tick.*Problem tick/s)
     expect(html).toContain('<div class="v2-meter__track" role="meter" aria-label="Server health" aria-valuenow="0.26" aria-valuemin="0" aria-valuemax="2.5" aria-valuetext="Server health">')
     expect(html).toContain('<span class="v2-meter__tick v2-meter__tick--warn" style="inset-inline-start:40%"></span><span class="v2-meter__tick v2-meter__tick--bad" style="inset-inline-start:80%"></span>')
     expect(html).toContain('<div class="v2-meter__scale v2-num" aria-hidden="true"><span>0</span><span>2.5</span></div>')
@@ -226,24 +229,26 @@ describe('v2 page layouts', () => {
     expect(count(html, /aria-current="step"/)).toBe(1)
     expect(html).toContain('<dl class="v2-facts" aria-label="Your choices">')
     expect(html).toMatch(/<section class="v2-wizard__panel" aria-labelledby="domain-title" hidden data-wizard-step="domain">/)
-    expect(html).toMatch(/<section class="v2-wizard__panel" aria-labelledby="review-title" data-wizard-step="review">.*Step 2 of 3.*<section class="v2-card v2-review"/s)
+    expect(html).toMatch(/<section class="v2-wizard__panel" aria-labelledby="review-title" data-wizard-step="review"><header class="v2-wizard__head kt-card-header [^"]*"><p class="v2-wizard__kicker v2-num [^"]*">Step 2 of 3<\/p><h2 id="review-title">Convert addon domain<\/h2><\/header><div class="v2-wizard__body kt-card-content [^"]*"><section class="v2-card v2-review kt-card"/)
     expect(count(html, /class="v2-wizard__panel"[^>]*hidden/)).toBe(2)
-    expect(html).toMatch(/data-wizard-back>Back<\/button><button type="button" class="v2-btn v2-btn--primary" data-wizard-next>/)
+    // Back and Next carry the directional Keenicons, which mirror in right-to-left pages.
+    expect(html).toMatch(/class="v2-btn kt-btn kt-btn-outline" data-wizard-back><i class="v2-icon ki-filled ki-left [^"]*v2-flip" aria-hidden="true"><\/i>Back<\/button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-wizard-next>Convert addon domain<i class="v2-icon ki-filled ki-right [^"]*v2-flip" aria-hidden="true"><\/i><\/button>/)
+    expect(html).toContain('<div class="v2-card v2-card--flush v2-wizard kt-card">')
     const blocked = wizard('Review again first.')
-    expect(blocked).toContain('aria-disabled="true" aria-describedby="v2-wizard-next-reason" data-wizard-next')
+    expect(blocked).toContain('class="v2-btn v2-btn--primary kt-btn kt-btn-primary aria-disabled:cursor-not-allowed aria-disabled:opacity-50" aria-disabled="true" aria-describedby="v2-wizard-next-reason" data-wizard-next')
     expect(blocked).toContain('<p id="v2-wizard-next-reason">Review again first.</p>')
   })
 
   it('log: query, stream root and every follow hook of the core contract', () => {
     const html = log()
-    expect(html).toMatch(/<button type="button" class="v2-btn" aria-pressed="false" data-log-follow-interval="5" data-log-follow>/)
+    expect(html).toMatch(/<button type="button" class="v2-btn kt-btn kt-btn-outline aria-pressed:[^"]*" aria-pressed="false" data-log-follow-interval="5" data-log-follow>/)
     expect(count(html, / data-log-follow[\s>]/)).toBe(1)
     expect(html).toMatch(/<div class="v2-log__stream" role="log" aria-labelledby="tail-title" data-log-stream data-log-follow-state="stopped">/)
     expect(count(html, /role="status"[^>]*data-log-follow-status/)).toBe(1)
     expect(html).toContain('<p class="v2-num" role="status" data-log-follow-status>Logs</p>')
-    expect(html).toMatch(/<button type="button" class="v2-btn" data-retry="follow" data-log-follow-retry hidden>/)
+    expect(html).toMatch(/<button type="button" class="v2-btn kt-btn kt-btn-sm kt-btn-outline" data-retry="follow" data-log-follow-retry hidden>/)
     // Each entry is a disclosure: the time is the expand toggle and its details row starts hidden with the slot.
-    expect(html).toMatch(/<template data-xp-template="log-entry"><tr data-level="info"><td><button type="button" class="v2-log__toggle" data-xp-action="expand" aria-expanded="false"><svg[^>]*>.*?<\/svg><span data-xp-slot="time"><\/span><\/button><\/td>/)
+    expect(html).toMatch(/<template data-xp-template="log-entry"><tr data-level="info"><td><button type="button" class="v2-log__toggle kt-btn kt-btn-sm kt-btn-ghost [^"]*" data-xp-action="expand" aria-expanded="false"><i class="v2-icon [^"]*"[^>]*><\/i><span data-xp-slot="time"><\/span><\/button><\/td>/)
     expect(html).toContain('<tr class="v2-log__details"><td colspan="2"><div class="v2-log__detail"><dl class="v2-log__facts" data-xp-slot="details" hidden></dl><template data-xp-template="log-fact"><div class="v2-log__fact"><dt data-xp-slot="label"></dt><dd><bdi dir="ltr" data-xp-slot="value"></bdi></dd></div></template><div class="v2-log__detail-actions"><button type="button" class="v2-btn" data-xp-action="copy">')
     expect(html).toContain('data-log-read>Logs</button>')
     // A caller cannot start the stream in another state.
@@ -260,10 +265,10 @@ describe('v2 page layouts', () => {
     expect(html).toMatch(/<label class="v2-sr" for="block">Error pages<\/label><textarea class="v2-editor__input" id="block" name="block" rows="8" wrap="off" spellcheck="false"[^>]*data-editor-input>ErrorDocument 404/)
     expect(html).toMatch(/role="tablist" aria-label="Error pages">.*<div class="v2-tabpanel" role="tabpanel" id="block-panel" aria-labelledby="tab-draft"/s)
     expect(html).toContain('<template data-xp-template="snippet">Error pages &lt;b&gt;</template>')
-    expect(html).toMatch(/<button type="button" class="v2-btn" aria-controls="block" data-snippet="404">/)
+    expect(html).toMatch(/<button type="button" class="v2-btn kt-btn kt-btn-sm kt-btn-outline" aria-controls="block" data-snippet="404"><i class="v2-icon ki-filled ki-plus /)
     expect(html).toContain('data-editor-test>')
     expect(html).toMatch(/<pre tabindex="0" aria-live="polite"><code>Error pages<\/code><\/pre>/)
-    expect(html).toContain('<p class="v2-apply__text" id="block-save-reason">Save is available after the draft passes its test.</p>')
+    expect(html).toMatch(/<div class="v2-apply kt-card [^"]*"><p class="v2-apply__text [^"]*" id="block-save-reason">Save is available after the draft passes its test.<\/p><span class="v2-apply__actions [^"]*">/)
     expect(html).toContain('aria-disabled="true" aria-describedby="block-save-reason" data-editor-save>')
     // The Changes tab: +/- markers against the saved version, with the change in words on each line.
     expect(html).toContain('<div class="v2-tabpanel" role="tabpanel" id="diff-panel" aria-labelledby="tab-diff" tabindex="0" hidden><div class="v2-diff" dir="ltr"><pre class="v2-diff__lines" role="region" tabindex="0" aria-label="Error pages" data-editor-diff>')
@@ -273,27 +278,29 @@ describe('v2 page layouts', () => {
     expect(html).toContain('<template data-xp-template="diff-line"><span class="v2-diff__line" data-state="unchanged">')
     const ready = editor(true)
     expect(ready).not.toContain('aria-disabled')
-    expect(ready).toMatch(/class="v2-btn v2-btn--primary" data-editor-save>Error pages<\/button>/)
+    expect(ready).toMatch(/class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-editor-save>Error pages<\/button>/)
     expect(layouts.editorPage(t, { ...{ header: header(), state: 'error', states: { error: { lead: 'Not read.' } } }, editor: { title: 'E', titleId: 'e', field: { id: 'f', label: 'F', value: '' } }, test: { titleId: 't', status: { tone: 'neutral', label: 'N' }, run: { label: 'R', hooks: {} }, outputLabel: 'O' }, save: { label: 'S', hooks: {}, ready: false } }))
       .not.toContain('<textarea')
   })
 
   it('matrix: grouped events, channel columns with group switches, the review and the save bar', () => {
     const html = matrix()
-    expect(html).toMatch(/<div class="v2-table-scroll" role="region" aria-labelledby="matrix-title-caption" tabindex="0"><table class="v2-table v2-matrix"><caption id="matrix-title-caption" class="v2-sr">/)
+    expect(html).toMatch(/<div class="v2-table-scroll kt-scrollable-x-auto" role="region" aria-labelledby="matrix-title-caption" tabindex="0"><table class="v2-table v2-matrix kt-table text-start"><caption id="matrix-title-caption" class="v2-sr">/)
     expect(html).toContain('<tbody data-group="accounts"><tr class="v2-matrix__group"><th scope="rowgroup" colspan="3">')
-    expect(html).toMatch(/<\/th><td><label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="Notifications" checked data-group-all="accounts"><span>All in group<\/span><\/label><\/td>/)
-    expect(html).toMatch(/<th scope="col"><label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="Notifications" data-channel-all="email">/)
-    expect(html).toMatch(/<tr data-event-row="account.created"><th scope="row">.*<td>Reconciler<\/td><td><span class="v2-matrix__fixed">.*<\/td><td><label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="Notifications" checked data-event="account.created"><\/label><\/td><\/tr>/s)
+    expect(html).toMatch(/<\/th><td><label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="Notifications" checked class="kt-switch" data-group-all="accounts"><span>All in group<\/span><\/label><\/td>/)
+    expect(html).toMatch(/<th scope="col"><label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="Notifications" class="kt-switch" data-channel-all="email">/)
+    expect(html).toMatch(/<tr data-event-row="account.created"><th scope="row">.*<td>Reconciler<\/td><td><span class="v2-matrix__fixed">.*<\/td><td><label class="v2-matrix__switch"><input type="checkbox" role="switch" aria-label="Notifications" checked class="kt-switch" data-event="account.created"><\/label><\/td><\/tr>/s)
     expect(html).toContain('<aside class="v2-aside" aria-label="Notifications">')
     expect(html).toContain('<span class="v2-matrix__channel"><span>Notifications</span><span class="v2-text--warn">Notifications</span></span>')
-    expect(html).toMatch(/<section class="v2-card v2-review" id="nt-review" aria-labelledby="review-title">\n<div class="v2-card__head"><div class="v2-card__title"><h2 id="review-title">Notifications<\/h2><\/div><span class="v2-review__meta v2-num">Notifications<\/span><\/div>/)
-    expect(html).toContain('<div class="v2-review__side"><h3>Current · saved 2026-10-22 14:05 UTC</h3><dl><div><dt>Notifications</dt><dd><bdi class="v2-num" dir="auto">Off</bdi></dd></div></dl></div>')
+    expect(html).toMatch(/<section class="v2-card v2-review kt-card" id="nt-review" aria-labelledby="review-title">\n<div class="v2-card__head kt-card-header"><div class="v2-card__title"><h2 id="review-title">Notifications<\/h2><\/div><div class="v2-card__actions kt-card-toolbar"><span class="v2-review__meta v2-num [^"]*">Notifications<\/span><\/div><\/div>/)
+    expect(html).toMatch(/<div class="v2-review__side [^"]*"><h3 class="[^"]*">Current · saved 2026-10-22 14:05 UTC<\/h3><dl class="[^"]*"><div class="[^"]*"><dt class="[^"]*">Notifications<\/dt><dd class="[^"]*"><bdi class="v2-num" dir="auto">Off<\/bdi><\/dd><\/div><\/dl><\/div>/)
+    // Only the changed proposed value takes the changed mark (and the semibold mono weight).
+    expect(count(html, /<dd class="v2-review__changed /)).toBe(1)
     expect(html).not.toContain('v2-review__gate')
     // In review: what saving does, then Back to editing and Save settings.
-    expect(html).toMatch(/<ul class="v2-review__steps" aria-label="What saving does"><li><svg[^>]*>.*?<\/svg><span>Notifications<\/span><\/li>/)
-    expect(html).toContain('<div class="v2-review__actions"><button type="button" class="v2-btn" data-review-back>Back to editing</button><button type="button" class="v2-btn v2-btn--primary" data-review-save>Save settings</button></div>')
-    expect(html).toContain('class="v2-btn v2-btn--primary" aria-controls="nt-review" data-save>Review and save')
+    expect(html).toMatch(/<ul class="v2-review__steps [^"]*" aria-label="What saving does"><li class="[^"]*"><i class="v2-icon [^"]*"[^>]*><\/i><span class="[^"]*">Notifications<\/span><\/li>/)
+    expect(html).toMatch(/<div class="v2-review__actions [^"]*"><button type="button" class="v2-btn kt-btn kt-btn-outline" data-review-back>Back to editing<\/button><button type="button" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-review-save>Save settings<\/button><\/div>/)
+    expect(html).toContain('class="v2-btn v2-btn--primary kt-btn kt-btn-primary" aria-controls="nt-review" data-save>Review and save')
     expect(html).toMatch(/<section class="v2-commit" aria-label="Save changes">.*data-discard>Discard<\/button>.*data-save>Review and save/s)
   })
 
@@ -316,7 +323,7 @@ describe('v2 page layouts', () => {
     const names = new Set<string>()
     for (const html of pages) {
       // The workspace root opens the page and its matching </div> closes it: every template lies inside.
-      expect(html).toMatch(/^<div class="v2-layout" data-[a-z-]+-workspace>/)
+      expect(html).toMatch(/^<div class="v2-layout grid grid-cols-1 content-start gap-8" data-[a-z-]+-workspace>/)
       let depth = 0
       let close = -1
       for (const tag of html.matchAll(/<(\/?)div\b/g)) {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { ActivityDrawerProps, StatusPageModel, UiTheme, UnavailableProps } from '../../contract.ts'
+import type { ActivityDrawerProps, StatusPageModel, UnavailableProps } from '../../contract.ts'
 import { parseMarkup } from '../../markup.ts'
 import { renderV2Login } from './login.ts'
 import { renderV2Status } from './status.ts'
@@ -60,7 +60,7 @@ describe('v2 sign-in contracts', () => {
     expect(html).toContain('data-auth-state="locked"')
     expect(html).toContain('data-retry-after="3"')
     // Each of the three sign-in guards leads with its icon inside the term.
-    expect(html.match(/<dt><svg class="v2-icon"/g)).toHaveLength(3)
+    expect(html.match(/<dt class="[^"]*"><span class="[^"]*" aria-hidden="true"><i class="v2-icon ki-filled ki-[a-z0-9-]+/g)).toHaveLength(3)
     expect(html).toContain('2026-10-29 10:15 UTC')
     expect(html).not.toContain('203.0.113.7')
     expect(html).not.toContain('14 minutes')
@@ -152,7 +152,7 @@ describe('v2 status and unqualified routes', () => {
     }))
     expect(readOnly).not.toHaveBeenCalled()
     expect(html).toContain('data-tool-availability="unverified"')
-    expect(html).toContain('<h1>Site settings</h1>')
+    expect(html).toMatch(/<h1 class="[^"]*">Site settings<[/]h1>/)
     expect(html).toContain('data-workspace-field="status"')
     expect(html).toContain('Suspended')
     expect(html).not.toContain('data-readonly="true"')

@@ -27,7 +27,8 @@ describe.each(['classic', 'v2'] as const)('%s saved directory privacy templates'
     expect(row).not.toBeNull()
     const name = row.querySelector<HTMLElement>('[data-xp-slot="username"]')!
     expect(name.textContent).toBe('alice'); expect(name.dir).toBe('ltr')
-    expect(name.className).toBe(theme === 'classic' ? 'xp-mono' : 'v2-mono')
+    if (theme === 'classic') expect(name.className).toBe('xp-mono')
+    else { expect(name.classList.contains('v2-mono')).toBe(true); expect(name.className).not.toMatch(/\bxp-/) }
     expect(row.querySelector('svg')).toBeNull(); expect(row.textContent).toContain('<svg>Private</svg>')
     const password = row.querySelector<HTMLInputElement>('[data-directory-privacy-user-password="alice"]')!
     expect(row.querySelector<HTMLLabelElement>('[data-xp-slot="password-label"]')!.htmlFor).toBe(password.id)

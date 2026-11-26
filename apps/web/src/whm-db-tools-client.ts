@@ -145,7 +145,7 @@ function bindDbTools(askDialog: ((options: Record<string, unknown>) => Promise<u
     const show = (): void => {
       for (const pane of steps) pane.hidden = pane.dataset.dbWizardStep !== String(step)
       next.hidden = back.hidden = step === 4; back.disabled = step === 1 || busy; next.disabled = !manage || busy
-      next.textContent = step === 3 ? t('Finish') : t('Next'); name.disabled = user.disabled = password.disabled = generate.disabled = !manage || busy || databaseId !== null && step === 1
+      ;(next.querySelector('[data-xp-slot="label"]') ?? next).textContent = step === 3 ? t('Finish') : t('Next'); name.disabled = user.disabled = password.disabled = generate.disabled = !manage || busy || databaseId !== null && step === 1
       if (all) all.disabled = !manage || busy
       for (const right of rights) right.disabled = !manage || busy || all?.checked === true
     }

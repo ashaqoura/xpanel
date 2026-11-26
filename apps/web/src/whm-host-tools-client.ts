@@ -168,7 +168,7 @@ function bindWhmHostTools(askDialog: Ask | undefined): void {
     const after0 = async (method: string, path: string, payload: Reply): Promise<[string, string]> => { const reply = object(await request!(method, path, payload)); resetForm(); return after(reply) }
     const button = (label: string, action: string, row: Reply, danger: boolean): HTMLButtonElement => {
       const item = document.createElement('button')
-      item.type = 'button'; item.className = (root.closest('.v2-host-tools') ? 'v2-btn' : 'xp-btn') + (danger ? (root.closest('.v2-host-tools') ? ' v2-btn--danger' : ' xp-btn--danger') : ''); item.textContent = label; item.disabled = !manageable()
+      item.type = 'button'; item.className = root.closest('.v2-host-tools') ? (danger ? 'v2-btn v2-btn--danger kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive' : 'v2-btn kt-btn kt-btn-sm kt-btn-outline') : (danger ? 'xp-btn xp-btn--danger' : 'xp-btn'); item.textContent = label; item.disabled = !manageable()
       item.addEventListener('click', () => rowAction(action, row))
       return item
     }

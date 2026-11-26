@@ -61,14 +61,14 @@ describe('v2 reseller family', () => {
     expect(html).toContain('Sign-in state not read')
     expect(html).toContain('Suspend reseller</button>')
     expect(html).not.toContain('>Suspended<')
-    expect(html).toContain('<dt>Contact</dt><dd>Not set</dd>')
+    expect(html).toMatch(/<dt[^>]*>Contact<\/dt><dd[^>]*>Not set<\/dd>/)
     expect(html).toMatch(/data-reseller-suspended="false"[^>]*>Suspend reseller<\/button>/)
   })
   it('shows the stored suspension and contact address of a reseller record', () => {
     const html = renderV2WhmResellers(t, props({ resellers: [{ ...reseller, suspended: true, contactEmail: 'ops@provider.example.test' }] }), authority)
     expect([...html.matchAll(/>Suspended</g)]).toHaveLength(2)
     expect(html).toContain('<th scope="col">Status</th>')
-    expect(html).toContain('<dt>Contact</dt><dd><bdi class="v2-mono v2-num" dir="ltr">ops@provider.example.test</bdi></dd>')
+    expect(html).toMatch(/<dt[^>]*>Contact<\/dt><dd[^>]*><bdi class="v2-mono v2-num" dir="ltr">ops@provider\.example\.test<\/bdi><\/dd>/)
   })
   it('supports the privileges document with the same real controls and escaped stored values', () => {
     const html = renderV2WhmResellers(t, props({ activeRoute: '/whm/resellers/privileges', resellers: [{ ...reseller, username: '<script>bad()</script>' }] }), authority)

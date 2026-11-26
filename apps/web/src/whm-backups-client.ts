@@ -294,6 +294,7 @@ function bindWhmBackups(askDialog: ((options: Record<string, unknown>) => Promis
         const tdCheck = document.createElement('td')
         const cb = document.createElement('input')
         cb.type = 'checkbox'
+        if (document.documentElement.dataset.uiTheme === 'v2') cb.className = 'kt-checkbox kt-checkbox-sm'
         cb.checked = included
         cb.disabled = !ready
         cb.setAttribute('aria-label', acct.username)
@@ -416,7 +417,7 @@ function bindWhmBackups(askDialog: ((options: Record<string, unknown>) => Promis
           const tdAction = document.createElement('td')
           if (item.runId) {
             const btn = document.createElement('button')
-            btn.type = 'button'; btn.className = 'v2-btn'; btn.textContent = t('Restore')
+            btn.type = 'button'; btn.className = document.documentElement.dataset.uiTheme === 'v2' ? 'v2-btn kt-btn kt-btn-sm kt-btn-outline' : 'v2-btn'; btn.textContent = t('Restore')
             btn.disabled = !item.canSelectRun || busy
             btn.addEventListener('click', () => {
               if (!btn.disabled && shared.selectRun && shared.selectRun(item.runId!)) {
@@ -426,7 +427,7 @@ function bindWhmBackups(askDialog: ((options: Record<string, unknown>) => Promis
             tdAction.append(btn)
           } else if (item.browseAccount) {
             const link = document.createElement('a')
-            link.className = 'v2-btn'
+            link.className = document.documentElement.dataset.uiTheme === 'v2' ? 'v2-btn kt-btn kt-btn-sm kt-btn-outline' : 'v2-btn'
             link.href = '/whm/backups/files?account=' + encodeURIComponent(item.browseAccount) + (pageLang && pageLang !== 'en' ? '&lang=' + encodeURIComponent(pageLang) : '')
             link.textContent = t('Browse files')
             tdAction.append(link)

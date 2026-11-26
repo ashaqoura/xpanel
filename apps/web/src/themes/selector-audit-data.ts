@@ -121,7 +121,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/account-database-remote-client.ts",
-    "sha256": "d42557e9517a1670adcab4b7eaede60f2619c3df4c19eeb7dc4faa255bddb79b",
+    "sha256": "5dbb45e671dc190772dce62fac8b867e022e930d0416d83f571cf2599d729768",
     "sites": [
       {
         "line": 59,
@@ -229,7 +229,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/account-edge-client.ts",
-    "sha256": "0f487b06ec332093b503d3c2391c27eed665ee37b1a059241c155bfab810be5d",
+    "sha256": "6d799a78d2b02f8d261f59aec500e0c63b67834a7da6f3a078b80f9768bb5014",
     "sites": [
       {
         "line": 63,
@@ -487,7 +487,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/account-logs-client.ts",
-    "sha256": "4d5ec95bbc6df4b71879e2f2d61b61b7162d61a64b85fc63b24cff69c038d9b5",
+    "sha256": "0c6de38c57a56f56c9ab9c4a1c55e7c600f65785beec31233245a9cc260b6c20",
     "sites": [
       {
         "line": 146,
@@ -913,7 +913,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/acct-team-client.ts",
-    "sha256": "3f4bfc5e9194870f71c9db26b47b0c5365b0a556a46a89b32bc6c9599b7d03ad",
+    "sha256": "f4cda955ad6abaaf3876eed0979382d6e55d86d4a7884f5bf3b8ea685bf0ac18",
     "sites": [
       {
         "line": 68,
@@ -929,7 +929,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/acct-templates-client.ts",
-    "sha256": "e5b31602911c99a1f14421d97b4cdf09df237572bd88f3e62f6b6bf3513af9e2",
+    "sha256": "79b54f455fe5d14a9dc13762b064ce7527dc03ede3ecfb28f33a38ad45e16ca5",
     "sites": [
       {
         "line": 44,
@@ -1740,7 +1740,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/database-workspace-client.ts",
-    "sha256": "126ed166a2bc0fc776719b375a714ee1defb776b806dfe6f1e85b4b6f1ad987a",
+    "sha256": "bab0a51e5101a99587c818fe955cfbb96fc720cd5733829996f56447f8e3545b",
     "sites": [
       {
         "line": 167,
@@ -1886,7 +1886,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/file-workspace-client.ts",
-    "sha256": "a9b48b29ca3727a31f2bdc876a9c2fea276f7a89aa73b075b1714b6b1c7dd2df",
+    "sha256": "2088d2148f5c275e5611ba51845572cfcb62269c186e9fdaed2fa3b5fc2c2adb",
     "sites": [
       {
         "line": 176,
@@ -2012,7 +2012,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/login-client.ts",
-    "sha256": "a3d180db3d50054ae87a8efa23887c35ef3afe4a94302ced2c05f01a8301eda4",
+    "sha256": "d4b00d6befe5c787741aaa220ed59ffd6a9fd560c2dc7d112b645db8aabd1a67",
     "sites": [
       {
         "line": 40,
@@ -2082,7 +2082,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/mail-calendar-view-client.ts",
-    "sha256": "c9e12b9be9d11e9fc19c172f45a0683b887178a28d0acb52b982499b227750ae",
+    "sha256": "b636e89d1977ff930ff5c9b875ff4c433c6f56bf712139ba456c082920a5aba6",
     "sites": [
       {
         "line": 178,
@@ -2115,7 +2115,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
         ]
       },
       {
-        "line": 337,
+        "line": 341,
         "column": 39,
         "method": "querySelector",
         "argument": "'[data-calview-day=\"' + calendarDayString(day) + '\"]'",
@@ -2128,7 +2128,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/mail-compose-editor-client.ts",
-    "sha256": "cf25fef80af8cfcd1014cb95ea2a246e1021008006b1d3c589602b034405bce9",
+    "sha256": "50fbd0fdc89aca3b15a67c003fed7bcc33eae268a90e3fced8113e0362d8961b",
     "sites": [
       {
         "line": 24,
@@ -2161,7 +2161,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
         ]
       },
       {
-        "line": 249,
+        "line": 254,
         "column": 43,
         "method": "querySelectorAll",
         "argument": "'[data-mail-chip=\"' + field + '\"]'",
@@ -2171,7 +2171,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
         ]
       },
       {
-        "line": 272,
+        "line": 277,
         "column": 41,
         "method": "querySelectorAll",
         "argument": "'[data-mail-chip=\"' + field + '\"]'",
@@ -2181,7 +2181,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
         ]
       },
       {
-        "line": 273,
+        "line": 278,
         "column": 38,
         "method": "querySelector",
         "argument": "'#compose-' + field",
@@ -2262,7 +2262,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/mail-disk-usage-client.ts",
-    "sha256": "937b5d6900ed5fe1abac97e42eb7bc90924f98bb350dbfcb7dfb608033326e69",
+    "sha256": "c89e2dd4bd7e64fe22aa15001e0ff8802d71c1938f3338bb2608988c0ef36806",
     "sites": [
       {
         "line": 102,
@@ -2320,7 +2320,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/mail-folders-client.ts",
-    "sha256": "bd6fb9564a2ab77f1f9be0233bfc13a2f60a90bb39fb2f33b843fe3c443dbf02",
+    "sha256": "96df7c2b505d721947de479fddcc33021301c3c2d4ccc4860e454d1fdac8c54d",
     "sites": [
       {
         "line": 69,
@@ -2838,7 +2838,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/password-generate-client.ts",
-    "sha256": "ba6972400e5b602cf936624e7fc7db2a3affebc18fd5cf9ba53fef1b2fd95095",
+    "sha256": "32a6a7ae9b4028086b1dfdbd304b6d7c65d4fe3a1b2c394af849d5c1eb54b295",
     "sites": [
       {
         "line": 37,
@@ -3086,7 +3086,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/service-users-client.ts",
-    "sha256": "565f787c65c614419f496ab8308f1b63ecf94297e6788e6e395e47f242ffdd11",
+    "sha256": "c0c4814869b427bed2e12ee8be88b68e9f8fbf48cd616d480a0c625649a63d90",
     "sites": [
       {
         "line": 25,
@@ -3255,7 +3255,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-account-health-client.ts",
-    "sha256": "149eb7a6446c9f5ec374c8cb38ce5695c384607f705e165d4748cfd4a00954b7",
+    "sha256": "9097993339a22546864d5024f58fe87fbf76163f2c4410217755d851d56566dd",
     "sites": [
       {
         "line": 76,
@@ -3307,7 +3307,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-announcements-client.ts",
-    "sha256": "f71dbe26a35bf6895d0216c3baa884781b8a9269b90979b0c94c6198b0e1abd2",
+    "sha256": "b25e6edb93ca59ac239e087e8b6e4075667745782730a6f28a43ae4bca9e44ec",
     "sites": [
       {
         "line": 70,
@@ -3395,7 +3395,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-backups-client.ts",
-    "sha256": "507272184e9e8105267fc1259e697165b57fa21fbd099a15137f7c2da5f13135",
+    "sha256": "5d1dbcd85a1e288f6abd405af0157cfcf2841913c4f07497cc538b3fd05a6567",
     "sites": [
       {
         "line": 178,
@@ -3428,7 +3428,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
         ]
       },
       {
-        "line": 712,
+        "line": 713,
         "column": 90,
         "method": "querySelector",
         "argument": "selector",
@@ -3438,7 +3438,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
         ]
       },
       {
-        "line": 713,
+        "line": 714,
         "column": 104,
         "method": "querySelectorAll",
         "argument": "'[data-backup-action=\"' + key + '\"]'",
@@ -3653,7 +3653,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-domains-client.ts",
-    "sha256": "5a2bc071c79ff413f4c4af997448855960afb6557e9a1584490c86c265eab24f",
+    "sha256": "3f1477a0d0e1537ea43886a22ebdd5cad5e1b5c7476d04f2000d399d3e159d96",
     "sites": [
       {
         "line": 54,
@@ -3901,7 +3901,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-mail-quality-client.ts",
-    "sha256": "4456a01296601bbe329feb32572b386759a5806233608eb3a1c8cb345d59818c",
+    "sha256": "0f28c46804be41d70af81c6b29b9f8e55698e0ff9c21cf4d0ed42c53527f7ad1",
     "sites": [
       {
         "line": 134,
@@ -3917,7 +3917,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-mail-queue-client.ts",
-    "sha256": "5d3c90a7607f914fd93ce8f92c0da814aee7a64c007e3e9899a0a5e5ead330e5",
+    "sha256": "4e4e0a4bd41b593321fd7ea970741eb1f668a0f6a1464a2ed34df2cb51373ff5",
     "sites": [
       {
         "line": 66,
@@ -3989,7 +3989,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-mailbox-maintenance-client.ts",
-    "sha256": "894be7aa4ca7eaf3e537ac0a7fb6baacea12715fd317f1387902f46b53c82bbe",
+    "sha256": "51bd847c57ef32f189b4e5615a07e01c4427fd9f8fca4546781311de90d4bf2b",
     "sites": [
       {
         "line": 74,
@@ -4015,7 +4015,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-metering-client.ts",
-    "sha256": "b532db94ea03d172bf591552e48f1a615ac6b9fe190cbde2550cbc92e6da5d73",
+    "sha256": "7820964f7557b64082f2c85bab26706e7817d3d073335165c2498d52b744b39f",
     "sites": [
       {
         "line": 147,
@@ -4407,7 +4407,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-repair-client.ts",
-    "sha256": "6cab0b2890e298eb0f72b5a0a4ba04b51969d7f4e4b6e5ba919f63db052e977b",
+    "sha256": "d1ca33e4f268c39df0dd8d3acff96cac8b05aeb4d0dcee6075c55b58b07fa7bb",
     "sites": [
       {
         "line": 89,
@@ -4935,7 +4935,7 @@ export const SELECTOR_SOURCE_REVIEWS: readonly SelectorSourceReview[] = [
   },
   {
     "path": "apps/web/src/whm-whmcs-client.ts",
-    "sha256": "df46cf95a9f1c93f688a9146e6b95954ef375462cd7ab4fabbae22b618d336b2",
+    "sha256": "39f525dca8e35ad366a1170f4d8c5f77e872dcefc1e838e4bf06e077a9d32583",
     "sites": [
       {
         "line": 65,

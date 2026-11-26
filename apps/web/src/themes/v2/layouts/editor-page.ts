@@ -5,6 +5,7 @@ import type { Translate } from '../../../i18n.ts'
 import { attr, escapeHtml, hookAttrs, type HookAttributes } from '../html.ts'
 import { icon } from '../icons.ts'
 import { card, type CardProps } from '../components/card.ts'
+import { APPLY_ACTIONS, APPLY_BAR, APPLY_TEXT } from '../components/change-review.ts'
 import { codeBlock } from '../components/code-block.ts'
 import { dataTable, type DataTableProps } from '../components/data-table.ts'
 import { statusPill, type StatusPillProps } from '../components/status-pill.ts'
@@ -134,44 +135,45 @@ export function editorPage(t: Translate, props: EditorPageProps): string {
   const editorCard = card({
     title: editor.title, titleId: editor.titleId, description: editor.description, actionsHtml: editor.actionsHtml, flush: true,
     bodyHtml: editor.tabs ? `${tabs(editor.tabs)}${panels}` : `${region}${diff}`,
-    footerHtml: editor.footer ? `<div class="v2-editor__foot">${editor.footer.meta ? `<span class="v2-num v2-mono">${escapeHtml(editor.footer.meta)}</span>` : ''}${editor.footer.note ? `<span>${escapeHtml(editor.footer.note)}</span>` : ''}</div>` : undefined,
+    footerHtml: editor.footer ? `<div class="v2-editor__foot flex flex-wrap grow justify-between gap-x-5 gap-y-1 text-xs text-secondary-foreground">${editor.footer.meta ? `<span class="v2-num v2-mono">${escapeHtml(editor.footer.meta)}</span>` : ''}${editor.footer.note ? `<span>${escapeHtml(editor.footer.note)}</span>` : ''}</div>` : undefined,
   })
   const reasonId = `${editor.field.id}-save-reason`
   const saveStatus = save.kind === 'validate-on-save' ? save.statusText
     : save.ready ? t(msgctxt('theme:v2', 'The draft passed its test. Saving writes exactly the tested draft.'))
     : save.blockedReason ?? t(msgctxt('theme:v2', 'Save is available after the draft passes its test.'))
-  const gate = `<div class="v2-apply"><p class="v2-apply__text"${save.ready ? '' : ` id="${escapeHtml(reasonId)}"`}>${escapeHtml(saveStatus)}</p><span class="v2-apply__actions">${save.discard ? `<button type="button" class="v2-btn"${hookAttrs(save.discard.hooks)}>${escapeHtml(save.discard.label ?? t('Discard'))}</button>` : ''}<button type="button" class="v2-btn v2-btn--primary"${save.ready ? '' : ` aria-disabled="true" aria-describedby="${escapeHtml(reasonId)}"`}${hookAttrs(save.hooks)}>${escapeHtml(save.label)}</button></span></div>`
+  const gate = `<div class="${APPLY_BAR}"><p class="${APPLY_TEXT}"${save.ready ? '' : ` id="${escapeHtml(reasonId)}"`}>${escapeHtml(saveStatus)}</p><span class="${APPLY_ACTIONS}">${save.discard ? `<button type="button" class="v2-btn kt-btn kt-btn-outline"${hookAttrs(save.discard.hooks)}>${escapeHtml(save.discard.label ?? t('Discard'))}</button>` : ''}<button type="button" class="${save.ready ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn v2-btn--primary kt-btn kt-btn-primary aria-disabled:cursor-not-allowed aria-disabled:opacity-50'}"${save.ready ? '' : ` aria-disabled="true" aria-describedby="${escapeHtml(reasonId)}"`}${hookAttrs(save.hooks)}>${escapeHtml(save.label)}</button></span></div>`
   const testCard = test ? card({
     title: test.title ?? t(msgctxt('theme:v2', 'Test before the switch')), titleId: test.titleId, description: test.description,
-    actionsHtml: `${statusPill({ ...test.status, live: true })}<button type="button" class="v2-btn"${hookAttrs(test.run.hooks)}>${icon('check', 16)}${escapeHtml(test.run.label)}</button>`,
+    actionsHtml: `${statusPill({ ...test.status, live: true })}<button type="button" class="v2-btn kt-btn kt-btn-outline"${hookAttrs(test.run.hooks)}>${icon('check', 16)}${escapeHtml(test.run.label)}</button>`,
     bodyHtml: `${codeBlock(t, { title: test.outputLabel, code: test.output ?? '', live: true, hooks: test.outputHooks })}${test.facts?.length ? factList(test.facts) : ''}`,
   }) : ''
   const snippets = props.snippets ? card({
     title: props.snippets.title, titleId: props.snippets.titleId, description: props.snippets.description,
-    bodyHtml: `<ul class="v2-snippets">${props.snippets.items.map(item => `<li><button type="button" class="v2-btn" aria-controls="${escapeHtml(editor.field.id)}"${hookAttrs(item.hooks)}>${icon('plus', 16)}${escapeHtml(item.label)}</button>${item.description ? `<span>${escapeHtml(item.description)}</span>` : ''}${xpTemplate('snippet', escapeHtml(item.code))}</li>`).join('')}</ul>`,
+    bodyHtml: `<ul class="v2-snippets">${props.snippets.items.map(item => `<li><button type="button" class="v2-btn kt-btn kt-btn-sm kt-btn-outline" aria-controls="${escapeHtml(editor.field.id)}"${hookAttrs(item.hooks)}>${icon('plus', 14)}${escapeHtml(item.label)}</button>${item.description ? `<span>${escapeHtml(item.description)}</span>` : ''}${xpTemplate('snippet', escapeHtml(item.code))}</li>`).join('')}</ul>`,
   }) : ''
   const side = `${snippets}${cards(props.aside)}`
   return layoutRoot(t, props, `${context}${splitWithAside(`${rulesCard}${editorCard}${testCard}`, side ? { label: props.asideLabel ?? props.snippets?.title ?? editor.title, html: side } : undefined)}${cards(props.extra)}${commitRegion(t('Save changes'), gate)}`)
 }
 
+// The code surface keeps its own dark face and 22px line grid; the card around it, its footer and the buttons are
+// Metronic. The +/- of a changed line are the diff markers themselves, in the code font.
 export const EDITOR_LAYOUT_CSS = `.v2-editor{display:flex;background:var(--code);color:var(--code-text)}
-.v2-editor__gutter{flex:none;display:flex;flex-direction:column;align-items:flex-end;min-inline-size:56px;padding:var(--space-2) 12px;border-inline-end:1px solid var(--nav-line);font:13px/22px var(--font-mono);color:var(--code-muted);user-select:none}
-.v2-editor>.v2-editor__input{flex:1 1 auto;min-width:0;min-height:0;padding:var(--space-2);border:0;border-radius:0;background:transparent;color:var(--code-text);font:13px/22px var(--font-mono);white-space:pre;overflow-x:auto;resize:vertical}
-.v2-editor>.v2-editor__input:focus-visible{outline-color:var(--nav-focus);outline-offset:-2px}
+.v2-editor__gutter{flex:none;display:flex;flex-direction:column;align-items:flex-end;min-inline-size:3.5rem;padding:1rem .75rem;border-inline-end:1px solid color-mix(in oklab,var(--code-muted) 30%,transparent);font:13px/22px var(--font-mono);color:var(--code-muted);user-select:none}
+.v2-editor>.v2-editor__input{flex:1 1 auto;min-width:0;min-height:0;max-width:none;padding:1rem;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--code-text);font:13px/22px var(--font-mono);white-space:pre;overflow-x:auto;resize:vertical}
+.v2-editor>.v2-editor__input:focus-visible{outline:2px solid var(--code-text);outline-offset:-2px;box-shadow:none}
 .v2-tabpanel:has(>:is(.v2-editor,.v2-diff)){padding-top:0}
 .v2-diff{background:var(--code);color:var(--code-text)}
-.v2-diff__lines{display:grid;grid-template-columns:auto 1fr;min-inline-size:100%;margin:0;padding:var(--space-2) 0;overflow-x:auto;font:13px/22px var(--font-mono);color:var(--code-text)}
-.v2-diff__lines:focus-visible{outline-color:var(--nav-focus);outline-offset:-2px}
+.v2-diff__lines{display:grid;grid-template-columns:auto 1fr;min-inline-size:100%;margin:0;padding:1rem 0;overflow-x:auto;font:13px/22px var(--font-mono);color:var(--code-text)}
+.v2-diff__lines:focus-visible{outline-color:var(--code-text);outline-offset:-2px}
 .v2-diff__line{display:contents}
-.v2-diff__gutter{position:sticky;inset-inline-start:0;display:flex;justify-content:space-between;gap:var(--space-1);min-inline-size:72px;padding-block:0;padding-inline:12px 10px;border-inline-end:1px solid var(--nav-line);background:var(--code);color:var(--code-muted);user-select:none}
+.v2-diff__gutter{position:sticky;inset-inline-start:0;display:flex;justify-content:space-between;gap:.5rem;min-inline-size:4.5rem;padding-block:0;padding-inline:.75rem .625rem;border-inline-end:1px solid color-mix(in oklab,var(--code-muted) 30%,transparent);background:var(--code);color:var(--code-muted);user-select:none}
 .v2-diff__mark{font-weight:600;color:var(--code-text)}
-.v2-diff__code{padding:0 var(--space-2);white-space:pre}
+.v2-diff__code{padding:0 1rem;white-space:pre}
 .v2-diff__line[data-state=added]>*{background-image:linear-gradient(color-mix(in srgb,var(--chart-2) 26%,transparent),color-mix(in srgb,var(--chart-2) 26%,transparent))}
 .v2-diff__line[data-state=removed]>*{background-image:linear-gradient(color-mix(in srgb,var(--bad) 26%,transparent),color-mix(in srgb,var(--bad) 26%,transparent))}
 .v2-diff__line[data-state=added] .v2-diff__mark::before{content:"+"}
 .v2-diff__line[data-state=removed] .v2-diff__mark::before{content:"-"}
 .v2-diff__line:not([data-state=added]) .v2-diff__added,.v2-diff__line:not([data-state=removed]) .v2-diff__removed{display:none}
-.v2-editor__foot{flex:1 1 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px var(--space-2);font-size:12px;color:var(--muted)}
-.v2-snippets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
-.v2-snippets>li{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:12px;color:var(--muted)}
+.v2-snippets{display:flex;flex-direction:column;gap:.625rem}
+.v2-snippets>li{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;font-size:.8125rem;color:var(--text-2)}
 `

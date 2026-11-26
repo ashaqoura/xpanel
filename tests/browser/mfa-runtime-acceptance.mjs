@@ -42,7 +42,8 @@ const sourceDrift = (before, after) => {
 const failure = error => ({ name: error.name, message: String(error.message).split('\n')[0].slice(0, 1000) })
 const markSynthetic = html => html
   .replace('<html ', '<html data-mfa-fixture="synthetic" ')
-  .replace('<body>', '<body><div data-mfa-fixture-watermark role="note" dir="ltr" style="position:sticky;inset-block-start:0;z-index:2000;padding:4px 12px;text-align:center;background:#f4f6f8;color:#344054;border-block-end:1px solid #d0d5dd;font:12px/1.4 system-ui,sans-serif">Synthetic MFA UI fixture</div>')
+  // v2 (Metronic) documents render `<body class="…">`; inject after the opening tag whatever its attributes.
+  .replace(/<body(?:\s[^>]*)?>/, match => match + '<div data-mfa-fixture-watermark role="note" dir="ltr" style="position:sticky;inset-block-start:0;z-index:2000;padding:4px 12px;text-align:center;background:#f4f6f8;color:#344054;border-block-end:1px solid #d0d5dd;font:12px/1.4 system-ui,sans-serif">Synthetic MFA UI fixture</div>')
 
 async function createMfaFixture(mfaMode = 'disabled', principalKind = 'root') {
   assert.ok(mfaMode === 'disabled' || mfaMode === 'optional')
@@ -315,7 +316,7 @@ export async function runMfaRuntimeAcceptance({ output, screenshotBudget = 8, fi
         assert.deepEqual(fonts.failed_faces, [])
         row.fonts = fonts
         const isV2 = await page.locator('[data-ui-theme="v2"]').count() > 0
-        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : 'IBM Plex Sans'
+        const uiFamily = state.locale === 'ar' ? (isV2 ? 'IBM Plex Sans Arabic' : 'sans-serif') : (isV2 ? 'Inter' : 'IBM Plex Sans')
         row.fonts.heading = await assertAppliedFont(page, state.screen === 'login' ? '.v2-login h1, .xp-login-shell h1' : '[data-security-page] h1', uiFamily)
         if (state.screen === 'login') {
           row.fonts.wordmark = isV2
@@ -351,7 +352,8 @@ export async function runMfaRuntimeAcceptance({ output, screenshotBudget = 8, fi
           await expect(page.locator('[data-account-security]')).toHaveAttribute('data-mfa-enabled', 'true')
           assert.equal(await page.locator('[data-account-security] p bdi').count(), 0, 'User cards never render the root recovery command.')
           assert.equal(await page.locator('[data-account-security]').evaluate(card => card.textContent.includes('disable-2fa')), false)
-          row.fonts.status = await assertAppliedFont(page, '[data-account-security] > p[role="status"]', uiFamily)
+          // v2 wraps the card content in a Metronic card body, so the status is no longer a direct child of the section.
+          row.fonts.status = await assertAppliedFont(page, '[data-account-security] > p[role="status"], [data-account-security] > .kt-card-content > p[role="status"]', uiFamily)
         }
         row.geometry = await geometry(page)
         if (state.mode === 'optional') row.recovery_command = await recoveryCommandGeometry(page, state.screen === 'recovery-command')

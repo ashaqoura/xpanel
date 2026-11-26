@@ -40,7 +40,7 @@ function bindMailboxPasswordGenerator(): void {
       target.type = reveal ? 'text' : 'password'
       button.setAttribute('aria-pressed', String(reveal))
       const label = reveal ? (xpT('Hide password')) : (xpT('Reveal password'))
-      button.textContent = label; button.title = label; button.setAttribute('aria-label', label)
+      ;(button.querySelector('[data-xp-slot="label"]') ?? button).textContent = label; button.title = label; button.setAttribute('aria-label', label)
       target.focus()
     })
   })

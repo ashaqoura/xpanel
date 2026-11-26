@@ -102,7 +102,7 @@ describe('V2 WHM service-tool documents', () => {
   it('loads the Web Server supplement only for that authorized document selection', () => {
     const selected = v2StylesheetsForDocument({ surface: 'xwhm', route: '/whm/services/web', viewKind: 'workspace' })
     const supplement = selected.find(item => item.path === '/assets/themes/v2/whm-web-server.css')
-    expect(supplement?.body).toBe(WHM_WEB_SERVER_CSS.trim() + '\n')
+    expect(supplement?.body).toBe('@layer v2{\n' + WHM_WEB_SERVER_CSS.trim() + '\n}\n')
     for (const route of ['/whm/services/dns', '/whm/services', '/whm/software/php', '/whm/plans']) {
       expect(v2StylesheetsForDocument({ surface: 'xwhm', route, viewKind: 'workspace' }).some(item => item.path === supplement!.path)).toBe(false)
     }

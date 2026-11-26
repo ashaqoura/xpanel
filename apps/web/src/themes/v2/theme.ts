@@ -33,8 +33,8 @@ export const v2Theme: UiTheme = Object.freeze<UiTheme>({
     radii: ['--radius-card', '--radius-control'],
     contrast: [['--text', '--surface'], ['--text', '--bg']],
     defaults: {
-      light: { '--accent': '#1d5bd6', '--bg': '#f3f5f9', '--surface': '#ffffff', '--text': '#0e1726' },
-      dark: { '--accent': '#84a9fa', '--bg': '#0a1220', '--surface': '#111c2e', '--text': '#e7edf6' },
+      light: { '--accent': '#155dfc', '--bg': '#ffffff', '--surface': '#ffffff', '--text': '#09090b' },
+      dark: { '--accent': '#51a2ff', '--bg': '#09090b', '--surface': '#09090b', '--text': '#fafafa' },
     },
   }),
   renderLogin: renderV2Login, renderStatus: renderV2Status, renderUnavailable,

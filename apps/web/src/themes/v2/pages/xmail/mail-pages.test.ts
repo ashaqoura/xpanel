@@ -60,25 +60,26 @@ describe('v2 mailbox pages', () => {
   it('names every reading action, isolates row text direction and keeps the sender block hooks', () => {
     const html = renderV2MailInbox(t, inbox())
     expect(html).toMatch(/role="toolbar" aria-label="Message actions"/)
-    for (const name of ['Reply', 'Reply all', 'Forward', 'Move', 'Mark as junk', 'Move to Trash']) expect(html).toContain(`<span class="v2-mail-actions__label">${name}</span>`)
+    // Every action keeps its visible name; a narrow reading pane collapses the label to assistive text only.
+    for (const name of ['Reply', 'Reply all', 'Forward', 'Move', 'Mark as junk', 'Move to Trash']) expect(html).toMatch(new RegExp(`<span class="v2-mail-actions__label [^"]*">${name}</span>`))
     expect(html).toMatch(/data-mail-action="delete" title="Move to Trash" disabled/)
     expect(renderV2MailInbox(t, inbox({ folder: 'Trash' }))).toMatch(/data-mail-action="restore" title="Restore to Inbox" disabled/)
     for (const hook of ['data-mail-name', 'data-mail-subject', 'data-mail-preview']) expect(html).toMatch(new RegExp(`${hook} dir="auto"`))
     expect(html).toMatch(/data-mail-detail-from aria-label="From"><bdi dir="ltr"><\/bdi>/)
-    expect(html).toMatch(/<dd data-mail-detail-to><bdi dir="ltr">/)
+    expect(html).toMatch(/<dd class="[^"]*" data-mail-detail-to><bdi dir="ltr">/)
     expect(html).toMatch(/data-mail-detail-date aria-label="Received"><bdi dir="ltr">/)
   })
 
   it('heads the composer with its title and a way back, and shows storage only from supplied quota', () => {
     const unknown = renderV2MailCompose(t, compose())
-    expect(unknown).toMatch(/<header class="v2-mail-compose-head"><div><h1 id="compose-title">New message<\/h1><p id="mail-send-status" role="status">/)
-    expect(unknown).toMatch(/<a class="v2-btn" href="\/mail\/inbox">.*Back to Inbox<\/a>/)
+    expect(unknown).toMatch(/<header class="v2-mail-compose-head"><div><h1 class="[^"]*" id="compose-title">New message<\/h1><p class="[^"]*" id="mail-send-status" role="status">/)
+    expect(unknown).toMatch(/<a class="v2-btn kt-btn kt-btn-outline" href="\/mail\/inbox">.*Back to Inbox<\/a>/)
     expect(unknown.match(/id="compose-title"/g)).toHaveLength(1)
     expect(unknown).toMatch(/data-mail-storage-card>.*<p role="status">Not read<\/p>/)
     expect(unknown).not.toMatch(/data-mail-storage-card>[^]*?role="meter"[^]*?id="vacation"/)
     const known = renderV2MailCompose(t, compose({ quota: { text: '160 / 1024 MiB', percent: 16 } }))
-    expect(known).toMatch(/<bdi class="v2-num" dir="ltr">160 \/ 1024 MiB<\/bdi>/)
-    expect(known).toMatch(/role="meter" aria-labelledby="v2-mail-storage-card-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="16"><span class="v2-bar__fill v2-bar--info" style="inline-size:16%">/)
+    expect(known).toMatch(/<bdi class="v2-num [^"]*" dir="ltr">160 \/ 1024 MiB<\/bdi>/)
+    expect(known).toMatch(/class="v2-bar kt-progress kt-progress-primary" role="meter" aria-labelledby="v2-mail-storage-card-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="16"><span class="v2-bar__fill v2-bar--info kt-progress-indicator block" style="inline-size:16%">/)
   })
 
   it('never grants a folder link or compose action from a bare observed label', () => {
@@ -181,7 +182,7 @@ describe('v2 mailbox pages', () => {
 
   it('opens the supported search workspace without a form that would discard a submitted query', () => {
     const html = createV2MailSurface(() => inbox({ searchHref: '/mail/search' }), () => '')({})
-    expect(html).toContain('class="v2-btn v2-mail-search" href="/mail/search?lang=en&amp;theme=light"')
+    expect(html).toMatch(/class="v2-btn v2-mail-search kt-btn kt-btn-outline [^"]*" href="\/mail\/search\?lang=en&amp;theme=light"/)
     expect(html).not.toContain('action="/mail/search"')
   })
 

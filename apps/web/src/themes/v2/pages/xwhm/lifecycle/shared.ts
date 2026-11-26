@@ -1,7 +1,7 @@
 import type { Locale, Translate } from '../../../../../i18n.ts'
 import { escapeHtml, hookAttrs, type HookAttributes } from '../../../html.ts'
 import { card, pageHeader } from '../../../components/index.ts'
-import { icon } from '../../../icons.ts'
+import { icon, type IconName } from '../../../icons.ts'
 import { whmPolish } from '../monitoring/common.ts'
 
 /** Admission is supplied by core; a theme never derives permissions from a role name. */
@@ -13,6 +13,17 @@ export interface LifecycleAccess {
 
 export const text = (t: Translate, value: string): string => escapeHtml(t(value))
 
+/** Keenicons the v2 icon set has no name for, at the size of a button icon. Complete literal class lists. */
+const KEENICONS = {
+  eye: 'ki-filled ki-eye text-base', key: 'ki-filled ki-key text-base', notes: 'ki-filled ki-notepad text-base',
+  pencil: 'ki-filled ki-pencil text-base', rocket: 'ki-filled ki-rocket text-base', trash: 'ki-filled ki-trash text-base',
+  undo: 'ki-filled ki-arrows-loop text-base', upload: 'ki-filled ki-exit-up text-base', verify: 'ki-filled ki-verify text-base',
+} as const
+export type LifecycleGlyph = IconName | keyof typeof KEENICONS
+const extraGlyph = (glyph: LifecycleGlyph): glyph is keyof typeof KEENICONS => Object.hasOwn(KEENICONS, glyph)
+/** A decorative Keenicon beside a label; the label carries the meaning. */
+export const lifecycleIcon = (glyph: LifecycleGlyph): string => extraGlyph(glyph) ? `<i class="${KEENICONS[glyph]}" aria-hidden="true"></i>` : icon(glyph, 16)
+
 export function lifecycleHeader(t: Translate, title: string, route: string, description: string, actionsHtml?: string): string {
   return pageHeader(t, {
     breadcrumb: [{ label: t(msgid('Home')), href: '/whm' }, { label: t(msgid('Server administration')) }, { label: t(title) }],
@@ -21,28 +32,63 @@ export function lifecycleHeader(t: Translate, title: string, route: string, desc
 }
 
 /** A header or card link to a neighbouring page or to a card on this page. */
-export const lifecycleLink = (t: Translate, label: string, href: string): string => `<a class="v2-btn" href="${escapeHtml(href)}">${text(t, label)}</a>`
+export const lifecycleLink = (t: Translate, label: string, href: string, glyph?: LifecycleGlyph): string => `<a class="v2-btn kt-btn kt-btn-outline" href="${escapeHtml(href)}">${glyph ? lifecycleIcon(glyph) : ''}${text(t, label)}</a>`
 
 /** Standing rules of a workflow: each line carries a check mark, never a state. */
 export const lifecycleRules = (t: Translate, labels: readonly string[]): string =>
-  `<ul class="v2-lifecycle__rules">${labels.map(label => `<li>${icon('check', 16)}<span>${text(t, label)}</span></li>`).join('')}</ul>`
+  `<ul class="v2-lifecycle__rules text-base text-secondary-foreground">${labels.map(label => `<li>${icon('okCircle', 16)}<span>${text(t, label)}</span></li>`).join('')}</ul>`
 
-export function lifecycleCard(t: Translate, key: string, title: string, bodyHtml: string, hooks?: HookAttributes): string {
-  return card({ title: t(title), titleId: `v2-lifecycle-${key}`, bodyHtml, ...(hooks ? { hooks } : {}) })
+/** A section label inside a card. */
+export const lifecycleHeading = (t: Translate, label: string, id?: string): string => `<h3 class="text-base font-semibold text-mono"${id ? ` id="${escapeHtml(id)}"` : ''}>${text(t, label)}</h3>`
+
+/** Body text of a card; a hint is the quieter line under a control or a group. */
+export const lifecycleNote = (t: Translate, label: string, hooks?: HookAttributes, hint = false): string =>
+  `<p class="${hint ? 'v2-muted text-[13px] leading-(--lh-cap) font-normal text-secondary-foreground' : 'text-base text-secondary-foreground'}"${hookAttrs(hooks)}>${text(t, label)}</p>`
+
+export interface LifecycleCardParts {
+  /** Header toolbar: the read and add actions of the card, built with lifecycleButton. */
+  readonly actionsHtml?: string
+  readonly footerHtml?: string
 }
 
-export function lifecycleButton(t: Translate, label: string, hooks: HookAttributes, primary = false): string {
-  return `<button type="button" class="v2-btn${primary ? ' v2-btn--primary' : ''}"${hookAttrs(hooks)} disabled>${text(t, label)}</button>`
+export function lifecycleCard(t: Translate, key: string, title: string, bodyHtml: string, hooks?: HookAttributes, parts: LifecycleCardParts = {}): string {
+  return card({ title: t(title), titleId: `v2-lifecycle-${key}`, bodyHtml, ...(hooks ? { hooks } : {}), ...(parts.actionsHtml ? { actionsHtml: parts.actionsHtml } : {}), ...(parts.footerHtml ? { footerHtml: parts.footerHtml } : {}) })
+}
+
+export interface LifecycleButtonLook {
+  readonly icon?: LifecycleGlyph
+  /** A quiet tertiary action, or one that removes or stops something. A primary button ignores it. */
+  readonly kind?: 'ghost' | 'danger'
+  /** Card header and row size. */
+  readonly small?: boolean
+}
+const BUTTON = {
+  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-outline',
+  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive',
+} as const
+const BUTTON_SMALL = {
+  primary: 'v2-btn v2-btn--primary kt-btn kt-btn-primary', outline: 'v2-btn kt-btn kt-btn-outline',
+  ghost: 'v2-btn v2-btn--ghost kt-btn kt-btn-ghost', danger: 'v2-btn kt-btn kt-btn-outline kt-btn-destructive',
+} as const
+
+export function lifecycleButton(t: Translate, label: string, hooks: HookAttributes, primary = false, look: LifecycleButtonLook = {}): string {
+  const kind = primary ? 'primary' : look.kind ?? 'outline'
+  return `<button type="button" class="${look.small ? BUTTON_SMALL[kind] : BUTTON[kind]}"${hookAttrs(hooks)} disabled>${look.icon ? lifecycleIcon(look.icon) : ''}${text(t, label)}</button>`
 }
 
 export function lifecycleStatus(t: Translate, label: string, hooks: HookAttributes, hidden = false): string {
-  return `<p class="v2-lifecycle__status" role="status"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${text(t, label)}</p>`
+  return `<p class="v2-lifecycle__status text-base" role="status"${hookAttrs(hooks)}${hidden ? ' hidden' : ''}>${text(t, label)}</p>`
 }
 
+/** Metronic control classes; a control that already carries a class keeps it. */
+const CONTROL_CLASS = { input: 'kt-input', select: 'kt-select', textarea: 'kt-textarea' } as const
+
+/** A stacked field: the label 8px above its control on the control's text edge, the hint under the control. */
 export function lifecycleField(t: Translate, id: string, label: string, controlHtml: string, help?: string): string {
   const helpId = `${id}-help`
-  const control = help ? controlHtml.replace(/^<(input|select|textarea)\b/, `<$1 aria-describedby="${escapeHtml(helpId)}"`) : controlHtml
-  return `<div class="v2-lifecycle__field"><label for="${escapeHtml(id)}">${text(t, label)}</label>${control}${help ? `<p class="v2-muted" id="${escapeHtml(helpId)}">${text(t, help)}</p>` : ''}</div>`
+  const styled = controlHtml.replace(/^<(input|select|textarea)\b(?![^>]*\sclass=)/, (_, tag: keyof typeof CONTROL_CLASS) => `<${tag} class="${CONTROL_CLASS[tag]}"`)
+  const control = help ? styled.replace(/^<(input|select|textarea)\b/, `<$1 aria-describedby="${escapeHtml(helpId)}"`) : styled
+  return `<div class="v2-lifecycle__field v2-field kt-form-item"><label class="kt-form-label" for="${escapeHtml(id)}">${text(t, label)}</label>${control}${help ? `<p class="v2-field__help kt-form-description" id="${escapeHtml(helpId)}">${text(t, help)}</p>` : ''}</div>`
 }
 
 /** Which cell is the row name (default the first) and which value sits opposite it on a phone. */
@@ -57,17 +103,25 @@ export type LifecycleColumn = string | { readonly label: string; readonly header
 export function lifecycleTable(t: Translate, title: string, columns: readonly LifecycleColumn[], hooks: HookAttributes, empty: string, phone: PhoneRow = {}): string {
   const labels = columns.map(column => t(typeof column === 'string' ? column : column.label))
   const headers = columns.map(column => typeof column === 'string' ? `<th scope="col">${text(t, column)}</th>` : `<th scope="col">${column.headerHtml}</th>`).join('')
-  return `<div class="v2-lifecycle__scroll" role="region" tabindex="0" aria-label="${text(t, title)}"><table class="v2-lifecycle__table"${phoneColumns(labels, phone)}><caption class="v2-sr">${text(t, title)}</caption><thead><tr>${headers}</tr></thead><tbody${hookAttrs(hooks)}><tr><td colspan="${columns.length}">${text(t, empty)}</td></tr></tbody></table></div>`
+  return `<div class="v2-lifecycle__scroll kt-scrollable-x-auto rounded-lg border border-border" role="region" tabindex="0" aria-label="${text(t, title)}"><table class="v2-lifecycle__table kt-table"${phoneColumns(labels, phone)}><caption class="v2-sr">${text(t, title)}</caption><thead><tr>${headers}</tr></thead><tbody${hookAttrs(hooks)}><tr><td colspan="${columns.length}">${text(t, empty)}</td></tr></tbody></table></div>`
 }
 
-export function lifecycleFacts(t: Translate, facts: readonly { key: string; label: string; value?: string }[], hook: `data-${string}`): string {
-  return `<dl class="v2-lifecycle__fields">${facts.map(fact => `<div class="v2-lifecycle__field"><dt>${text(t, fact.label)}</dt><dd><bdi dir="ltr"${hookAttrs({ [hook]: fact.key })}>${fact.value === undefined ? text(t, msgid('Not read')) : escapeHtml(fact.value)}</bdi></dd></div>`).join('')}</dl>`
+/** The label and value classes of a fact: a row of a fact table, or a dashed tile that leads with its value. */
+const FACT = { table: ['text-sm leading-(--lh-label) text-secondary-foreground', 'text-base leading-(--lh-text) text-mono'], tiles: ['text-sm leading-(--lh-label) text-secondary-foreground', 'text-base leading-(--lh-text) font-medium text-mono'] } as const
+const FACT_LIST = { table: 'v2-lifecycle__fields', tiles: 'v2-lifecycle__fields v2-lifecycle__stats' } as const
+
+/** Facts a controller fills by key: label and value rows of a fact table, or summary tiles (`tiles`). */
+export function lifecycleFacts(t: Translate, facts: readonly { key: string; label: string; value?: string }[], hook: `data-${string}`, look: keyof typeof FACT = 'table'): string {
+  return `<dl class="${FACT_LIST[look]}">${facts.map(fact => `<div class="v2-lifecycle__field"><dt class="${FACT[look][0]}">${text(t, fact.label)}</dt><dd class="${FACT[look][1]}"><bdi dir="ltr"${hookAttrs({ [hook]: fact.key })}>${fact.value === undefined ? text(t, msgid('Not read')) : escapeHtml(fact.value)}</bdi></dd></div>`).join('')}</dl>`
 }
+
+const PHONE_LABEL = 'display:block;margin-block-end:.5rem;color:var(--text-2);font-size:.875rem;font-weight:400;line-height:var(--lh-label)'
+const PHONE_NAME = 'font-weight:500;color:var(--mono,var(--text))'
 
 /** The same placement for a table whose markup this page cannot mark: the name and value cells are fixed in the rule. */
 const fixedRow = (row: string, { name = 1, value }: PhoneRow): string => `${name === 1 ? '' : `
-${row}>:first-child{grid-area:auto;font-weight:400}${row}>:first-child::before{content:var(--c1,none);display:block;margin-block-end:2px;color:var(--muted);font-size:12px;font-weight:500;line-height:1.4}
-${row}>:nth-child(${name}){grid-area:1/1;font-weight:600;color:var(--text)}${row}>:nth-child(${name})::before{content:none}`}${value ? `
+${row}>:first-child{grid-area:auto;font-weight:400}${row}>:first-child::before{content:var(--c1,none);${PHONE_LABEL}}
+${row}>:nth-child(${name}){grid-area:1/1;${PHONE_NAME}}${row}>:nth-child(${name})::before{content:none}`}${value ? `
 ${name === 1 ? `${row}>:first-child{grid-area:1/1}` : ''}${row}>:nth-child(${value}){grid-area:1/2;justify-self:end;text-align:end;font-weight:400}${row}>:nth-child(${value})::before{content:none}` : ''}`
 
 /** Two-column rows for a narrow table: the row name with the chosen value opposite it, the other values
@@ -79,162 +133,164 @@ export const phoneRows = (table: string, fixed?: PhoneRow): string => {
   const checked = `${row}:has(>:first-child [type=checkbox])`
   return `${table}>thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}
 ${table},${table}>tbody{display:block}
-${row}{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 16px;padding:12px 16px;border-block-end:1px solid var(--line)}
+${row}{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.5rem 1rem;padding:.75rem 1rem;border-block-end:1px solid var(--line)}
 ${row}:last-child{border-block-end:0}
-${row}>:nth-child(n){position:static;grid-area:auto;background:none;justify-self:stretch;padding:0;border:0;min-inline-size:0;text-align:start;overflow-wrap:anywhere}
-${row}>:first-child{grid-column:1/-1;font-weight:600;color:var(--text)}
-${row}>:not(:first-child)::before{display:block;margin-block-end:2px;color:var(--muted);font-size:12px;font-weight:500;line-height:1.4}
+${row}>:nth-child(n){position:static;grid-area:auto;background:none;justify-self:stretch;block-size:auto;padding:0!important;border:0;min-inline-size:0;text-align:start;overflow-wrap:anywhere}
+${row}>:first-child{grid-column:1/-1;${PHONE_NAME}}
+${row}>:not(:first-child)::before{${PHONE_LABEL}}
 ${cells.map(n => `${row}>:nth-child(${n})::before{content:var(--c${n},none)}`).join('')}
 ${row}>:is(td:has(.v2-btn,button,details),td[colspan]){grid-column:1/-1}
 ${row}>:is(td:has(.v2-btn,button,details),td[colspan])::before{content:none}
-${table}[data-phone-value]:not([data-phone-name])>tbody>tr>:first-child{grid-area:1/1}
-${table}[data-phone-name]>tbody>tr>:first-child:not([colspan]){grid-column:auto;font-weight:400}${table}[data-phone-name]>tbody>tr>:first-child:not([colspan])::before{content:var(--c1,none);display:block;margin-block-end:2px;color:var(--muted);font-size:12px;font-weight:500;line-height:1.4}
+${table}[data-phone-value]:not([data-phone-name])>tbody>tr>:first-child:not([colspan]){grid-area:1/1}
+${table}[data-phone-name]>tbody>tr>:first-child:not([colspan]){grid-column:auto;font-weight:400}${table}[data-phone-name]>tbody>tr>:first-child:not([colspan])::before{content:var(--c1,none);${PHONE_LABEL}}
 ${[1, ...cells].map(n => `${table}[data-phone-value="${n}"]>tbody>tr>:nth-child(${n}){grid-area:1/2;justify-self:end;text-align:end;font-weight:400}${table}[data-phone-value="${n}"]>tbody>tr>:nth-child(${n})::before{content:none}`).join('')}
-${[2, 3].map(n => `${table}[data-phone-name="${n}"]>tbody>tr>:nth-child(${n}){grid-area:1/1;font-weight:600;color:var(--text)}${table}[data-phone-name="${n}"]>tbody>tr>:nth-child(${n})::before{content:none}`).join('')}
+${[2, 3].map(n => `${table}[data-phone-name="${n}"]>tbody>tr>:nth-child(${n}){grid-area:1/1;${PHONE_NAME}}${table}[data-phone-name="${n}"]>tbody>tr>:nth-child(${n})::before{content:none}`).join('')}
 ${fixed ? fixedRow(row, fixed) : ''}
-${checked}{position:relative;padding-inline-start:48px}
-${checked}>:first-child{position:absolute;inset-block-start:12px;inset-inline-start:16px;grid-area:auto}
+${checked}{position:relative;padding-inline-start:3rem}
+${checked}>:first-child{position:absolute;inset-block-start:.75rem;inset-inline-start:1rem;grid-area:auto}
 ${checked}>:first-child::before{content:none}
 ${checked}>:nth-child(2){grid-area:1/1/auto/-1}
-${row}>td[colspan]{grid-area:auto/1/auto/-1;justify-self:stretch;padding:12px 0;font-weight:400;text-align:center;color:var(--muted)}${row}>td[colspan]::before{content:none}`
+${row}>td[colspan]{grid-area:auto/1/auto/-1;justify-self:stretch;padding:.75rem 0!important;font-weight:400;text-align:center;color:var(--muted)}${row}>td[colspan]::before{content:none}`
 }
 
+const L = '.v2-lifecycle'
+
+/** The outline badge of Metronic on an element a controller creates without a class. */
+const BADGE = 'display:inline-flex;align-items:center;gap:.375rem;min-block-size:1.5rem;padding:.125rem .45rem;border:1px solid var(--line);border-radius:.375rem;background:var(--sunken);color:var(--text-2);font-size:.75rem;font-weight:500;line-height:1rem;font-variant-numeric:tabular-nums'
+/** A Metronic choice card: the selected card takes the primary border and tint. */
+const CHOICE_CARD = 'padding:.75rem 1rem;border:1px solid var(--line-strong);border-radius:var(--radius-card);background:var(--surface);transition:background-color .14s ease-out,border-color .14s ease-out'
+const CHOSEN = 'border-color:var(--accent-fill);background:var(--accent-soft)'
+/** The chevron of a fold whose summary a controller fills: the Keenicon `ki-down` glyph. */
+const CHEVRON = 'content:"\\eaa3";flex:none;font-family:keenicons-filled;font-size:.875rem;line-height:1;color:var(--muted);transition:transform .14s ease-out'
+
 /** Scoped to lifecycle bodies: compact table cells do not inherit panel padding. */
-export const LIFECYCLE_PAGES_CSS = `.v2-lifecycle{display:flex;flex-direction:column;gap:32px;min-inline-size:0;text-align:start}
-.v2-lifecycle .v2-card__body{gap:24px}
-.v2-lifecycle .v2-lifecycle__address{display:flex;flex-wrap:wrap;gap:16px;grid-column:1/-1}
-.v2-lifecycle .v2-lifecycle__address>div{flex:3 1 180px;min-inline-size:0}
-.v2-lifecycle .v2-lifecycle__address>div:last-child{flex:1 1 72px}
-.v2-lifecycle :is(p,dl,dd,h2,h3,ol,ul){margin:0}
-.v2-lifecycle__grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:24px;align-items:stretch}
-.v2-lifecycle__grid>.v2-lifecycle__column>.v2-card:last-child{flex:1 1 auto}
-.v2-lifecycle__column,.v2-lifecycle__group{display:flex;flex-direction:column;gap:24px;min-inline-size:0}
-.v2-lifecycle__fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:16px;min-inline-size:0}
-.v2-lifecycle dl.v2-lifecycle__fields{grid-template-columns:repeat(auto-fill,minmax(min(200px,calc(50% - 8px)),1fr))}
-.v2-lifecycle dl.v2-lifecycle__fields dd{font-variant-numeric:tabular-nums}
-.v2-lifecycle aside dl.v2-lifecycle__fields{grid-template-columns:minmax(0,1fr)}
-.v2-lifecycle__field{display:flex;flex-direction:column;gap:8px;min-inline-size:0;text-align:start}
-.v2-lifecycle__field>label{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600}
-.v2-lifecycle__field :is(input,select,textarea){inline-size:100%;min-inline-size:0;box-sizing:border-box}
-.v2-lifecycle__field :is(input,select){min-block-size:44px}
-.v2-lifecycle__field select{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.v2-lifecycle[data-whm-detail-route^="/whm/backups"] :is(.v2-lifecycle__fields,dl.v2-lifecycle__fields,fieldset .v2-lifecycle__choices){grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
-.v2-lifecycle__field :is(dd,bdi){overflow-wrap:anywhere}
-.v2-lifecycle [dir=ltr]{text-align:var(--v2-control-align,start);unicode-bidi:isolate}
+export const LIFECYCLE_PAGES_CSS = `${L}{display:flex;flex-direction:column;gap:2rem;min-inline-size:0;text-align:start}
+${L} :is(p,dl,dd,h2,h3,ol,ul){margin:0}
+${L} [hidden]{display:none!important}
+${L} [dir=ltr]{text-align:var(--v2-control-align,start);unicode-bidi:isolate}
+${L}__column,${L}__group{display:flex;flex-direction:column;gap:2rem;min-inline-size:0}
+${L}__group{gap:1rem}
+${L}__grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:2rem;align-items:stretch}
+${L}__grid--editor{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
+${L}__grid>${L}__column>.v2-card:last-child{flex:1 1 auto}
+${L} .v2-card ${L}__column{gap:1.5rem}
+${L} .v2-card__body{gap:1.5rem}
+${L}__summary dd{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;unicode-bidi:plaintext;inline-size:fit-content;max-inline-size:100%;margin-inline-end:auto}
+${L}__fields{display:flex;flex-direction:column;gap:1rem;min-inline-size:0}
+${L}__field{display:flex;flex-direction:column;gap:.5rem;min-inline-size:0;text-align:start}
+${L}__field :is(input,select,textarea){inline-size:100%;min-inline-size:0;box-sizing:border-box}
+${L}__field select{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+${L}__field :is(dd,bdi){overflow-wrap:anywhere}
+${L} ${L}__address{flex-direction:row;flex-wrap:wrap;gap:1rem}
+${L} ${L}__address>div{flex:3 1 11.25rem;min-inline-size:0}
+${L} ${L}__address>div:last-child{flex:1 1 4.5rem}
+${L} dl${L}__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:1rem 1.5rem}
+${L} dl${L}__fields dt{text-box:trim-end text}
+${L} dl${L}__fields dd{min-inline-size:0;font-variant-numeric:tabular-nums}
+${L} dl${L}__stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:.5rem}
+${L} dl${L}__stats>${L}__field{min-inline-size:0;max-inline-size:100%;padding:.75rem 1rem;border:1px dashed var(--line-strong);border-radius:.375rem}
+${L}__release{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1.5rem}
 .v2-lifecycle__actions,.v2-lifecycle__choices{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
-.v2-lifecycle__choice{display:flex;align-items:start;gap:8px;min-inline-size:44px;min-block-size:44px;overflow-wrap:anywhere}
-.v2-lifecycle__choice>span{display:flex;flex-direction:column;gap:8px}
-.v2-lifecycle__choice>input{flex:none;inline-size:20px;block-size:20px;margin:0}
+${L}__actions{gap:.5rem}
+${L}__choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13.75rem),1fr));gap:.5rem;align-items:stretch}
+${L}__choices>:not(${L}__choice){grid-column:1/-1}
+${L} :is(${L}__choices,${L}__actions,[data-transfer-review-results],[data-transfer-archive-review]):empty{display:none}
+${L}__choice{display:flex;align-items:flex-start;gap:.5rem;min-inline-size:0;min-block-size:var(--target);overflow-wrap:anywhere;cursor:pointer}
+${L}__choice>input{flex:none}
+${L}__choice>span{display:flex;flex-direction:column;gap:.25rem;min-inline-size:0}
+${L}__choice:has(input:disabled){cursor:not-allowed}
+${L}__choice${L}__switch{flex-direction:row-reverse;align-items:center;justify-content:space-between}
+${L}__choices>${L}__choice{${CHOICE_CARD}}
+${L}__choices>${L}__choice:has(input:checked){${CHOSEN}}
+${L}__choices>${L}__choice:has(input:focus-visible){outline:2px solid var(--accent-fill);outline-offset:2px}
 .v2-lifecycle [data-approved-whm-backups] [role=radiogroup]{display:flex;flex-direction:column;gap:16px;min-inline-size:0}
-.v2-lifecycle [data-approved-whm-backups] .v2-lifecycle__choice[role=radio]{inline-size:100%;align-items:center;min-block-size:52px;padding:8px 16px;border:1px solid var(--line-strong);border-radius:var(--radius-control);background:var(--surface);color:var(--text);font:inherit;text-align:start;cursor:pointer;transition:background-color 140ms ease-out,border-color 140ms ease-out}
-.v2-lifecycle [data-approved-whm-backups] .v2-lifecycle__choice[role=radio]>span:last-child{flex:1;min-inline-size:0;text-align:start}
-.v2-lifecycle [data-approved-whm-backups] .v2-lifecycle__radio-ring{display:inline-flex;align-items:center;justify-content:center;flex:none;inline-size:18px;block-size:18px;border:2px solid var(--line-strong);border-radius:50%}
-.v2-lifecycle [data-approved-whm-backups] [role=radio][aria-checked=true]{border-color:var(--accent-fill);background:var(--accent-soft)}
-.v2-lifecycle [data-approved-whm-backups] [role=radio][aria-checked=true] .v2-lifecycle__radio-ring{border-color:var(--accent-fill)}
-.v2-lifecycle [data-approved-whm-backups] [role=radio][aria-checked=true] .v2-lifecycle__radio-ring::after{content:"";inline-size:8px;block-size:8px;border-radius:50%;background:var(--accent-fill)}
+${L} ${L}__choice[role=radio]{inline-size:100%;align-items:center;${CHOICE_CARD};color:var(--text);font:inherit;text-align:start}
+${L} ${L}__choice[role=radio]>span:last-child{flex:1;min-inline-size:0;text-align:start}
+.v2-lifecycle__radio-ring{display:inline-flex;align-items:center;justify-content:center;flex:none;inline-size:18px;block-size:18px;border:2px solid var(--line-strong);border-radius:50%}
+${L} ${L}__radio-ring{inline-size:1.25rem;block-size:1.25rem;border-width:1px;background:var(--bg)}
+${L} [role=radio][aria-checked=true]{${CHOSEN}}
+${L} [role=radio][aria-checked=true] .v2-lifecycle__radio-ring{border-color:var(--accent-fill);background:var(--accent-fill)}
+${L} [role=radio][aria-checked=true] .v2-lifecycle__radio-ring::after{content:"";inline-size:.625rem;block-size:.625rem;border-radius:50%;background:var(--on-accent)}
 .v2-lifecycle [data-approved-whm-backups] [role=radio]:disabled{color:var(--muted);background:var(--sunken);cursor:not-allowed}
-.v2-lifecycle__scroll{max-inline-size:100%;overflow:auto}
-.v2-lifecycle [data-transfer-revert-loss]:empty{display:none}
-.v2-lifecycle [data-transfer-revert-loss] th{white-space:normal}
-.v2-lifecycle__table{inline-size:100%;border-collapse:collapse;text-align:start}
-.v2-lifecycle__table :is(th,td){padding:12px 16px;text-align:start;vertical-align:top;overflow-wrap:break-word;border-block-end:1px solid var(--line)}
-.v2-lifecycle__table th{color:var(--muted);font-size:12px;font-weight:600;overflow-wrap:normal}
-.v2-lifecycle__table td{font-size:13px}
-.v2-lifecycle__table bdi{overflow-wrap:anywhere}
-@media(min-width:1280px){.v2-lifecycle__table bdi{overflow-wrap:break-word}}
-.v2-lifecycle :is(ul,ol):not([class],.v2-crumbs *){display:flex;flex-direction:column;gap:4px;padding-inline-start:20px;font-size:13px;line-height:1.6;color:var(--text-2)}
-.v2-lifecycle__status{overflow-wrap:anywhere}.v2-lifecycle__status:not([role=alert],[data-state=failed],[data-state=error]){color:var(--muted)}
-.v2-lifecycle__key{padding:16px;border-radius:var(--radius-notice);background:var(--code);color:var(--code-text);font:12px/1.7 var(--font-mono);font-variant-numeric:tabular-nums;white-space:pre-wrap;overflow-wrap:anywhere}
-.v2-lifecycle__steps{display:flex;flex-wrap:wrap;list-style:none;padding:0;gap:16px}
-.v2-lifecycle__steps>li{display:flex;flex:1 1 180px;align-items:center;gap:8px;color:var(--muted)}
-.v2-lifecycle__steps>li>span:first-child{display:flex;align-items:center;justify-content:center;inline-size:28px;block-size:28px;flex:none;border:1px solid var(--line-strong);border-radius:50%;font-variant-numeric:tabular-nums}
-.v2-lifecycle__steps>li[aria-current=step]{color:var(--text);font-weight:600}
-.v2-lifecycle__steps>li[aria-current=step]>span:first-child{border-color:var(--accent-fill);background:var(--accent-fill);color:var(--on-accent)}
-.v2-lifecycle details{display:flex;flex-direction:column;gap:16px;min-inline-size:0}
-.v2-lifecycle details>summary{cursor:pointer;min-block-size:44px;align-content:center;font-weight:600}
-.v2-lifecycle fieldset{border:0;padding:0;margin:0;min-inline-size:0}
-.v2-lifecycle fieldset>legend{margin-block-end:16px;font-weight:600}
-.v2-lifecycle [hidden]{display:none!important}
-${whmPolish('.v2-lifecycle')}.v2-lifecycle__tabs{display:flex;flex-wrap:wrap;gap:16px;border-block-end:1px solid var(--line)}
-.v2-lifecycle__tabs>a{display:inline-flex;align-items:center;min-inline-size:44px;min-block-size:44px;padding-inline:8px;color:var(--muted);text-decoration:none;border-block-end:2px solid transparent;transition:color 140ms ease-out,border-color 140ms ease-out}
-.v2-lifecycle__tabs>a[aria-current=page]{color:var(--text);border-color:var(--accent-fill);font-weight:600}
-.v2-lifecycle__summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.v2-lifecycle__summary>div{padding:24px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface)}
-.v2-lifecycle__summary dt{color:var(--muted);font-size:13px}
-.v2-lifecycle__summary dd{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
-.v2-lifecycle__summary dd{unicode-bidi:plaintext;inline-size:fit-content;max-inline-size:100%;margin-inline-end:auto}
-.v2-lifecycle__summary>div{gap:12px;box-shadow:var(--shadow)}
-.v2-lifecycle__summary dt{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
-.v2-lifecycle__summary dd{line-height:1.3;letter-spacing:-.01em;overflow-wrap:anywhere}
-.v2-lifecycle:dir(rtl) .v2-lifecycle__summary dd,.v2-lifecycle[dir=rtl] .v2-lifecycle__summary dd{letter-spacing:0}
-.v2-lifecycle__column>.v2-lifecycle__status:not([role=alert],[data-state=failed],[data-state=error]){padding:12px 16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken);color:var(--text-2);font-size:13px;line-height:1.6}
-.v2-lifecycle .v2-card__body>fieldset+fieldset{padding-block-start:24px;border-block-start:1px solid var(--line)}
-.v2-lifecycle fieldset .v2-lifecycle__choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px;align-items:stretch}
-.v2-lifecycle fieldset .v2-lifecycle__choices>.v2-lifecycle__choice{padding:12px 16px;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface);transition:background-color 140ms ease-out,border-color 140ms ease-out}
-.v2-lifecycle fieldset .v2-lifecycle__choices>.v2-lifecycle__choice:has(input:checked){border-color:var(--accent-line);background:var(--accent-soft)}
-.v2-lifecycle fieldset .v2-lifecycle__choices>.v2-lifecycle__choice:has(input:focus-visible){outline:2px solid var(--accent-fill);outline-offset:2px}
-.v2-lifecycle__choice>span{gap:2px;min-inline-size:0}
-.v2-lifecycle__choice strong{font-size:14px;font-weight:600}
-.v2-lifecycle__choice .v2-muted,.v2-lifecycle__choice>span>span{font-size:13px;line-height:1.5;color:var(--muted)}
-.v2-lifecycle__rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px 24px;list-style:none;padding:0;font-size:13px;line-height:1.6;color:var(--text-2)}
-.v2-lifecycle__rules>li{display:flex;align-items:flex-start;gap:8px}
-.v2-lifecycle__rules>li>.v2-icon{flex:none;margin-block-start:2px;color:var(--ok)}
-.v2-lifecycle__steps{gap:8px 16px;padding:12px 16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken);font-size:13px}
-.v2-lifecycle__steps>li:not(:last-child)::after{content:"";flex:1 1 16px;min-inline-size:16px;block-size:1px;background:var(--line-strong)}
-.v2-lifecycle__steps>li{flex-basis:120px}
-.v2-lifecycle__steps>li>span:first-child{background:var(--surface)}
-.v2-lifecycle__steps a{display:inline-flex;align-items:center;min-inline-size:44px;min-block-size:44px;color:inherit;text-decoration:none}
-.v2-lifecycle__steps a:hover{color:var(--text);text-decoration:underline}
-.v2-lifecycle__scroll{border:1px solid var(--line);border-radius:var(--radius-notice)}
-.v2-lifecycle__table thead th{background:var(--sunken)}
-.v2-lifecycle__table tbody tr:last-child>*{border-block-end:0}
-.v2-lifecycle__table td[colspan]{padding:24px 16px;text-align:center;color:var(--muted)}
-.v2-lifecycle__table td{font-variant-numeric:tabular-nums}
-.v2-lifecycle__release>section{padding:16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken);gap:16px}
-.v2-lifecycle__release>section:last-child{border-color:var(--accent-line);background:var(--accent-soft)}
-.v2-lifecycle .v2-card__body>details{padding-inline:16px;border:1px solid var(--line);border-radius:var(--radius-notice)}
-.v2-lifecycle .v2-card__body>details[open]{padding-block-end:16px}
-.v2-lifecycle .v2-card__body>details+details{margin-block-start:-12px}
-.v2-lifecycle__grid--editor{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
-${phoneRows('.v2-lifecycle__grid--editor .v2-lifecycle__table:has(>[data-destination-rows])')}
-.v2-lifecycle__grid--editor .v2-lifecycle__scroll:has(>table>[data-destination-rows]:empty){display:none}
-.v2-lifecycle__release{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
-.v2-lifecycle__nowrap{white-space:nowrap}
-.v2-lifecycle__table .v2-lifecycle__actions{gap:8px}
-.v2-lifecycle__archive-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;min-inline-size:0}
-.v2-lifecycle__archive-bar>.v2-lifecycle__field{flex:1 1 220px}
-.v2-lifecycle [data-account-backups] .v2-lifecycle__table bdi.v2-num{white-space:nowrap}
-.v2-lifecycle [data-account-backups] .v2-lifecycle__table a.v2-btn{block-size:auto;min-block-size:var(--target);white-space:normal;overflow-wrap:anywhere;text-align:start}
-.v2-backup-pending{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken)}
+${L}__scroll{max-inline-size:100%;overflow:auto}
+${L} [data-transfer-revert-loss]:empty{display:none}
+${L} [data-transfer-revert-loss] th{white-space:normal}
+${L}__table{text-align:start}
+${L}__table :is(th,td){text-align:start;overflow-wrap:break-word}
+${L}__table thead th{overflow-wrap:normal}
+${L}__table tbody th{padding:.75rem 1rem;font-weight:500;color:var(--mono,var(--text))}
+${L}__table td{font-variant-numeric:tabular-nums}
+${L}__table td[colspan]{padding-block:1.5rem;text-align:center;color:var(--muted)}
+${L}__table bdi{overflow-wrap:anywhere}
+@media(min-width:1280px){${L}__table bdi{overflow-wrap:break-word}}
+${L}__table ${L}__actions{gap:.5rem}
+${L} ${L}__table .v2-btn:where(:not(.kt-btn)){block-size:1.75rem;padding-inline:.625rem;gap:.3125rem;font-size:.75rem}
+${L} ${L}__table .v2-btn:where(:not(.kt-btn)):is([data-xp-action=delete],[data-xp-action=revoke],[data-xp-action=remove]){border-color:color-mix(in oklab,var(--destructive) 10%,transparent);background:color-mix(in oklab,var(--destructive) 10%,transparent);color:var(--destructive)}
+${L} ${L}__table .v2-btn:where(:not(.kt-btn)):is([data-xp-action=delete],[data-xp-action=revoke],[data-xp-action=remove])>i{color:inherit}
+${L}__nowrap{white-space:nowrap}
+${L} [data-account-backups] ${L}__table bdi.v2-num{white-space:nowrap}
+${L} [data-account-backups] ${L}__table a.v2-btn{overflow-wrap:anywhere}
+${L} :is(ul,ol):not([class],.v2-crumbs *){display:flex;flex-direction:column;gap:.25rem;padding-inline-start:1.25rem;list-style:disc;font-size:1rem;line-height:var(--lh-text);color:var(--text-2)}
+${L}__status{overflow-wrap:anywhere}${L}__status:not([role=alert],[data-state=failed],[data-state=error]){color:var(--text-2)}
+${L}__column>${L}__status:not([role=alert],[data-state=failed],[data-state=error]){padding:1rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken)}
+${L}__key{padding:1rem;border-radius:var(--radius-control);background:var(--code);color:var(--code-text);font:.75rem/1.7 var(--font-mono);font-variant-numeric:tabular-nums;white-space:pre-wrap;overflow-wrap:anywhere}
+${L}__steps{display:flex;flex-wrap:wrap;gap:.5rem 0;list-style:none;padding:0}
+${L}__steps>li{display:flex;flex:1 1 8.25rem;align-items:center;gap:.5rem;min-inline-size:0;color:var(--text-2);font-size:1rem;line-height:var(--lh-text);font-weight:500}
+${L}__steps>li>span:first-child{display:flex;align-items:center;justify-content:center;flex:none;inline-size:2rem;block-size:2rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.8125rem;font-weight:600;font-variant-numeric:tabular-nums}
+${L}__steps>li:not(:last-child)::after{content:"";flex:1 1 1rem;min-inline-size:.5rem;margin-inline-end:.5rem;block-size:2px;border-radius:1px;background:var(--line-strong)}
+${L}__steps>li[aria-current=step]{color:var(--mono,var(--text))}
+${L}__steps>li[aria-current=step]>span:first-child{background:var(--accent-fill);color:var(--on-accent)}
+${L}__steps a{display:inline-flex;align-items:center;min-block-size:var(--target);color:inherit;text-decoration:none}
+${L}__steps a:hover{color:var(--accent)}
+${L} details{display:block;min-inline-size:0;border:1px solid var(--line);border-radius:var(--radius-card)}
+${L} details>summary{display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-block-size:var(--target);padding:.5rem 1rem;list-style:none;font-size:1rem;line-height:var(--lh-text);font-weight:500;color:var(--mono,var(--text));cursor:pointer}
+${L} details>summary::-webkit-details-marker{display:none}
+${L} details>summary:not(:has(>i))::after{${CHEVRON}}
+${L} details>summary>i{transition:transform .14s ease-out}
+${L} details[open]>summary{border-block-end:1px solid var(--line)}
+${L} details[open]>summary::after,${L} details[open]>summary>i{transform:rotate(180deg)}
+${L} details>:not(summary){margin:1rem}
+${L} .v2-card__body>details+details{margin-block-start:-1rem}
+${L}__table details{border:0;border-radius:0}
+${L}__table details>summary{justify-content:flex-start;padding:0;border:0}
+${L}__table details>:not(summary){margin:.5rem 0 0}
+${L} fieldset{border:0;padding:0;margin:0;min-inline-size:0}
+${L} fieldset>legend{float:inline-start;inline-size:100%;margin-block-end:1rem;padding:0;font-size:1rem;line-height:var(--lh-text);font-weight:600;color:var(--mono,var(--text))}
+${L} fieldset>legend+*{clear:both}
+${L} .v2-card__body>fieldset+fieldset{padding-block-start:1.5rem;border-block-start:1px solid var(--line)}
+${whmPolish(L)}${L}__rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr));gap:.5rem 2rem;padding:0;list-style:none}
+${L}__rules>li{display:flex;align-items:flex-start;gap:.5rem}
+${L}__rules>li>.v2-icon{flex:none;margin-block-start:.1875rem;color:var(--color-green-500,var(--ok))}
+${phoneRows(`${L}__grid--editor ${L}__table:has(>[data-destination-rows])`)}
+${L}__grid--editor ${L}__scroll:has(>table>[data-destination-rows]:empty){display:none}
+${L}__archive-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:1rem 1.5rem;min-inline-size:0}
+${L}__archive-bar>${L}__field{flex:1 1 13.75rem}
+.v2-backup-pending{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem 1.5rem;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--sunken)}
 .v2-backup-pending[data-dirty="true"]{border-color:var(--accent-line);background:var(--accent-soft)}
-.v2-backup-pending__meta{display:flex;flex-direction:column;gap:8px;flex:1 1 260px;min-inline-size:0}
-.v2-backup-pending__summary{font-size:13px;font-weight:600;color:var(--text)}
-.v2-backup-pending__diff{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;font-size:12px;font-variant-numeric:tabular-nums;color:var(--text-2)}
-.v2-backup-pending__diff>li{padding:4px 10px;border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--surface)}
-.v2-backup-policy-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-block-end:12px}
-.v2-backup-policy-filters{display:inline-flex;flex-wrap:wrap;gap:8px}
-.v2-backup-policy-filters>[aria-pressed="true"]{border-color:var(--accent-fill);background:var(--accent-soft);color:var(--text);font-weight:600}
-.v2-transfer-discovery-pills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;font-size:12px;font-variant-numeric:tabular-nums}
-.v2-transfer-discovery-pills>li{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--sunken);color:var(--text-2);font-weight:600}
-.v2-transfer-slice-box{display:flex;flex-direction:column;gap:8px;min-inline-size:0;padding:16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--subtle)}
-.v2-transfer-slice-box__label{font-size:12px;font-weight:600;color:var(--muted)}
-.v2-upgrade-progress{display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--sunken)}
-.v2-upgrade-progress__head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
-.v2-upgrade-meter{display:block;inline-size:100%;block-size:10px;border-radius:999px;overflow:hidden;background:var(--line)}
+.v2-backup-pending__meta{display:flex;flex-direction:column;gap:.5rem;flex:1 1 16.25rem;min-inline-size:0}
+.v2-backup-pending__summary{font-size:1rem;line-height:var(--lh-text);font-weight:500;color:var(--mono,var(--text))}
+.v2-backup-pending__diff,.v2-transfer-discovery-pills{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0}
+.v2-backup-pending__diff>li,.v2-transfer-discovery-pills>li{${BADGE}}
+.v2-backup-pending[data-dirty="true"] .v2-backup-pending__diff>li{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent)}
+.v2-upgrade-progress__head{font-variant-numeric:tabular-nums}
 .v2-upgrade-meter__native{display:block;inline-size:100%;block-size:100%;border:0;appearance:none;background:transparent}
-.v2-upgrade-meter__native::-webkit-progress-bar{background:var(--line);border-radius:999px}
+.v2-upgrade-meter__native::-webkit-progress-bar{background:transparent;border-radius:999px}
 .v2-upgrade-meter__native::-webkit-progress-value{background:var(--accent-fill);border-radius:999px}
 .v2-upgrade-meter__native::-moz-progress-bar{background:var(--accent-fill);border-radius:999px}
-.v2-upgrade-log{display:flex;flex-direction:column;gap:8px;list-style:none;padding:12px 16px;border:1px solid var(--line);border-radius:var(--radius-notice);background:var(--code);color:var(--code-text);font:12px/1.6 var(--font-mono);font-variant-numeric:tabular-nums;max-block-size:280px;overflow:auto}
-.v2-upgrade-log>li{display:flex;flex-wrap:wrap;gap:8px 12px;padding-block:4px;border-block-end:1px solid var(--line)}
+.v2-upgrade-log{display:flex;flex-direction:column;gap:.5rem;padding:.75rem 1rem;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--code);color:var(--code-text);font:.75rem/1.6 var(--font-mono);font-variant-numeric:tabular-nums;max-block-size:17.5rem;overflow:auto;list-style:none}
+.v2-upgrade-log>li{display:flex;flex-wrap:wrap;gap:.5rem .75rem;padding-block:.25rem;border-block-end:1px solid var(--line)}
 .v2-upgrade-log>li:last-child{border-block-end:0}
 .v2-upgrade-log__time{color:var(--code-muted);flex:none}
 .v2-upgrade-log__phase{font-weight:600;flex:none}
-.v2-upgrade-log__msg{flex:1 1 200px;min-inline-size:0;overflow-wrap:anywhere}
-@media(prefers-reduced-motion:reduce){.v2-lifecycle__tabs>a,.v2-lifecycle fieldset .v2-lifecycle__choices>.v2-lifecycle__choice,.v2-lifecycle [data-approved-whm-backups] .v2-lifecycle__choice[role=radio]{transition:none}}
-@media(min-width:1001px){.v2-lifecycle__table .v2-lifecycle__actions>.v2-btn{padding-inline:12px;font-size:13px}}
-@media(max-width:600px){${phoneRows('.v2-lifecycle .v2-lifecycle__table')}
-.v2-lifecycle__steps>li:not(:last-child)::after{display:none}.v2-lifecycle__actions>:is(.v2-btn,button){flex:1 1 auto}}
-@media(max-width:1000px){.v2-lifecycle__grid{grid-template-columns:minmax(0,1fr)}.v2-lifecycle__summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.v2-lifecycle div.v2-lifecycle__fields{grid-template-columns:minmax(0,1fr)}.v2-lifecycle__summary>div{padding:16px}.v2-lifecycle__summary .v2-tile{display:none}.v2-lifecycle__summary dd{font-size:16px}}
+.v2-upgrade-log__msg{flex:1 1 12.5rem;min-inline-size:0;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){${L}__choice,${L} details>summary::after,${L} details>summary>i{transition:none}}
+@media(max-width:600px){${phoneRows(`${L} ${L}__table`)}
+${L} ${L}__table>thead:has(>tr>:first-child [type=checkbox]){position:static;display:block;inline-size:auto;block-size:auto;overflow:visible;clip-path:none}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox]){display:flex;border-block-end:1px solid var(--line)}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox])>th{display:flex;align-items:center;min-block-size:var(--target)}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox])>th:nth-child(2){flex:1 1 auto}
+${L} ${L}__table>thead>tr:has(>:first-child [type=checkbox])>th:nth-child(n+3){position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}
+${L} ${L}__table>thead ${L}__choice{align-items:center;min-inline-size:var(--target)}
+${L}__steps>li:not(:last-child)::after{display:none}${L}__actions>:is(.v2-btn,button){flex:1 1 auto}${L}__summary .v2-tile{display:none}}
+@media(max-width:1000px){${L}__grid{grid-template-columns:minmax(0,1fr)}}
 `

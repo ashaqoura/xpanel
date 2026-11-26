@@ -45,7 +45,7 @@ describe('selected-theme software controllers', () => {
     expect(row.querySelector('bdi')?.getAttribute('dir')).toBe('ltr')
     expect(row.querySelector<HTMLButtonElement>('[data-sw-action="start"]')!.disabled).toBe(true)
     const stop = row.querySelector<HTMLButtonElement>('[data-sw-action="stop"]')!
-    expect(stop.className).toBe(theme === 'v2' ? 'v2-btn' : 'xp-btn')
+    expect(stop.className).toBe(theme === 'v2' ? 'v2-btn kt-btn kt-btn-outline' : 'xp-btn')
     stop.click(); await settle()
     expect(ask).toHaveBeenCalledOnce()
     expect(send.mock.calls.find(call => call[0] === 'POST')).toEqual(['POST', '/api/server/software/containers/action', { engine: 'podman', containerId: 'a'.repeat(64), action: 'stop', expectedRevision: 'b'.repeat(64) }])

@@ -6,6 +6,7 @@ import { escapeHtml, hookAttrs, type HookAttributes } from '../../../html.ts'
 import { icon } from '../../../icons.ts'
 import { v2Messages } from '../../../messages.ts'
 import { v2MailClientTemplatesForHooks } from '../client-templates.ts'
+import { mailIcon, type MailIcon } from '../icons.ts'
 
 /** Core supplies the current sealed mailbox and its independent route/capability decisions. */
 export interface MailWorkspaceInput extends Pick<MailSurfaceProps, 'quotaUsedMb' | 'quotaUsedBytes' | 'quotaLimitMb'> {
@@ -38,160 +39,159 @@ export function ctx(input: MailWorkspaceInput): { t: Translate; readable: boolea
   return { t: v2Messages.translator(input.locale ?? 'en'), readable, factsReadable, editable: readable && input.canManage === true }
 }
 
-export const button = (label: string, hooks?: HookAttributes, disabled = true, primary = false): string =>
-  `<button type="button" class="v2-btn${primary ? ' v2-btn--primary' : ''}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${esc(label)}</button>`
-export function field(id: string, label: string, controlHtml: string, help?: string): string {
+// Complete literal class lists. A long loaded name may wrap inside its button, so a button is never taller than its text needs.
+const WRAP = 'max-w-full h-auto min-h-11 py-2 whitespace-normal text-start'
+export const BUTTON = {
+  primary: `v2-btn v2-btn--primary kt-btn kt-btn-primary ${WRAP}`,
+  outline: `v2-btn kt-btn kt-btn-outline ${WRAP}`,
+  ghost: `v2-btn v2-btn--ghost kt-btn kt-btn-ghost ${WRAP}`,
+  danger: `v2-btn kt-btn kt-btn-outline kt-btn-destructive ${WRAP}`,
+} as const
+export type ButtonTone = keyof typeof BUTTON
+// type roles: caption 13/20, sub-heading at the body size, body 16/24 (Arabic line heights in the rtl variants)
+export const HINT = 'text-[0.8125rem] leading-(--lh-cap) font-normal text-muted-foreground'
+export const SUBHEAD = 'text-base leading-(--lh-text) font-semibold text-mono'
+export const COPY = 'text-base leading-(--lh-text) font-normal text-secondary-foreground'
+const LABEL = 'kt-form-label leading-(--lh-label)'
+
+/** One action of a card: the single primary one, outline for secondary, ghost for tertiary and soft red for removal. */
+export const button = (label: string, hooks?: HookAttributes, disabled = true, primary = false, glyph?: MailIcon, tone?: ButtonTone): string =>
+  `<button type="button" class="${BUTTON[tone ?? (primary ? 'primary' : 'outline')]}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${glyph ? mailIcon(glyph, 16) : ''}${esc(label)}</button>`
+export const submit = (label: string, hooks?: HookAttributes, disabled = true, glyph?: MailIcon): string =>
+  `<button type="submit" class="${BUTTON.primary}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${glyph ? mailIcon(glyph, 16) : ''}${esc(label)}</button>`
+/** A small action of a card header toolbar, such as Refresh beside the title. */
+export const toolButton = (label: string, hooks?: HookAttributes, disabled = true, glyph?: MailIcon, primary = false): string =>
+  `<button type="button" class="${primary ? 'v2-btn v2-btn--primary kt-btn kt-btn-primary' : 'v2-btn kt-btn kt-btn-outline'}"${hookAttrs(hooks)}${disabled ? ' disabled' : ''}>${glyph ? mailIcon(glyph, 14) : ''}${esc(label)}</button>`
+
+/** A labelled field: the label above its control on the same start edge (8px), the hint under the control. Every
+ *  width stacks; the former settings row (`layout: 'row'`) is withdrawn by the project standard and renders stacked. */
+export function field(id: string, label: string, controlHtml: string, help?: string, _layout: 'row' | 'stack' = 'stack'): string {
   const described = help && !controlHtml.includes('aria-describedby=')
     ? controlHtml.replace(/<(input|select|textarea)\b/, `<$1 aria-describedby="${esc(id)}-help"`) : controlHtml
-  return `<div class="v2-field"><label for="${esc(id)}">${esc(label)}</label>${described}${help ? `<p id="${esc(id)}-help" class="v2-field__help">${esc(help)}</p>` : ''}</div>`
+  const hint = help ? `<p id="${esc(id)}-help" class="v2-field__help mt-0 ${HINT}">${esc(help)}</p>` : ''
+  return `<div class="v2-field kt-form-item flex flex-col gap-2 min-w-0"><label class="${LABEL}" for="${esc(id)}">${esc(label)}</label>${described}${hint}</div>`
 }
+/** A labelled group whose control is not a single labelled input, such as a switch: its label above it. */
+export const row = (label: string, bodyHtml: string): string =>
+  `<div class="v2-mail-workspace__row v2-field kt-form-item flex flex-col gap-2 min-w-0"><span class="v2-field__label ${LABEL}">${esc(label)}</span><div class="flex flex-col gap-2 w-full min-w-0">${bodyHtml}</div></div>`
+/** A confirmation: a checkbox with its sentence. */
 export const check = (name: string, label: string, checked = false, disabled = true, hooks?: HookAttributes): string =>
-  `<label class="v2-mail-workspace__check"><input type="checkbox"${name ? ` name="${esc(name)}"` : ''}${checked ? ' checked' : ''}${disabled ? ' disabled' : ''}${hookAttrs(hooks)}><span>${esc(label)}</span></label>`
+  `<label class="v2-mail-workspace__check kt-label items-center gap-2 min-h-11 font-normal text-base leading-(--lh-text)"><input class="kt-checkbox" type="checkbox"${name ? ` name="${esc(name)}"` : ''}${checked ? ' checked' : ''}${disabled ? ' disabled' : ''}${hookAttrs(hooks)}><span>${esc(label)}</span></label>`
+/** An on/off setting: the label at the start and a Metronic switch at the end. Group several in `toggles`. */
+export const toggle = (name: string, label: string, checked = false, disabled = true, hooks?: HookAttributes, extra = ''): string =>
+  `<label class="v2-mail-workspace__check v2-mail-workspace__switch flex items-center justify-between gap-4 min-h-11 px-4 py-2 cursor-pointer"><span class="text-base leading-(--lh-text) font-medium text-mono">${esc(label)}</span><input class="kt-switch" type="checkbox"${name ? ` name="${esc(name)}"` : ''}${checked ? ' checked' : ''}${disabled ? ' disabled' : ''}${extra}${hookAttrs(hooks)}></label>`
+export const toggles = (body: string): string => `<div class="v2-mail-workspace__toggles flex flex-col rounded-lg border border-border divide-y divide-border">${body}</div>`
 export const input = (id: string, name: string, type = 'text', extra = '', disabled = true): string =>
-  `<input id="${esc(id)}"${name ? ` name="${esc(name)}"` : ''} type="${esc(type)}"${extra}${disabled ? ' disabled' : ''}>`
+  `<input class="kt-input" id="${esc(id)}"${name ? ` name="${esc(name)}"` : ''} type="${esc(type)}"${extra}${disabled ? ' disabled' : ''}>`
 export const area = (id: string, name: string, extra = '', disabled = true): string =>
-  `<textarea id="${esc(id)}"${name ? ` name="${esc(name)}"` : ''}${extra}${disabled ? ' disabled' : ''}></textarea>`
+  `<textarea class="kt-textarea" id="${esc(id)}"${name ? ` name="${esc(name)}"` : ''}${extra}${disabled ? ' disabled' : ''}></textarea>`
 export const select = (id: string, name: string, options: readonly (readonly [string, string])[], extra = '', disabled = true, selectedValue?: string): string =>
-  `<span class="v2-select"><select id="${esc(id)}"${name ? ` name="${esc(name)}"` : ''}${extra}${disabled ? ' disabled' : ''}>${options.map(([value, label]) => `<option value="${esc(value)}"${value === selectedValue ? ' selected' : ''}>${esc(label)}</option>`).join('')}</select>${icon('chevDown', 16)}</span>`
-export const actions = (body: string): string => `<div class="v2-mail-workspace__actions">${body}</div>`
-export const fields = (body: string): string => `<div class="v2-mail-workspace__fields">${body}</div>`
+  `<span class="v2-select"><select class="${extra.includes(' multiple') ? 'kt-select h-auto py-1' : 'kt-select'}" id="${esc(id)}"${name ? ` name="${esc(name)}"` : ''}${extra}${disabled ? ' disabled' : ''}>${options.map(([value, label]) => `<option value="${esc(value)}"${value === selectedValue ? ' selected' : ''}>${esc(label)}</option>`).join('')}</select>${icon('chevDown', 16)}</span>`
+/** The actions of a card or form: at its end, the primary one last. */
+export const actions = (body: string, align: 'end' | 'start' = 'end'): string => `<div class="${align === 'end' ? 'v2-mail-workspace__actions justify-end' : 'v2-mail-workspace__actions'}">${body}</div>`
+export const fields = (body: string): string => `<div class="v2-mail-workspace__fields grid gap-4 min-w-0">${body}</div>`
+/** Label and value pairs laid out as the rows of a Metronic general-info table. */
 export const facts = (rows: readonly { label: string; valueHtml: string }[], hooks?: HookAttributes): string =>
-  `<dl class="v2-mail-workspace__facts"${hookAttrs(hooks)}>${rows.map(row => `<div><dt>${esc(row.label)}</dt><dd>${row.valueHtml}</dd></div>`).join('')}</dl>`
+  `<dl class="v2-mail-workspace__facts"${hookAttrs(hooks)}>${rows.map(item => `<div><dt>${esc(item.label)}</dt><dd>${item.valueHtml}</dd></div>`).join('')}</dl>`
+/** Explanatory copy of a card. */
+export const copy = (text: string, hooks?: HookAttributes): string => `<p class="${COPY}"${hookAttrs(hooks)}>${esc(text)}</p>`
+/** A fixed remark the reader should not miss: a light Metronic alert. Its text may be written by a controller. */
+export const note = (text: string, hooks?: HookAttributes, hidden = false): string =>
+  `<p class="v2-mail-workspace__note kt-alert kt-alert-light kt-alert-primary"${hookAttrs(hooks)} role="note"${hidden ? ' hidden' : ''}>${esc(text)}</p>`
 export const section = (id: string, title: string, bodyHtml: string, actionsHtml?: string, hooks?: HookAttributes): string =>
   card({ id, title, titleId: `${id}-heading`, bodyHtml: v2MailClientTemplatesForHooks(hooks) + bodyHtml, actionsHtml, hooks })
 // phone rows print each value's column name from these custom properties; the header cells stay in the document
 const columnNames = (columns: readonly string[]): string => columns.map((label, index) => `--h${index + 1}:'${label.replace(/[\\']/g, '\\$&')}'`).join(';')
 export const table = (id: string, title: string, columns: readonly string[], bodyHtml: string, hooks?: HookAttributes): string =>
-  `<div class="v2-mail-workspace__table" role="region" tabindex="0" aria-label="${esc(title)}" style="${esc(columnNames(columns))}"><table id="${esc(id)}"><caption class="v2-sr">${esc(title)}</caption><thead><tr>${columns.map(label => `<th scope="col">${esc(label)}</th>`).join('')}</tr></thead><tbody${hookAttrs(hooks)}>${bodyHtml}</tbody></table></div>`
+  `<div class="v2-mail-workspace__table kt-scrollable-x-auto overflow-x-auto rounded-lg border border-border" role="region" tabindex="0" aria-label="${esc(title)}" style="${esc(columnNames(columns))}"><table class="kt-table text-start" id="${esc(id)}"><caption class="v2-sr">${esc(title)}</caption><thead><tr>${columns.map(label => `<th class="text-start font-medium" scope="col">${esc(label)}</th>`).join('')}</tr></thead><tbody${hookAttrs(hooks)}>${bodyHtml}</tbody></table></div>`
 export const unreadRow = (text: string, columns: number): string => `<tr><td colspan="${columns}">${esc(text)}</td></tr>`
 export function page(input: MailWorkspaceInput, title: string, description: string, bodyHtml: string, hooks?: HookAttributes): string {
   const { t, readable } = ctx(input)
   const blockNative = input.readOnly === true && !(input.route === '/mail/settings/security' && input.securityHtml)
-  return `<div class="v2-mail-workspace" lang="${esc(input.locale ?? 'en')}" dir="${localeDirection(input.locale ?? 'en')}" data-mail-workspace-route="${esc(input.route)}"${blockNative ? ' data-readonly="true"' : ''}${hookAttrs(hooks)}>${v2MailClientTemplatesForHooks(hooks)}${pageHeader(t, { route: input.route, title, description, breadcrumb: [{ label: t(msgid('Inbox')), href: '/mail/inbox' }, { label: title }] })}${!readable ? `<p class="v2-mail-workspace__access" role="status">${esc(t(msgctxt('theme:v2', 'This mailbox workspace is unavailable for the current session. No mailbox data has been read.')))}</p>` : ''}${bodyHtml}</div>`
+  return `<div class="v2-mail-workspace flex flex-col gap-8 min-w-0" lang="${esc(input.locale ?? 'en')}" dir="${localeDirection(input.locale ?? 'en')}" data-mail-workspace-route="${esc(input.route)}"${blockNative ? ' data-readonly="true"' : ''}${hookAttrs(hooks)}>${v2MailClientTemplatesForHooks(hooks)}${pageHeader(t, { route: input.route, title, description, breadcrumb: [{ label: t(msgid('Inbox')), href: '/mail/inbox' }, { label: title }] })}${!readable ? `<p class="v2-mail-workspace__access kt-alert kt-alert-light kt-alert-warning" role="status"><span class="kt-alert-icon text-yellow-500">${icon('info', 18)}</span><span class="kt-alert-title">${esc(t(msgctxt('theme:v2', 'This mailbox workspace is unavailable for the current session. No mailbox data has been read.')))}</span></p>` : ''}${bodyHtml}</div>`
 }
 
-export const MAIL_WORKSPACES_CSS = `.v2-mail-workspace{display:flex;flex-direction:column;gap:var(--space-4);min-inline-size:0;max-inline-size:1200px}
-.v2-mail-workspace :is(h2,h3,p,dl,dd,ul,ol,pre){margin:0}
-.v2-mail-workspace .v2-card,.v2-mail-workspace .v2-card__body{gap:var(--space-3)}
-.v2-mail-workspace__groups,.v2-mail-workspace form,.v2-mail-workspace__panel{display:grid;gap:var(--space-3);min-inline-size:0}
-.v2-mail-workspace>[data-mail-contacts]{gap:var(--space-4)}
-.v2-mail-workspace__fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:var(--space-2);min-inline-size:0}
-.v2-mail-workspace__fields>.v2-field:only-child{max-inline-size:560px}
-.v2-mail-workspace__facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:var(--space-2);min-inline-size:0}
-.v2-mail-workspace__facts>div{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0;text-align:start}
-.v2-mail-workspace__facts :is(dt,dd){margin:0;overflow-wrap:anywhere;text-align:start}
-.v2-mail-workspace__facts dt{font-size:12px;color:var(--muted)}
-.v2-mail-workspace__actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
+// Metronic gives the look through the kt-* classes and utilities in the markup. These rules keep the structure of
+// elements the controllers write (facts, lists, status lines, phone table rows) and the states they set.
+const STATUS = '.v2-mail-workspace .v2-card :is([role=status],[role=alert]):not(.kt-alert)'
+const LIVE = `${STATUS}:not(:empty,[data-state=failed],[data-state=error])`
+export const MAIL_WORKSPACES_CSS = `.v2-mail-workspace{max-inline-size:75rem}
+.v2-mail-workspace .v2-card__body{gap:1.5rem}
+.v2-mail-workspace__groups,.v2-mail-workspace form{display:grid;gap:1.5rem;min-inline-size:0}
+.v2-mail-workspace__facts{display:grid;gap:1rem;min-inline-size:0}
+.v2-mail-workspace__facts>div{display:flex;flex-direction:column;align-items:stretch;gap:.5rem;min-inline-size:0;text-align:start}
+.v2-mail-workspace__facts dt{margin:0;font-size:.875rem;line-height:var(--lh-label);font-weight:500;color:var(--text-2);overflow-wrap:anywhere;text-align:start}
+.v2-mail-workspace__facts dd{margin:0;font-size:1rem;line-height:var(--lh-text);font-weight:400;color:var(--mono,var(--text));font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:start}
+.v2-mail-workspace__facts dd :is(bdi,span){min-inline-size:0;max-inline-size:100%;overflow-wrap:anywhere;white-space:normal}
+.v2-mail-workspace__facts.v2-dav-guide{gap:1.5rem}
+.v2-mail-workspace__facts.v2-dav-guide>div{display:flex;flex-direction:column;gap:.5rem;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-notice)}
+.v2-mail-workspace__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
 .v2-mail-workspace__actions:not(:has(>:not([hidden]))){display:none}
 .v2-mail-workspace .v2-card p:empty{display:none}
-.v2-mail-workspace input[type=file]{block-size:auto;padding:var(--space-1);font-size:13px;color:var(--text-2)}
-.v2-mail-workspace input[type=file]::file-selector-button{min-inline-size:44px;min-block-size:var(--target);margin-inline-end:12px;padding:0 14px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--text);font:600 13px/1.2 inherit;cursor:pointer;transition:background-color 140ms ease-out,border-color 140ms ease-out}
-.v2-mail-workspace input[type=file]:not(:disabled)::file-selector-button:hover{background:var(--subtle)}
-.v2-mail-workspace :is(form[role=search],[data-mail-track-form]){display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--space-2)}
-.v2-mail-workspace :is(form[role=search],[data-mail-track-form])>.v2-mail-workspace__fields{flex:1 1 420px}
-.v2-mail-workspace .v2-actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1)}
-.v2-mail-workspace .v2-mail-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--space-2);max-inline-size:720px;min-inline-size:0}
-.v2-mail-workspace #v2-mail-lists-admin .v2-card__body>div{display:grid;gap:var(--space-2);min-inline-size:0}
-.v2-mail-workspace .v2-security__form{max-inline-size:560px}
-.v2-mail-workspace .v2-table-wrap{border:1px solid var(--line);border-radius:12px;overflow-x:auto}
-.v2-mail-workspace__check{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target);font-size:14px}
-@media(max-width:600px){.v2-mail-workspace__check{min-block-size:var(--target)}}
-.v2-mail-workspace__check>input{flex:none;margin-block:0}
-.v2-mail-workspace [data-mailbox-settings] .v2-mail-workspace__fields>.v2-mail-workspace__check{grid-column:1/-1}
-.v2-mail-workspace__table{max-inline-size:100%;overflow:auto;min-inline-size:0;font-variant-numeric:tabular-nums}
-.v2-mail-workspace__table :is(th,td){text-align:start;vertical-align:middle;padding:12px 16px}
-.v2-mail-workspace__table>table{inline-size:100%}
-.v2-mail-workspace :is(.v2-mail-workspace__actions,td)>.v2-btn{max-inline-size:100%;block-size:auto;padding-block:8px;white-space:normal;text-align:start}
+.v2-mail-workspace .v2-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.v2-mail-workspace .v2-mail-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13.75rem),1fr));gap:1rem;max-inline-size:45rem;min-inline-size:0}
+.v2-mail-workspace #v2-mail-lists-admin .v2-card__body>div{display:grid;gap:1.5rem;min-inline-size:0}
+.v2-mail-workspace .v2-table-wrap{border:1px solid var(--line);border-radius:var(--radius-notice);overflow-x:auto}
+.v2-mail-workspace__table{max-inline-size:100%;min-inline-size:0;font-variant-numeric:tabular-nums}
+.v2-mail-workspace #v2-mail-forwarder-table th:last-child{inline-size:1%;white-space:nowrap}
 .v2-mail-workspace[data-mail-mailing-lists] .v2-mail-workspace__table td:nth-child(-n+2){overflow-wrap:anywhere}
-.v2-mail-workspace [data-filter-list] .v2-card__body{gap:var(--space-1)}
-.v2-mail-workspace [data-filter-list] .v2-card__body>.v2-mail-workspace__actions{margin-block-start:var(--space-1)}
-@media(min-width:601px){.v2-mail-workspace__table .v2-mail-folders__row-actions{flex-wrap:nowrap;gap:var(--space-1)}.v2-mail-workspace [data-contact-table] bdi{white-space:nowrap}}
-.v2-mail-workspace__list{display:grid;gap:var(--space-2);padding:0;list-style:none;min-inline-size:0}
+@media(min-width:601px){.v2-mail-workspace__table .v2-mail-folders__row-actions{flex-wrap:nowrap}.v2-mail-workspace [data-contact-table] bdi{white-space:nowrap}}
+.v2-mail-workspace__list{display:grid;gap:.5rem;padding:0;list-style:none;min-inline-size:0;font-size:1rem;line-height:var(--lh-text);color:var(--text)}
 .v2-mail-workspace__list:empty{display:none}
-.v2-mail-workspace__list>li:has(>.v2-btn){display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-1) var(--space-2);min-inline-size:0}
+.v2-mail-workspace__list>li:has(>.v2-btn){display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;min-inline-size:0}
 .v2-mail-workspace__list>li>span{min-inline-size:0;overflow-wrap:anywhere}
-.v2-mail-workspace__preview{padding:var(--v2-panel-padding);border:1px solid var(--line);border-radius:12px;background:var(--subtle);display:grid;gap:var(--space-3);min-inline-size:0}
-.v2-mail-workspace__split{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:var(--space-3);align-items:start;min-inline-size:0}
+.v2-mail-workspace :is([data-filter-list],[data-filter-trace],[data-mail-track-detail-events])>li{padding:1rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
+.v2-mail-workspace [data-calview-legend]:not(:empty){display:flex;flex-wrap:wrap;gap:.5rem 1.5rem}
+.v2-mail-workspace [data-calview-legend]>li{display:block;min-inline-size:0;font-size:.8125rem;line-height:var(--lh-cap);font-weight:500;color:var(--text-2);overflow-wrap:anywhere}
+.v2-mail-workspace [data-calview-legend]>li>.v2-mail-calview__swatch{display:inline-block;margin-inline-end:.375rem;vertical-align:baseline}
+.v2-mail-workspace__preview{display:grid;gap:1.5rem;min-inline-size:0;padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius-notice);background:color-mix(in oklab,var(--kt-muted) 40%,transparent)}
 .v2-mail-workspace :is(input,select,textarea){min-inline-size:0;max-inline-size:100%}
 .v2-mail-workspace input[type=number]{font-variant-numeric:tabular-nums}
 .v2-mail-workspace :is(input,select,textarea)[dir=ltr]{text-align:var(--v2-control-align,start)}
-.v2-mail-workspace textarea{inline-size:100%;min-block-size:100px}
-.v2-mail-workspace pre{white-space:pre-wrap;overflow-wrap:anywhere;max-inline-size:100%;min-inline-size:0}
-.v2-mail-workspace__message{display:grid;gap:var(--space-3);min-inline-size:0}
-.v2-mail-workspace__message [data-mail-search-body]{white-space:pre-wrap;overflow-wrap:anywhere}
-.v2-mail-workspace__access{padding:12px 16px;border:1px solid var(--warn-line);border-radius:12px;background:var(--warn-soft);color:var(--text);font-size:13px}
+.v2-mail-workspace textarea{inline-size:100%;min-block-size:6.25rem}
+.v2-mail-workspace__message{display:grid;gap:1.5rem;min-inline-size:0}
+.v2-mail-workspace__message [data-mail-search-body]{font-size:1rem;line-height:var(--lh-text);color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
 .v2-mail-workspace [hidden]{display:none}
-.v2-mail-workspace .v2-card h2{font-size:16px;font-weight:600}
-.v2-mail-workspace .v2-card h3{font-size:14px;font-weight:600}
-.v2-mail-workspace .v2-card :is(p,ol,[data-forwarders-count]){font-size:13px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
+.v2-mail-workspace .v2-card :is(p,ol,[data-forwarders-count]):not(.kt-alert,.kt-badge,[data-state=failed],[data-state=error]){font-size:1rem;line-height:var(--lh-text);color:var(--text-2);overflow-wrap:anywhere}
 .v2-mail-workspace :is([data-forwarders-count],[data-contact-count],[data-contact-capacity],[data-calendar-capacity],[data-filter-count],[data-mail-track-page-label]){font-variant-numeric:tabular-nums}
-.v2-mail-workspace .v2-card p{max-inline-size:88ch}
-.v2-mail-workspace .v2-card :is([role=status],[role=alert]):not(:empty,[data-state=failed],[data-state=error]){position:relative;padding-inline-start:var(--space-2);color:var(--text-2)}
-.v2-mail-workspace .v2-card :is([role=status],[role=alert]):not(:empty,[data-state=failed],[data-state=error])::before{content:"";position:absolute;inset-inline-start:0;inset-block-start:.5em;inline-size:8px;block-size:8px;border-radius:50%;background:var(--line-strong)}
-.v2-mail-workspace .v2-card :is([role=status],[role=alert]):is([data-state=read],[data-state=saved],[data-state=ready],[data-state=sent])::before{background:var(--ok)}
-.v2-mail-workspace .v2-card :is([role=status],[role=alert]):is([data-state=reading],[data-state=saving],[data-state=busy])::before{background:var(--accent)}
-.v2-mail-workspace .v2-card :is([role=status],[role=alert]):is([data-state=uncertain],[data-state=stale],[data-state=conflict])::before{background:var(--warn)}
-.v2-mail-workspace .v2-card :is([role=status],[role=alert]):empty{display:none}
-.v2-mail-workspace .v2-card [role=note]{max-inline-size:none;padding:12px var(--space-2);border:1px solid var(--accent-line);border-radius:12px;background:var(--accent-soft);color:var(--text)}
-.v2-mail-workspace .v2-card__body>:is(form,article,section,[role=group],.v2-mail-workspace__groups):not(:first-child,[hidden],.v2-mail-workspace__preview,.v2-mail-workspace__actions){padding-block-start:var(--space-3);border-block-start:1px solid var(--line)}
-.v2-mail-workspace :is(.v2-card__body,form,[role=group],[data-filter-group])>.v2-field{max-inline-size:560px}
-.v2-mail-workspace :is(.v2-card__body,form,[role=group],[data-filter-group])>.v2-field:has(textarea){max-inline-size:720px}
-.v2-mail-workspace__table td[colspan]{padding:var(--space-3);text-align:center;font-size:13px;color:var(--muted)}
+.v2-mail-workspace .v2-card p:not([role],[data-state],.kt-alert){max-inline-size:88ch}
+${LIVE}{font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2)}
+${STATUS}:empty{display:none}
+.v2-mail-workspace .v2-card .v2-mail-workspace__note{color:var(--text)}
+.v2-mail-workspace__note::before{content:"\\eb5e";flex:none;font:normal 1.125rem/1.25rem 'keenicons-filled';color:var(--accent)}
+.v2-mail-workspace__note:empty{display:none}
+.v2-mail-workspace .v2-card__body>:is(form,article,section,[role=group],.v2-mail-workspace__groups):not(:first-child,[hidden],.v2-mail-workspace__preview,.v2-mail-workspace__actions){padding-block-start:1.5rem;border-block-start:1px solid var(--line)}
+.v2-mail-workspace__table td[colspan]{padding:1.5rem!important;text-align:center;font-size:.875rem;line-height:var(--lh-label);color:var(--muted)}
 .v2-mail-workspace__table tbody tr:has(>td[colspan]):hover>td{background:transparent}
-.v2-mail-workspace__table tbody tr:first-child>td{border-block-start:0}
-.v2-mail-workspace .v2-card ol:not(.v2-mail-workspace__list){display:grid;gap:var(--space-1);padding-inline-start:20px;color:var(--text-2)}
-.v2-mail-workspace .v2-card__body>:is(.v2-btn,button){align-self:flex-start}
-.v2-mail-workspace .v2-card__body>:is(div[role=group],[data-preferences-form],[data-identities-form],[data-filter-test-section],[data-account-password]):not(.v2-mail-workspace__actions,.v2-mail-workspace__groups),.v2-mail-workspace :is([data-filter-group],[data-filter-test]):not(.v2-mail-workspace__actions){display:grid;gap:var(--space-2);min-inline-size:0}
-.v2-mail-workspace__fields>label:not(.v2-mail-workspace__check){display:flex;align-items:flex-start;gap:var(--space-1);min-block-size:var(--target);font-size:14px}
-.v2-mail-workspace__fields>label:not(.v2-mail-workspace__check)>input{flex:none;margin-block:2px 0}
-.v2-mail-workspace__fields>:is(p,[role=note]){grid-column:1/-1}
-.v2-mail-workspace__fields .v2-field>:is(input,select,textarea,.v2-select){inline-size:100%}
-.v2-mail-workspace__facts dd{font-size:14px;font-variant-numeric:tabular-nums}
-.v2-mail-workspace__table{border:1px solid var(--line);border-radius:12px}
-.v2-mail-workspace meter{appearance:none;-webkit-appearance:none;display:block;inline-size:100%;max-inline-size:480px;block-size:8px;border:0;border-radius:var(--radius-pill);background:var(--sunken);overflow:hidden}
-.v2-mail-workspace meter::-webkit-meter-inner-element{display:block;block-size:8px}
-.v2-mail-workspace meter::-webkit-meter-bar{block-size:8px;border:0;border-radius:var(--radius-pill);background:var(--sunken)}
+.v2-mail-workspace .v2-card ol:not(.v2-mail-workspace__list){display:grid;gap:.5rem;padding-inline-start:1.5rem;list-style:decimal}
+.v2-mail-workspace .v2-card__body>:is(div[role=group],[data-preferences-form],[data-identities-form],[data-filter-test-section],[data-account-password]):not(.v2-mail-workspace__actions,.v2-mail-workspace__groups),.v2-mail-workspace :is([data-filter-group],[data-filter-test]):not(.v2-mail-workspace__actions){display:grid;gap:1.5rem;min-inline-size:0}
+.v2-mail-workspace .v2-field>:is(input,select,textarea,.v2-select){inline-size:100%}
+.v2-mail-workspace meter{appearance:none;-webkit-appearance:none;display:block;inline-size:100%;max-inline-size:30rem;block-size:.25rem;border:0;border-radius:var(--radius-pill);background:var(--secondary);overflow:hidden}
+.v2-mail-workspace meter::-webkit-meter-inner-element{display:block;block-size:.25rem}
+.v2-mail-workspace meter::-webkit-meter-bar{block-size:.25rem;border:0;border-radius:var(--radius-pill);background:var(--secondary)}
 .v2-mail-workspace meter::-webkit-meter-optimum-value{border-radius:var(--radius-pill);background:var(--accent-fill)}
 .v2-mail-workspace meter::-webkit-meter-suboptimum-value{border-radius:var(--radius-pill);background:var(--warn)}
 .v2-mail-workspace meter::-webkit-meter-even-less-good-value{border-radius:var(--radius-pill);background:var(--bad)}
 .v2-mail-workspace meter::-moz-meter-bar{border-radius:var(--radius-pill);background:var(--accent-fill)}
-.v2-mail-workspace__home{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:var(--space-3);padding-block-start:var(--space-3);border-block-start:1px solid var(--line);min-inline-size:0}
-.v2-mail-workspace__home>div{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0}
-.v2-mail-workspace__home h3{font-size:12px;color:var(--muted)}
-.v2-mail-workspace__home ul{display:flex;flex-direction:column;gap:2px;list-style:none;padding:0}
-.v2-mail-workspace__home a{display:flex;align-items:center;min-inline-size:var(--target);min-block-size:var(--target);margin-inline:-12px;padding-inline:12px;border-radius:var(--radius-control);font-size:14px;font-weight:500;color:var(--text);text-decoration:none;transition:background-color 140ms ease-out,color 140ms ease-out}
-.v2-mail-workspace__home a:hover{background:var(--subtle);color:var(--accent)}
-.v2-mail-workspace #v2-mail-tools .v2-mail-workspace__list{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--space-2)}
-.v2-mail-workspace #v2-mail-tools .v2-mail-workspace__list>li{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-1);min-inline-size:0}
-.v2-mail-workspace #v2-mail-tools .v2-mail-workspace__list .v2-btn{max-inline-size:100%;white-space:normal;text-align:start}
-.v2-mail-workspace #vacation.v2-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--space-2)}
-.v2-mail-workspace #vacation.v2-card>:not(h2,[data-vacation-requested]){grid-column:1/-1}
-.v2-mail-workspace #vacation.v2-card>.v2-btn{justify-self:start}
-.v2-mail-workspace[data-mail-vacation] [data-vacation-form]{max-inline-size:720px}
-.v2-mail-workspace[data-mail-vacation] .v2-field,.v2-mail-workspace[data-mail-vacation] .v2-field:has(textarea){max-inline-size:none}
-.v2-mail-workspace [data-vacation-requested]{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-pill);background:var(--sunken);color:var(--text-2);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
-.v2-mail-workspace pre{padding:var(--space-2);border:1px solid var(--line);border-radius:12px;background:var(--code);color:var(--code-text);font:12px/1.7 var(--font-mono);direction:ltr;text-align:start}
+.v2-mail-workspace[data-mail-vacation] [data-vacation-form]{max-inline-size:none}
+.v2-mail-workspace [data-vacation-requested]{font-variant-numeric:tabular-nums}
+.v2-mail-workspace pre{white-space:pre-wrap;overflow-wrap:anywhere;max-inline-size:100%;min-inline-size:0;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--code);color:var(--code-text);font:.8125rem/1.25rem var(--font-mono);direction:ltr;text-align:start}
 .v2-mail-workspace pre:empty{display:none}
-@media(prefers-reduced-motion:reduce){.v2-mail-workspace input[type=file]::file-selector-button,.v2-mail-workspace__home a{transition:none}}
-@media(min-width:601px){.v2-mail-workspace__facts>div:has(.v2-mono):not(:only-child){grid-column:span 2}}
-@media(max-width:900px){.v2-mail-workspace__split{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){.v2-mail-workspace table.v2-table:not(:has(td))>thead>tr{display:flex;flex-wrap:wrap;gap:4px var(--space-2);padding:8px var(--space-2)}
+@media(max-width:600px){.v2-mail-workspace__preview{padding:1rem}
+.v2-mail-workspace table.v2-table:not(:has(td))>thead>tr{display:flex;flex-wrap:wrap;gap:.25rem 1rem;padding:.5rem 1rem}
 .v2-mail-workspace table.v2-table:not(:has(td))>thead>tr>th{padding:0;inline-size:auto}
-.v2-mail-workspace__table{overflow:visible}
 .v2-mail-workspace__table thead{position:absolute;inline-size:1px;block-size:1px;margin:-1px;overflow:hidden;clip-path:inset(50%)}
 .v2-mail-workspace__table :is(table,tbody){display:block}
-.v2-mail-workspace__table tr{display:grid;grid-template-columns:minmax(0,1fr) fit-content(50%);column-gap:var(--space-2);padding:12px var(--space-2);border-block-start:1px solid var(--line)}
+.v2-mail-workspace__table tr{display:grid;grid-template-columns:minmax(0,1fr) fit-content(50%);column-gap:1rem;padding:1rem;border-block-start:1px solid var(--line)}
 .v2-mail-workspace__table tbody tr:first-child{border-block-start:0}
-.v2-mail-workspace__table td,.v2-mail-workspace__table :is(th,td):is(:first-child,:last-child){display:block;grid-column:1;min-inline-size:0;padding:0;border:0;font-size:13px;color:var(--text-2);overflow-wrap:anywhere}
-.v2-mail-workspace__table td:not(:first-child){padding-block-start:2px}
-.v2-mail-workspace__table td:first-child{font-size:14px;font-weight:600;color:var(--text)}
-.v2-mail-workspace__table td:last-child:not(:first-child):has(button,a,input){grid-column:2;grid-row:1/span 8;align-self:center;padding:0;text-align:end}
+.v2-mail-workspace__table td,.v2-mail-workspace__table :is(th,td):is(:first-child,:last-child){display:block;grid-column:1;min-inline-size:0;block-size:auto;padding:0!important;border:0;background:transparent;font-size:.8125rem;line-height:var(--lh-cap);color:var(--text-2);overflow-wrap:anywhere}
+.v2-mail-workspace__table td:not(:first-child){padding-block-start:.25rem!important}
+.v2-mail-workspace__table td:first-child{font-size:.875rem;line-height:var(--lh-label);font-weight:500;color:var(--mono,var(--text))}
+.v2-mail-workspace__table td:last-child:not(:first-child):has(button,a,input){grid-column:2;grid-row:1/span 8;align-self:center;text-align:end}
 .v2-mail-workspace__table td:not(:first-child,[colspan]):not(:last-child:has(button,a,input))::before{color:var(--muted)}
 .v2-mail-workspace__table td:nth-child(2)::before{content:var(--h2) ": "}.v2-mail-workspace__table td:nth-child(3)::before{content:var(--h3) ": "}.v2-mail-workspace__table td:nth-child(4)::before{content:var(--h4) ": "}.v2-mail-workspace__table td:nth-child(5)::before{content:var(--h5) ": "}.v2-mail-workspace__table td:nth-child(6)::before{content:var(--h6) ": "}.v2-mail-workspace__table td:nth-child(7)::before{content:var(--h7) ": "}
 .v2-mail-workspace__table td:last-child:not(:first-child):has(button,a,input)::before{content:none}
-.v2-mail-workspace__table td:last-child .v2-btn{padding-inline:12px;font-size:13px}
 .v2-mail-workspace:is([data-mail-mailing-lists],[data-mail-connect-devices]) .v2-mail-workspace__table td:nth-child(2),.v2-mail-workspace__table [data-contact-table] td:nth-child(2){grid-column:1;grid-row:auto;justify-self:stretch;text-align:start}
-.v2-mail-workspace__table td[colspan]{grid-column:1/-1;padding:var(--space-2) 0;font-weight:400;color:var(--muted);text-align:center}
-.v2-mail-workspace__fields{grid-template-columns:minmax(0,1fr)}.v2-mail-workspace__facts{display:flex;flex-wrap:wrap}.v2-mail-workspace__facts>div{flex:1 1 calc(50% - var(--space-2));min-inline-size:min-content;max-inline-size:100%}.v2-mail-workspace__facts>div:has(.v2-mono){flex-basis:100%}.v2-mail-workspace__facts :is(dt,dd){overflow-wrap:break-word}
-.v2-mail-workspace__table [data-mail-folders-rows] td:last-child:has(button){grid-column:1/-1;grid-row:auto;display:flex;flex-wrap:wrap;gap:var(--space-1);padding-block-start:var(--space-1)}}
+.v2-mail-workspace__table td[colspan]{grid-column:1/-1;padding:1rem 0!important;font-weight:400;color:var(--muted);text-align:center}
+.v2-mail-workspace__table [data-mail-folders-rows] td:last-child:has(button){grid-column:1/-1;grid-row:auto;display:flex;flex-wrap:wrap;gap:.5rem;padding-block-start:.5rem!important}}
 `

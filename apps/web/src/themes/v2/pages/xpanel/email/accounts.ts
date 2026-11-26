@@ -26,16 +26,24 @@ export interface EmailAccountsPageProps {
 
 const technical = (value: string | number): string => `<bdi class="v2-mono v2-num" dir="ltr">${escapeHtml(value)}</bdi>`
 
+// Row actions as in a Metronic table: one small text button, then small ghost icon buttons named by aria-label.
+const ROW_BUTTON = 'v2-btn kt-btn kt-btn-outline'
+const ROW_ICON = 'v2-btn v2-btn--ghost v2-btn--icon kt-btn kt-btn-icon kt-btn-ghost'
+const ROW_ICON_DANGER = 'v2-btn v2-btn--ghost v2-btn--icon kt-btn kt-btn-icon kt-btn-ghost kt-btn-destructive'
+const rowIcon = (label: string, classes: string, hook: string, glyph: string): string =>
+  `<button type="button" class="${classes}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" ${hook}>${glyph}</button>`
+
 const field = (id: string, label: string, controlHtml: string, help?: string): string =>
-  `<div class="v2-field"><label for="${id}">${escapeHtml(label)}</label>${controlHtml}${help ? `<span class="v2-field__help" id="${id}-help">${escapeHtml(help)}</span>` : ''}</div>`
+  `<div class="v2-field"><label class="kt-form-label" for="${id}">${escapeHtml(label)}</label>${controlHtml}${help ? `<span class="v2-field__help kt-form-description" id="${id}-help">${escapeHtml(help)}</span>` : ''}</div>`
 
 function handoff(t: Translate, login: string, disabled = false): string {
-  return `<span class="v2-email-handoff" data-handoff-control><button type="button" class="v2-btn" data-handoff="xmail" data-handoff-mailbox="${escapeHtml(login)}" data-handoff-state="idle"${disabled ? ' disabled' : ''}>${icon('external', 16)}${escapeHtml(t('Open webmail'))}</button><span data-handoff-status role="status" aria-live="polite" hidden></span></span>`
+  return `<span class="v2-email-handoff" data-handoff-control><button type="button" class="${ROW_BUTTON}" data-handoff="xmail" data-handoff-mailbox="${escapeHtml(login)}" data-handoff-state="idle"${disabled ? ' disabled' : ''}>${icon('external', 14)}${escapeHtml(t('Open webmail'))}</button><span class="text-[0.8125rem] leading-[var(--lh-cap)] text-muted-foreground" data-handoff-status role="status" aria-live="polite" hidden></span></span>`
 }
 
 function rowActions(t: Translate, user: ServiceUser, canManage: boolean, readOnly = false): string {
-  if (!user.services.email) return `<span class="v2-muted">${escapeHtml(t('Read only'))}</span>`
-  return `<div class="v2-email-row-actions">${handoff(t, user.login, readOnly)}${canManage ? `<button type="button" class="v2-btn" data-mailbox-password="${escapeHtml(user.id)}">${escapeHtml(t('Password'))}</button><button type="button" class="v2-btn" data-mailbox-quota="${escapeHtml(user.id)}"${typeof user.mailboxQuotaMb === 'number' ? ` data-mailbox-quota-value="${user.mailboxQuotaMb}"` : ''}>${escapeHtml(t('Quota'))}</button><button type="button" class="v2-btn v2-btn--ghost" data-remove-mailbox="${escapeHtml(user.id)}">${escapeHtml(t('Delete'))}</button>` : ''}</div>`
+  if (!user.services.email) return `<span class="kt-badge kt-badge-sm kt-badge-outline">${escapeHtml(t('Read only'))}</span>`
+  const id = escapeHtml(user.id)
+  return `<div class="v2-email-row-actions">${handoff(t, user.login, readOnly)}${canManage ? `${rowIcon(t('Password'), ROW_ICON, `data-mailbox-password="${id}"`, '<i class="ki-filled ki-key" aria-hidden="true"></i>')}${rowIcon(t('Quota'), ROW_ICON, `data-mailbox-quota="${id}"${typeof user.mailboxQuotaMb === 'number' ? ` data-mailbox-quota-value="${user.mailboxQuotaMb}"` : ''}`, icon('disk', 14))}${rowIcon(t('Delete'), ROW_ICON_DANGER, `data-remove-mailbox="${id}"`, '<i class="ki-filled ki-trash" aria-hidden="true"></i>')}` : ''}</div>`
 }
 
 function mailboxDialogs(t: Translate): string {
@@ -43,9 +51,9 @@ function mailboxDialogs(t: Translate): string {
     const password = kind === 'password'
     const id = `v2-mailbox-${kind}`
     const title = password ? t('New mailbox password') : t('Mailbox quota (MiB)')
-    const control = `<input id="${id}-next" name="${password ? 'password' : 'mailboxQuotaMb'}" type="${password ? 'password' : 'number'}" dir="ltr" ${password ? 'minlength="8" autocomplete="new-password"' : 'min="1" step="1" inputmode="numeric"'} required>`
+    const control = `<input class="kt-input" id="${id}-next" name="${password ? 'password' : 'mailboxQuotaMb'}" type="${password ? 'password' : 'number'}" dir="ltr" ${password ? 'minlength="8" autocomplete="new-password"' : 'min="1" step="1" inputmode="numeric"'} required>`
     // The controller requires native showModal()/close(), not a role-only dialog element.
-    return `<dialog class="v2-email-dialog" data-mailbox-${kind}-dialog aria-labelledby="${id}-title"><form method="dialog" class="v2-form"><header><h2 id="${id}-title">${escapeHtml(title)}</h2></header>${field(`${id}-next`, title, control)}<p data-dialog-status role="status" hidden></p><footer class="v2-email-actions"><button type="button" class="v2-btn" data-dialog-cancel>${escapeHtml(t('Cancel'))}</button><button type="submit" class="v2-btn v2-btn--primary">${escapeHtml(t('Save'))}</button></footer></form></dialog>`
+    return `<dialog class="v2-email-dialog" data-mailbox-${kind}-dialog aria-labelledby="${id}-title"><form method="dialog" class="v2-form"><header class="flex items-center gap-2"><span class="flex items-center justify-center size-9 shrink-0 rounded-full border border-border bg-accent/60 text-muted-foreground" aria-hidden="true">${password ? '<i class="ki-filled ki-key text-base" aria-hidden="true"></i>' : icon('disk', 16)}</span><h2 class="text-lg font-semibold text-mono" id="${id}-title">${escapeHtml(title)}</h2></header>${field(`${id}-next`, title, control)}<p data-dialog-status role="status" hidden></p><footer class="v2-email-actions"><button type="button" class="v2-btn kt-btn kt-btn-outline" data-dialog-cancel>${escapeHtml(t('Cancel'))}</button><button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"><i class="ki-filled ki-check" aria-hidden="true"></i>${escapeHtml(t('Save'))}</button></footer></form></dialog>`
   }).join('')
 }
 
@@ -54,15 +62,15 @@ function createMailbox(t: Translate, props: EmailAccountsPageProps): string {
   const disabled = domains.length ? '' : ' disabled'
   const defaultQuota = props.plan?.defaultMailboxQuotaMb
   const quota = typeof defaultQuota === 'number' ? defaultQuota : 1024
-  const local = field('mailbox-local', t('Local name'), '<input id="mailbox-local" name="localPart" type="text" dir="ltr" required pattern="[a-z0-9][a-z0-9._-]{0,31}" maxlength="32" autocomplete="off">')
-  const domain = field('mailbox-domain', t('Domain'), `<span class="v2-select"><select id="mailbox-domain" name="domainId" required${disabled}>${domains.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}</select>${icon('chevDown', 16)}</span>`)
-  const password = field('mailbox-password', t('Password'), `<div class="v2-email-password"><input id="mailbox-password" name="password" type="password" required minlength="8" autocomplete="new-password"><button type="button" class="v2-btn" data-password-generate data-password-target="mailbox-password"${disabled}>${escapeHtml(t('Generate password'))}</button></div>`)
-  const quotaField = field('mailbox-quota', t('Requested quota (MiB)'), `<input id="mailbox-quota" name="mailboxQuotaMb" type="number" dir="ltr" min="1" step="1" value="${quota}" required inputmode="numeric">`)
-  const services = `<fieldset class="v2-email-services-choice" aria-describedby="v2-mailbox-services-note"><legend>${escapeHtml(t('Services'))}</legend><label><input type="checkbox" checked disabled><span>${escapeHtml(t('Email'))}</span></label><label><input type="checkbox" disabled><span>FTP</span></label><label><input type="checkbox" disabled><span>Web Disk</span></label><p class="v2-field__help" id="v2-mailbox-services-note">${escapeHtml(t('Creates an email mailbox using the existing account service. FTP and Web Disk creation are not configured here.'))}</p></fieldset>`
+  const local = field('mailbox-local', t('Local name'), '<input class="kt-input" id="mailbox-local" name="localPart" type="text" dir="ltr" required pattern="[a-z0-9][a-z0-9._-]{0,31}" maxlength="32" autocomplete="off">')
+  const domain = field('mailbox-domain', t('Domain'), `<span class="v2-select"><select class="kt-select" id="mailbox-domain" name="domainId" required${disabled}>${domains.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}</select></span>`)
+  const password = field('mailbox-password', t('Password'), `<div class="v2-email-password"><input class="kt-input" id="mailbox-password" name="password" type="password" required minlength="8" autocomplete="new-password"><button type="button" class="v2-btn kt-btn kt-btn-outline" data-password-generate data-password-target="mailbox-password"${disabled}><i class="ki-filled ki-key" aria-hidden="true"></i>${escapeHtml(t('Generate password'))}</button></div>`)
+  const quotaField = field('mailbox-quota', t('Requested quota (MiB)'), `<input class="kt-input" id="mailbox-quota" name="mailboxQuotaMb" type="number" dir="ltr" min="1" step="1" value="${quota}" required inputmode="numeric">`)
+  const services = `<fieldset class="v2-email-services-choice" aria-describedby="v2-mailbox-services-note"><legend class="text-sm leading-[var(--lh-label)] font-medium text-foreground">${escapeHtml(t('Services'))}</legend><div class="v2-email-services-choice__options"><label><input class="kt-checkbox kt-checkbox-sm" type="checkbox" checked disabled><span>${escapeHtml(t('Email'))}</span></label><label><input class="kt-checkbox kt-checkbox-sm" type="checkbox" disabled><span>FTP</span></label><label><input class="kt-checkbox kt-checkbox-sm" type="checkbox" disabled><span>Web Disk</span></label></div><p class="v2-field__help kt-form-description" id="v2-mailbox-services-note">${escapeHtml(t('Creates an email mailbox using the existing account service. FTP and Web Disk creation are not configured here.'))}</p></fieldset>`
   const domainNote = domains.length ? '' : notice(t, { tone: 'warn', text: t('No authorized domain was read. Creation is unavailable.') })
   return drawer(t, {
     id: 'v2-mailbox-create', title: t('Create mailbox'),
-    bodyHtml: `<form class="v2-form" data-mailbox-form="true">${local}${domain}${services}${password}${quotaField}${domainNote}<p data-mailbox-status role="status" hidden></p><div class="v2-email-actions"><button type="submit" class="v2-btn v2-btn--primary"${disabled}>${icon('plus', 16)}${escapeHtml(t('Create mailbox'))}</button></div></form>`,
+    bodyHtml: `<form class="v2-form" data-mailbox-form="true">${local}${domain}${services}${password}${quotaField}${domainNote}<p data-mailbox-status role="status" hidden></p><div class="v2-email-actions"><button type="submit" class="v2-btn v2-btn--primary kt-btn kt-btn-primary"${disabled}>${icon('plus', 16)}${escapeHtml(t('Create mailbox'))}</button></div></form>`,
   })
 }
 
@@ -72,7 +80,7 @@ function accountFacts(t: Translate, props: EmailAccountsPageProps): string {
     { label: t('Primary domain'), value: props.account?.primaryDomain ?? t('Not read'), technical: !!props.account },
     { label: t('Plan'), value: props.plan?.name ?? t('Not read'), technical: false },
   ]
-  return card({ title: t('Account and plan'), titleId: 'v2-email-account-title', bodyHtml: `<dl class="v2-email-facts">${facts.map(item => `<div><dt>${escapeHtml(item.label)}</dt><dd>${item.technical ? technical(item.value) : escapeHtml(item.value)}</dd></div>`).join('')}</dl>` })
+  return card({ title: t('Account and plan'), titleId: 'v2-email-account-title', bodyHtml: `<dl class="v2-email-facts">${facts.map(item => `<div><dt class="text-secondary-foreground">${escapeHtml(item.label)}</dt><dd class="text-mono">${item.technical ? technical(item.value) : escapeHtml(item.value)}</dd></div>`).join('')}</dl>` })
 }
 
 const serviceKeys = (user: ServiceUser): string[] => [user.services.email ? 'email' : '', user.services.ftp ? 'ftp' : '', user.services.webdisk ? 'webdisk' : ''].filter(Boolean)
@@ -121,7 +129,7 @@ function howServiceUsersWork(t: Translate): string {
     ['disk', msgctxt('theme:v2', 'Counts toward your disk'), msgctxt('theme:v2', 'Mailboxes and uploads use the disk quota of your account.')],
   ] as const
   return card({ title: t('How service users work'), titleId: 'v2-email-how-title', description: t('Email, FTP and Web Disk credentials are separate from account control-panel access.'),
-    bodyHtml: `<dl class="v2-email-how">${items.map(([name, title, text]) => `<div><dt><span class="v2-email-how__mark" aria-hidden="true">${icon(name, 16)}</span>${escapeHtml(t(title))}</dt><dd>${escapeHtml(t(text))}</dd></div>`).join('')}</dl>` })
+    bodyHtml: `<ul class="v2-email-how">${items.map(([name, title, text]) => `<li><span class="v2-email-how__mark flex items-center justify-center size-9 rounded-full border border-border bg-accent/60 text-muted-foreground" aria-hidden="true">${icon(name, 16)}</span><h3 class="text-base font-medium text-mono">${escapeHtml(t(title))}</h3><p class="text-secondary-foreground">${escapeHtml(t(text))}</p></li>`).join('')}</ul>` })
 }
 
 /** Page body only. The active surface supplies the shell and core supplies the shared mutation controllers. */
@@ -131,11 +139,11 @@ export function renderV2EmailAccountsPage(t: Translate, props: EmailAccountsPage
   const users = props.users.state === 'read' ? props.users.items : undefined
   const counts = users ? { email: users.filter(user => user.services.email).length, ftp: users.filter(user => user.services.ftp).length, webdisk: users.filter(user => user.services.webdisk).length } : undefined
   const summaries = kpiStrip({ label: t('Service users'), items: [
-    { label: t('Mailboxes'), value: counts ? String(counts.email) : t('Not read'), ...(props.plan ? { unit: `/ ${props.plan.caps.mailboxes === 'unlimited' ? t('Unlimited') : props.plan.caps.mailboxes}` } : {}) },
-    { label: t('FTP accounts'), value: counts ? String(counts.ftp) : t('Not read') },
-    { label: t('Web Disk'), value: counts ? String(counts.webdisk) : t('Not read') },
+    { label: t('Mailboxes'), icon: 'mail', value: counts ? String(counts.email) : t('Not read'), ...(props.plan ? { unit: `/ ${props.plan.caps.mailboxes === 'unlimited' ? t('Unlimited') : props.plan.caps.mailboxes}` } : {}) },
+    { label: t('FTP accounts'), icon: 'files', value: counts ? String(counts.ftp) : t('Not read') },
+    { label: t('Web Disk'), icon: 'disk', value: counts ? String(counts.webdisk) : t('Not read') },
   ] })
-  const connection = card({ title: t('Connection information'), titleId: 'v2-email-connection-title', bodyHtml: `<p class="v2-muted">${escapeHtml(t('Connection hosts, ports, mailbox usage and delivery health were not read.'))}</p>` })
+  const connection = card({ title: t('Connection information'), titleId: 'v2-email-connection-title', bodyHtml: `<p class="flex items-center gap-2 text-secondary-foreground">${icon('info', 16)}<span>${escapeHtml(t('Connection hosts, ports, mailbox usage and delivery health were not read.'))}</span></p>` })
   const main = `<div class="v2-stack">${usersTable(t, props)}${connection}${howServiceUsersWork(t)}</div>`
   const create = props.canManage ? createMailbox(t, props) : props.readOnly === true || !props.account ? `<div data-readonly="true"><fieldset disabled>${createMailbox(t, props)}</fieldset></div>` : ''
   const body = `${summaries}${accountFacts(t, props)}<div class="v2-split">${main}${create}</div>${props.canManage ? mailboxDialogs(t) : ''}`
@@ -143,68 +151,60 @@ export function renderV2EmailAccountsPage(t: Translate, props: EmailAccountsPage
     header: {
       breadcrumb: [{ label: t('Home'), href: '/home' }, { label: t('Email accounts') }], route: '/email/accounts',
       title: t('Email accounts'), description: t('Service users'),
-      ...(props.canManage ? { actionsHtml: `<a class="v2-btn v2-btn--primary" href="#v2-mailbox-create">${icon('plus', 16)}${escapeHtml(t('Create mailbox'))}</a>` } : {}),
+      ...(props.canManage ? { actionsHtml: `<a class="v2-btn v2-btn--primary kt-btn kt-btn-primary" href="#v2-mailbox-create">${icon('plus', 16)}${escapeHtml(t('Create mailbox'))}</a>` } : {}),
     },
   }, body)}</div>`
 }
 
+// Layout only: colors, radii, control and button looks come from the Metronic classes in the markup. Spacing follows
+// the standard rhythm (24px groups, 16px fields, 8px label to value); a label sits above its control.
 export const EMAIL_ACCOUNTS_CSS = `.v2-email-accounts{min-inline-size:0}
-.v2-email-accounts h1{font-size:26px;line-height:1.2}
-.v2-email-accounts .v2-card h2{font-size:16px;line-height:1.3}
-.v2-email-accounts .v2-drawer h2,.v2-email-dialog h2{margin:0;font-size:18px;line-height:1.3}
-.v2-email-accounts .v2-card h3{font-size:14px;line-height:1.4}
-.v2-email-accounts .v2-field,.v2-email-dialog .v2-field{gap:var(--space-1)}
-.v2-email-accounts .v2-field>label,.v2-email-dialog .v2-field>label{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600}
-.v2-email-accounts .v2-field__help,.v2-email-dialog .v2-field__help{font-size:13px;line-height:1.5;color:var(--muted)}
-.v2-email-accounts .v2-email-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:var(--space-2)}
-.v2-email-facts>div{display:flex;flex-direction:column;gap:var(--space-1);min-inline-size:0}
-.v2-email-accounts .v2-field>label,.v2-email-facts dt{text-box-trim:trim-end;text-box-edge:text}
-.v2-email-facts dt{font-size:12px;color:var(--muted)}
-.v2-email-facts dd{margin:0;font-size:13px;overflow-wrap:anywhere;text-box-trim:trim-start;text-box-edge:text}
+.v2-email-accounts .v2-email-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:1rem 1.5rem;min-inline-size:0}
+.v2-email-facts>div{display:flex;flex-direction:column;align-items:stretch;gap:.5rem;min-inline-size:0}
+.v2-email-facts dt{font-size:.875rem;line-height:var(--lh-label);font-weight:500;text-box-trim:trim-end;text-box-edge:text}
+.v2-email-facts dd{min-inline-size:0;overflow-wrap:anywhere;text-box-trim:trim-start;text-box-edge:text}
 .v2-email-accounts :is(.v2-num,.v2-kpi__value,.v2-kpi__unit,.v2-email-facts dd,#v2-email-users td,.v2-count){font-variant-numeric:tabular-nums}
-.v2-email-accounts .v2-btn,.v2-email-dialog .v2-btn{min-inline-size:44px;min-block-size:44px;transition-property:background-color,border-color,color,box-shadow,opacity,transform;transition-duration:140ms;transition-timing-function:ease-out}
-@media(min-width:601px){.v2-email-accounts #v2-email-users{min-inline-size:880px!important}.v2-email-accounts #v2-email-users th{white-space:normal}.v2-email-accounts #v2-email-users :is(th,td):not(:first-child){padding-inline-start:8px}.v2-email-accounts #v2-email-users :is(th,td):not(:last-child){padding-inline-end:8px}.v2-email-accounts .v2-email-row-actions .v2-btn{padding-inline:10px;font-size:13px}}
-.v2-email-accounts .v2-email-row-actions{display:grid;grid-template-columns:repeat(2,max-content);justify-content:start;gap:var(--space-1)}
+@media(min-width:601px){.v2-email-accounts #v2-email-users{min-inline-size:880px!important}.v2-email-accounts #v2-email-users th{white-space:normal}.v2-email-accounts #v2-email-users :is(th,td):not(:first-child){padding-inline-start:.5rem}.v2-email-accounts #v2-email-users :is(th,td):not(:last-child){padding-inline-end:.5rem}}
 .v2-email-accounts .v2-split{flex-direction:column;align-items:stretch}.v2-email-accounts .v2-split>*{flex:none;align-self:stretch;inline-size:100%;min-inline-size:0}
 .v2-email-accounts .v2-drawer{flex:none;max-width:none}
 .v2-email-accounts [data-readonly]>fieldset{margin:0;padding:0;border:0;min-inline-size:0}
-.v2-email-accounts .v2-drawer .v2-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:var(--space-2) var(--space-3);align-items:start}
-.v2-email-accounts .v2-drawer .v2-form>:is(.v2-email-actions,[data-mailbox-status],.v2-notice){grid-column:1/-1}
-.v2-email-accounts .v2-card p.v2-muted{font-size:13px;line-height:1.6}
-.v2-email-filter{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:12px;background:var(--sunken)}
-.v2-email-filter>label{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-block-size:var(--target);min-inline-size:var(--target);padding:0 12px;border:1px solid transparent;border-radius:8px;font-size:13px;color:var(--text-2);cursor:pointer;transition-property:background-color,border-color,color,box-shadow,opacity,transform;transition-duration:140ms;transition-timing-function:ease-out}
-.v2-email-filter input{position:absolute;inset:0;inline-size:100%;block-size:100%;margin:0;opacity:0;cursor:pointer}
-.v2-email-filter>label:has(input:checked){border-color:var(--line);background:var(--surface);color:var(--text);font-weight:600;box-shadow:var(--shadow)}
-.v2-email-filter>label:has(input:focus-visible){outline:2px solid var(--accent-fill);outline-offset:2px}
-.v2-email-accounts:has(.v2-email-filter input[value=email]:checked) #v2-email-users tbody tr:not([data-email-services~=email]),.v2-email-accounts:has(.v2-email-filter input[value=ftp]:checked) #v2-email-users tbody tr:not([data-email-services~=ftp]),.v2-email-accounts:has(.v2-email-filter input[value=webdisk]:checked) #v2-email-users tbody tr:not([data-email-services~=webdisk]){display:none!important}
-.v2-email-accounts .v2-filter__search{flex:0 1 360px}.v2-email-filter-empty,.v2-email-search-empty{display:none;margin:0;padding:var(--space-3);text-align:center;font-size:13px;color:var(--muted)}.v2-email-search-empty:not([hidden]){display:block}.v2-email-accounts #v2-email-users tbody tr[hidden]{display:none!important}
-.v2-email-accounts:has(.v2-email-filter input[value=email]:checked):not(:has(tr[data-email-services~=email]:not([hidden]))):not(:has(.v2-email-search-empty:not([hidden]))) .v2-email-filter-empty,.v2-email-accounts:has(.v2-email-filter input[value=ftp]:checked):not(:has(tr[data-email-services~=ftp]:not([hidden]))):not(:has(.v2-email-search-empty:not([hidden]))) .v2-email-filter-empty,.v2-email-accounts:has(.v2-email-filter input[value=webdisk]:checked):not(:has(tr[data-email-services~=webdisk]:not([hidden]))):not(:has(.v2-email-search-empty:not([hidden]))) .v2-email-filter-empty{display:block}
-.v2-email-how{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2) var(--space-3);margin:0;font-size:13px;line-height:1.6}
-.v2-email-how>div{position:relative;padding-inline-start:40px;display:flex;flex-direction:column;gap:2px;min-inline-size:0}
-.v2-email-how__mark{position:absolute;inset-inline-start:0;inset-block-start:0;display:flex;align-items:center;justify-content:center;inline-size:28px;block-size:28px;border-radius:8px;background:var(--sunken);color:var(--text-2)}
-.v2-email-how dt{font-weight:600}.v2-email-how dd{margin:0;color:var(--muted)}
-.v2-email-fact{display:contents}
-.v2-email-services,.v2-email-row-actions,.v2-email-actions{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-2)}
-.v2-email-services{gap:var(--space-1)}
-.v2-email-accounts .v2-table__actions{text-align:start}
-.v2-email-handoff{display:inline-flex;align-items:flex-start;flex-direction:column;gap:var(--space-1)}
-.v2-email-handoff [data-handoff-status]{max-inline-size:32ch;white-space:normal;overflow-wrap:anywhere}
-.v2-email-password{display:grid;gap:var(--space-2);min-inline-size:0}
-.v2-email-services-choice{display:flex;flex-flow:row wrap;gap:0 var(--space-3);margin:0;padding:0;border:0;min-inline-size:0}
-.v2-email-services-choice legend{padding:0;margin-block-end:var(--space-1);font-size:13px;font-weight:600}.v2-email-services-choice>p{flex-basis:100%}
-.v2-email-services-choice label{display:flex;align-items:center;gap:var(--space-1);min-block-size:var(--target)}
+.v2-email-accounts .v2-drawer__body{container-type:inline-size}
+.v2-email-accounts .v2-drawer .v2-form{display:flex;flex-direction:column;gap:1rem}
+.v2-email-accounts .v2-field,.v2-email-dialog .v2-field{min-inline-size:0}
+.v2-email-accounts .v2-field>*,.v2-email-dialog .v2-field>*{min-inline-size:0}
 .v2-email-accounts .v2-field :is(input,select)[dir=ltr],.v2-email-dialog .v2-field input[dir=ltr]{text-align:var(--v2-control-align,start)}
+.v2-email-password{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;min-inline-size:0}
+.v2-email-password>input{flex:1 1 12rem;min-inline-size:0}
+.v2-email-services-choice{display:flex;flex-flow:row wrap;gap:.5rem 1.5rem;min-inline-size:0}
+.v2-email-services-choice legend{margin-block-end:.5rem}.v2-email-services-choice>p{flex-basis:100%}
+.v2-email-services-choice__options{display:flex;flex-wrap:wrap;gap:0 1.5rem;min-inline-size:0}
+.v2-email-services-choice label{display:flex;align-items:center;gap:.5rem;min-block-size:var(--target)}
+.v2-email-filter{display:inline-flex;flex-wrap:wrap;gap:.25rem;padding:.25rem;border-radius:var(--radius-control);background:var(--sunken)}
+.v2-email-filter>label{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-block-size:var(--target);min-inline-size:var(--target);padding:0 .75rem;border-radius:var(--radius-chip);font-weight:500;color:var(--text-2);cursor:pointer;transition:background-color .14s ease-out,color .14s ease-out}
+.v2-email-filter input{position:absolute;inset:0;inline-size:100%;block-size:100%;margin:0;opacity:0;cursor:pointer}
+.v2-email-filter>label:has(input:checked){background:var(--bg);color:var(--mono,var(--text));box-shadow:var(--shadow)}
+.v2-email-filter>label:has(input:focus-visible){outline:2px solid var(--focus);outline-offset:2px}
+.v2-email-accounts:has(.v2-email-filter input[value=email]:checked) #v2-email-users tbody tr:not([data-email-services~=email]),.v2-email-accounts:has(.v2-email-filter input[value=ftp]:checked) #v2-email-users tbody tr:not([data-email-services~=ftp]),.v2-email-accounts:has(.v2-email-filter input[value=webdisk]:checked) #v2-email-users tbody tr:not([data-email-services~=webdisk]){display:none!important}
+.v2-email-accounts .v2-filter__field{gap:.5rem}.v2-email-accounts .v2-filter__field>.kt-form-label{display:block!important;padding-inline-start:calc(2.25rem + 1px);font-size:.875rem;line-height:var(--lh-label);text-box:trim-end text}.v2-email-accounts .v2-filter__input{position:relative;padding-inline:0!important;gap:0!important}.v2-email-accounts .v2-filter__input>:not(input){position:absolute!important;inset-inline-start:.75rem;inset-block-start:50%;translate:0 -50%;pointer-events:none}.v2-email-accounts .v2-filter__input>input{align-self:stretch;inline-size:100%;block-size:auto;min-block-size:var(--target);margin-block:-1px;padding-inline:2.25rem .75rem!important}.v2-email-accounts .v2-filter__search{flex:0 1 360px}.v2-email-filter-empty,.v2-email-search-empty{display:none;padding:1.5rem;text-align:center;color:var(--muted)}.v2-email-search-empty:not([hidden]){display:block}.v2-email-accounts #v2-email-users tbody tr[hidden]{display:none!important}
+.v2-email-accounts:has(.v2-email-filter input[value=email]:checked):not(:has(tr[data-email-services~=email]:not([hidden]))):not(:has(.v2-email-search-empty:not([hidden]))) .v2-email-filter-empty,.v2-email-accounts:has(.v2-email-filter input[value=ftp]:checked):not(:has(tr[data-email-services~=ftp]:not([hidden]))):not(:has(.v2-email-search-empty:not([hidden]))) .v2-email-filter-empty,.v2-email-accounts:has(.v2-email-filter input[value=webdisk]:checked):not(:has(tr[data-email-services~=webdisk]:not([hidden]))):not(:has(.v2-email-search-empty:not([hidden]))) .v2-email-filter-empty{display:block}
+.v2-email-how{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}
+.v2-email-how>li{position:relative;padding-inline-start:3.25rem;display:flex;flex-direction:column;gap:.25rem;min-inline-size:0}
+.v2-email-how__mark{position:absolute;inset-inline-start:0;inset-block-start:0}
+.v2-email-fact{display:contents}
+.v2-email-services,.v2-email-row-actions,.v2-email-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem}
+.v2-email-accounts .v2-email-row-actions{justify-content:flex-end}
+.v2-email-handoff{display:inline-flex;align-items:flex-start;flex-direction:column;gap:.25rem}
+.v2-email-handoff [data-handoff-status]{max-inline-size:32ch;white-space:normal;overflow-wrap:anywhere}
 .v2-email-actions{justify-content:flex-end}
-.v2-email-dialog{padding:var(--space-3);border:1px solid var(--line-strong);border-radius:var(--radius-card);background:var(--surface);color:var(--text);inline-size:min(560px,calc(100% - 32px));max-block-size:calc(100dvh - 32px);overflow:auto}
+.v2-email-dialog{padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);color:var(--text);box-shadow:var(--v2-elev);inline-size:min(31.25rem,calc(100% - 2rem));max-block-size:calc(100dvh - 2rem);overflow:auto}
 .v2-email-dialog::backdrop{background:var(--scrim)}
-.v2-email-dialog .v2-form{gap:var(--space-3)}
-.v2-email-dialog [data-dialog-status]:not([hidden]),.v2-email-accounts [data-mailbox-status]:not([hidden]){padding:var(--space-2);border:1px solid var(--bad-line);border-radius:12px;background:var(--bad-soft);color:var(--bad);overflow-wrap:anywhere}
+.v2-email-dialog .v2-form{display:flex;flex-direction:column;gap:1.5rem}
+.v2-email-dialog [data-dialog-status]:not([hidden]),.v2-email-accounts [data-mailbox-status]:not([hidden]){padding:1rem;border:1px solid var(--bad-line);border-radius:var(--radius-notice);background:var(--bad-soft);color:var(--bad);overflow-wrap:anywhere}
 .v2-email-accounts #v2-email-users th:nth-child(3){min-inline-size:104px}.v2-email-accounts #v2-email-users th:nth-child(5){min-inline-size:80px}
 .v2-email-accounts:dir(rtl) *,[data-ui-theme="v2"] [dir=rtl] .v2-email-accounts *{letter-spacing:0}
-@media(prefers-reduced-motion:reduce){.v2-email-accounts .v2-btn,.v2-email-dialog .v2-btn,.v2-email-filter>label{transition-duration:0ms}}
+@media(prefers-reduced-motion:reduce){.v2-email-filter>label{transition-duration:0ms}}
 @media(min-width:1760px){.v2-email-accounts .v2-split{flex-direction:row;align-items:flex-start}.v2-email-accounts .v2-split>:first-child{flex:1 1 0;inline-size:auto}.v2-email-accounts .v2-split>:not(:first-child){flex:0 0 400px;inline-size:400px;align-self:flex-start}}
-@media(max-width:640px){.v2-email-accounts .v2-card:not(.v2-card--flush),.v2-email-accounts .v2-kpi,.v2-email-dialog{padding:var(--space-2)}}
-@media(max-width:600px){.v2-email-accounts .v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-email-accounts .v2-kpi-row>.v2-kpi:last-child:nth-child(odd){grid-column:1/-1}.v2-email-how{grid-template-columns:minmax(0,1fr)}.v2-email-filter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.v2-email-filter>label{min-block-size:var(--target);justify-content:center}.v2-email-accounts #v2-email-users tr>td:is(:first-child,:nth-child(2)):not([colspan]),.v2-email-accounts #v2-email-users tr>td:has(>.v2-email-fact){grid-column:1/-1!important;grid-row:auto!important;justify-self:stretch!important;text-align:start!important}.v2-email-fact{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-2)}.v2-email-fact::before{content:attr(data-label);font-size:12px;color:var(--muted)}.v2-email-accounts .v2-email-row-actions{display:flex}.v2-email-accounts .v2-cell-lead,.v2-email-accounts .v2-cell-lead__text{min-inline-size:0}.v2-email-accounts .v2-cell-lead__text>bdi{white-space:normal;overflow-wrap:anywhere}.v2-email-dialog{padding:var(--space-2)}.v2-email-accounts .v2-email-actions>.v2-btn{flex:1 1 auto}}
-@media(min-width:901px){.v2-email-accounts #v2-email-users{table-layout:fixed;min-inline-size:0!important}.v2-email-accounts #v2-email-users th:nth-child(1){inline-size:27%}.v2-email-accounts #v2-email-users th:nth-child(2){inline-size:12%}.v2-email-accounts #v2-email-users th:nth-child(3){inline-size:9%}.v2-email-accounts #v2-email-users th:nth-child(4){inline-size:14%}.v2-email-accounts #v2-email-users th:nth-child(5){inline-size:9%}.v2-email-accounts #v2-email-users th:nth-child(6){inline-size:29%}}
+@media(max-width:600px){.v2-email-accounts .v2-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-email-accounts .v2-kpi-row>.v2-kpi:last-child:nth-child(odd){grid-column:1/-1}.v2-email-how{grid-template-columns:minmax(0,1fr)}.v2-email-filter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.v2-email-filter>label{min-block-size:var(--target);justify-content:center}.v2-email-accounts #v2-email-users tr>td:is(:first-child,:nth-child(2)):not([colspan]),.v2-email-accounts #v2-email-users tr>td:has(>.v2-email-fact){grid-column:1/-1!important;grid-row:auto!important;justify-self:stretch!important;text-align:start!important}.v2-email-fact{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}.v2-email-fact::before{content:attr(data-label);font-size:.8125rem;line-height:var(--lh-cap);color:var(--muted)}.v2-email-accounts .v2-email-row-actions{justify-content:flex-start}.v2-email-accounts .v2-cell-lead,.v2-email-accounts .v2-cell-lead__text{min-inline-size:0}.v2-email-accounts .v2-cell-lead__text>bdi{white-space:normal;overflow-wrap:anywhere}.v2-email-dialog{padding:1rem}.v2-email-accounts .v2-email-actions>.v2-btn{flex:1 1 auto}}
+@media(min-width:901px){.v2-email-accounts #v2-email-users{table-layout:fixed;min-inline-size:0!important}.v2-email-accounts #v2-email-users th:nth-child(1){inline-size:32%}.v2-email-accounts #v2-email-users th:nth-child(2){inline-size:13%}.v2-email-accounts #v2-email-users th:nth-child(3){inline-size:10%}.v2-email-accounts #v2-email-users th:nth-child(4){inline-size:13%}.v2-email-accounts #v2-email-users th:nth-child(5){inline-size:9%}.v2-email-accounts #v2-email-users th:nth-child(6){inline-size:23%}.v2-email-accounts .v2-email-row-actions{flex-wrap:nowrap}}
 @media(min-width:901px){.v2-email-accounts #v2-email-users td{overflow-wrap:anywhere}.v2-email-accounts #v2-email-users .v2-cell-lead{min-inline-size:0}}
 `

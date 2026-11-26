@@ -10,14 +10,12 @@ import { CHANGE_REVIEW_CSS } from './components/change-review.ts'
 import { CHART_CSS } from './components/chart.ts'
 import { CODE_BLOCK_CSS } from './components/code-block.ts'
 import { DATA_TABLE_CSS } from './components/data-table.ts'
-import { DIALOG_CSS } from './components/dialog.ts'
 import { DRAWER_CSS } from './components/drawer.ts'
 import { FORM_FIELD_CSS } from './components/form-field.ts'
 import { KPI_CARD_CSS } from './components/kpi-card.ts'
 import { METER_CSS } from './components/meter.ts'
 import { NOTICE_CSS } from './components/notice.ts'
 import { PAGE_HEADER_CSS } from './components/page-header.ts'
-import { PAGINATION_CSS } from './components/pagination.ts'
 import { ROW_MENU_CSS } from './components/row-menu.ts'
 import { STATE_BLOCK_CSS } from './components/state-block.ts'
 import { STATUS_PILL_CSS } from './components/status-pill.ts'
@@ -35,8 +33,8 @@ import { SHELL_CSS } from './shell/shell.ts'
 // layouts before the shell.
 const SOURCES = [
   V2_TOKENS_CSS, V2_BASE_CSS, STATUS_PILL_CSS, PAGE_HEADER_CSS, CARD_CSS, KPI_CARD_CSS, CHART_CSS, NOTICE_CSS,
-  DATA_TABLE_CSS, DRAWER_CSS, DIALOG_CSS, ROW_MENU_CSS, TABS_CSS, STEPPER_CSS,
-  PAGINATION_CSS, CHANGE_REVIEW_CSS, FORM_FIELD_CSS, CODE_BLOCK_CSS, METER_CSS, STATE_BLOCK_CSS, TOAST_REGION_CSS,
+  DATA_TABLE_CSS, DRAWER_CSS, ROW_MENU_CSS, TABS_CSS, STEPPER_CSS,
+  CHANGE_REVIEW_CSS, FORM_FIELD_CSS, CODE_BLOCK_CSS, METER_CSS, STATE_BLOCK_CSS, TOAST_REGION_CSS,
   LAYOUTS_CSS, OVERLAYS_CSS, SHELL_CSS, ACTION_STATE_CSS,
 ]
 

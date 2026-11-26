@@ -252,7 +252,7 @@ describe('V2 account observation layout', () => {
 
   it('keeps the range as links and the summary rows free of inline layout styles', () => {
     const html = renderV2PanelTraffic({ ...props, websiteAnalytics: reading(), websiteAnalyticsWindow: '7d' }, authority)
-    expect(html).toMatch(/<div class="v2-panel-obs-seg" role="group"[^>]*>(<a href="[^"]*window=[^"]*"( aria-current="true")?>[^<]+<\/a>){4}<\/div>/)
+    expect(html).toMatch(/<div class="v2-panel-obs-seg kt-toggle-group" role="group"[^>]*>(<a class="kt-btn kt-btn-outline [^"]*" href="[^"]*window=[^"]*"( aria-current="true")?>[^<]+<\/a>){4}<\/div>/)
     expect(html).not.toMatch(/class="v2-kpi-row[^"]*" style=/)
     expect(renderV2PanelWebStatistics({ account }, authority)).not.toMatch(/class="v2-kpi-row[^"]*" style=/)
   })

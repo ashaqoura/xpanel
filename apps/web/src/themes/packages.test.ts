@@ -50,7 +50,7 @@ describe('theme packages', { tags: ['unit'] }, () => {
 
   it('keeps the base data-ui-theme for a v2 package and clones a built-in with its shipped values', () => {
     const clone = cloneThemePackage('v2', 'v2-copy', 'V2 copy')
-    expect(clone).toMatchObject({ base: 'v2', version: '1.0.0', tokens: { light: { '--accent': '#1d5bd6', '--text': '#0e1726' } } })
+    expect(clone).toMatchObject({ base: 'v2', version: '1.0.0', tokens: { light: { '--accent': '#155dfc', '--text': '#09090b' } } })
     installThemePackage(clone)
     const html = renderWebApp({ surface: 'login', locale: 'en', uiTheme: 'v2-copy' })
     expect(html).toContain('data-ui-theme="v2"')

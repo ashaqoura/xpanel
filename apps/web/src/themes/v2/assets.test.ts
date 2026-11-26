@@ -30,7 +30,7 @@ const topLevelSelectors = (list: string): string[] => {
   }
   return [...parts, list.slice(start)]
 }
-const rulesFor = (source: string): string[] => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@media[^{]+\{|@supports[^{]+\{|@keyframes[^{]+\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '').split('}').map(rule => rule.trim()).filter(Boolean)
+const rulesFor = (source: string): string[] => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@layer[^{;]+\{|@container[^{]+\{|@media[^{]+\{|@supports[^{]+\{|@keyframes[^{]+\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '').split('}').map(rule => rule.trim()).filter(Boolean)
 
 describe('v2 stylesheet asset', () => {
   it('is versioned by content hash and stays well inside the browser budget', () => {
@@ -39,7 +39,8 @@ describe('v2 stylesheet asset', () => {
     expect(v2Assets).toEqual([v2Stylesheet, ...v2SharedStylesheets, ...Object.values(v2ViewStylesheets), ...v2RouteStylesheets.map(entry => entry.stylesheet), ...v2SupplementalStylesheets.map(entry => entry.stylesheet)])
     expect(Object.isFrozen(v2Assets)).toBe(true)
     // The shared foundation remains under a fifth of the 60 KB per-route budget.
-    expect(compressedBytes(foundationAssets)).toBeLessThan(12 * 1024)
+    // 13 KB: the foundation now carries the project standards' control sizes, type roles and card rhythm.
+    expect(compressedBytes(foundationAssets)).toBeLessThan(13 * 1024)
     // Template families no route renders stay out of the foundation; the shared controls every page uses stay in.
     for (const unused of ['.v2-matrix', '.v2-editor', '.v2-log__', '.v2-wizard__', '.v2-status-list', '.v2-filter__', '.v2-bulk']) expect(css).not.toContain(unused)
     for (const shared of ['.v2-btn--soft-danger', '.v2-kpi__value--text', '::file-selector-button', '::-webkit-meter-bar', '.v2-tools[open]>summary::after']) expect(css).toContain(shared)
@@ -255,9 +256,9 @@ describe('v2 stylesheet asset', () => {
   })
 
   it('defines light tokens, the dark override and the Arabic font override', () => {
-    expect(css).toMatch(/^\[data-ui-theme="v2"\]\{color-scheme:light;/)
+    expect(css).toMatch(/^@layer v2\{\n\[data-ui-theme="v2"\]\{color-scheme:light;/)
     expect(css).toContain('[data-ui-theme="v2"][data-theme="dark"]{color-scheme:dark;')
-    expect(css).toContain("[data-ui-theme=\"v2\"]:lang(ar){--font-sans:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif}")
+    expect(css).toContain("[data-ui-theme=\"v2\"]:lang(ar){--font-sans:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}")
     expect(css).toContain('@media (prefers-reduced-motion:reduce)')
   })
 })

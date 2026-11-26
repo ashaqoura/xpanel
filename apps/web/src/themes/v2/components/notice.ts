@@ -19,28 +19,29 @@ export interface NoticeProps {
 }
 
 const NOTICE_ICONS: Readonly<Record<NoticeProps['tone'], IconName>> = { info: 'info', ok: 'okCircle', warn: 'alert', bad: 'xCircle' }
+// The Metronic alert of each tone: the light kt-alert variant.
+const ALERT: Readonly<Record<NoticeProps['tone'], string>> = {
+  info: 'kt-alert kt-alert-light kt-alert-primary', ok: 'kt-alert kt-alert-light kt-alert-success',
+  warn: 'kt-alert kt-alert-light kt-alert-warning', bad: 'kt-alert kt-alert-light kt-alert-destructive',
+}
 
 export function notice(t: Translate, props: NoticeProps): string {
   const action = !props.action ? '' : props.action.kind === 'button'
-    ? `<button type="button" class="v2-notice__action"${props.action.disabled ? ' disabled' : ''}${hookAttrs(props.action.hooks)}>${escapeHtml(props.action.label)}</button>`
-    : `<a class="v2-notice__action" href="${escapeHtml(props.action.href)}"${hookAttrs(props.action.hooks)}>${escapeHtml(props.action.label)}</a>`
-  const dismiss = props.dismiss ? `<button type="button" class="v2-notice__dismiss" aria-label="${escapeHtml(t('Dismiss'))}"${hookAttrs(props.dismiss)}>${icon('x', 16)}</button>` : ''
-  return `<div class="v2-notice v2-notice--${props.tone}" role="${props.urgent ? 'alert' : 'status'}"${hookAttrs(props.hooks)}>${icon(NOTICE_ICONS[props.tone])}<div class="v2-notice__body"><p>${props.lead ? `<strong>${escapeHtml(props.lead)}</strong> ` : ''}${escapeHtml(props.text)}</p>${props.extraHtml ?? ''}${action}</div>${dismiss}</div>`
+    ? `<button type="button" class="v2-notice__action kt-link"${props.action.disabled ? ' disabled' : ''}${hookAttrs(props.action.hooks)}>${escapeHtml(props.action.label)}</button>`
+    : `<a class="v2-notice__action kt-link" href="${escapeHtml(props.action.href)}"${hookAttrs(props.action.hooks)}>${escapeHtml(props.action.label)}</a>`
+  const dismiss = props.dismiss ? `<button type="button" class="v2-notice__dismiss kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost shrink-0 -my-2.5 -me-2.5" aria-label="${escapeHtml(t('Dismiss'))}"${hookAttrs(props.dismiss)}>${icon('x', 14)}</button>` : ''
+  return `<div class="v2-notice v2-notice--${props.tone} ${ALERT[props.tone]}" role="${props.urgent ? 'alert' : 'status'}"${hookAttrs(props.hooks)}>${icon(NOTICE_ICONS[props.tone])}<div class="v2-notice__body kt-alert-title"><p>${props.lead ? `<strong>${escapeHtml(props.lead)}</strong> ` : ''}${escapeHtml(props.text)}</p>${props.extraHtml ?? ''}${action}</div>${dismiss}</div>`
 }
 
-export const NOTICE_CSS = `.v2-notice{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--radius-notice);border:1px solid;border-inline-start-width:3px;font-size:13px;line-height:1.5;color:var(--text)}
-.v2-notice>.v2-icon{margin-top:2px}
-.v2-notice__body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+// The surface, border and padding of each tone come from kt-alert kt-alert-light; these rules place the Keenicon
+// (toned, on the first text line), stack the body and tone the icon.
+export const NOTICE_CSS = `.v2-notice{align-items:flex-start;line-height:1.5}
+.v2-notice>.v2-icon{margin-block-start:.125rem;color:var(--tone)}
+.v2-notice__body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:.25rem}
 .v2-notice__body strong{font-weight:600}
-.v2-notice__action{display:inline-flex;align-items:center;min-height:var(--target);font-weight:600}
-.v2-notice__action:is(button){padding:0;border:0;background:transparent;text-align:start;cursor:pointer}
-.v2-notice__action:disabled{color:var(--muted);cursor:not-allowed}
-.v2-notice:has(.v2-notice__action){padding-block-end:0}
-.v2-notice__dismiss{flex:none;display:inline-flex;align-items:center;justify-content:center;width:var(--target);height:var(--target);margin:-10px;margin-inline-start:0;border:0;border-radius:var(--radius-control);background:transparent;cursor:pointer}
-.v2-notice__dismiss:hover{background:var(--surface)}
-.v2-notice>.v2-icon,.v2-notice__action,.v2-notice__dismiss{color:var(--tone)}
-.v2-notice--info{--tone:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
-.v2-notice--ok{--tone:var(--ok);border-color:var(--ok-line);background:var(--ok-soft)}
-.v2-notice--warn{--tone:var(--warn);border-color:var(--warn-line);background:var(--warn-soft)}
-.v2-notice--bad{--tone:var(--bad);border-color:var(--bad-line);background:var(--bad-soft)}
+.v2-notice__action:disabled{opacity:.5;cursor:not-allowed}
+.v2-notice--info{--tone:var(--accent)}
+.v2-notice--ok{--tone:var(--color-green-500,var(--ok))}
+.v2-notice--warn{--tone:var(--color-yellow-500,var(--warn))}
+.v2-notice--bad{--tone:var(--destructive)}
 `

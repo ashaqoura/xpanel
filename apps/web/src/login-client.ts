@@ -174,7 +174,7 @@ export const LOGIN_CLIENT_SCRIPT = MOBILE_NAVIGATION_CLIENT_SCRIPT + /* js */ St
     show('[data-login-factor="recovery"]', recovery);
     fields.setAttribute('data-factor-mode', mode);
     var toggle = document.querySelector('[data-login-factor-toggle]');
-    if (toggle) { toggle.textContent = recovery ? copy.authenticatorSwitch : copy.recoverySwitch; toggle.setAttribute('aria-pressed', String(recovery)); }
+    if (toggle) { ((toggle.querySelector && toggle.querySelector('[data-xp-slot="label"]')) || toggle).textContent = recovery ? copy.authenticatorSwitch : copy.recoverySwitch; toggle.setAttribute('aria-pressed', String(recovery)); }
     var selected = recovery ? recoveryCode : otp;
     if (focus && selected) selected.focus();
     return true;

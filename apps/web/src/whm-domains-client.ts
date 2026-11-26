@@ -110,7 +110,7 @@ function bindWhmDomains(askDialog: ((options: Record<string, unknown>) => Promis
           const box = tr.querySelector<HTMLInputElement>('input[data-xp-action="select"]')
           if (!page!.querySelector('[data-domain-bulk]')) box?.remove()
           else if (box) select(box)
-          else { const made = document.createElement('input'); select(made); tr.cells[0]?.prepend(made, ' ') }
+          else { const made = document.createElement('input'); if (document.documentElement.dataset.uiTheme === 'v2') made.className = 'kt-checkbox kt-checkbox-sm'; select(made); tr.cells[0]?.prepend(made, ' ') }
           body.append(tr)
           continue
         }
@@ -120,7 +120,7 @@ function bindWhmDomains(askDialog: ((options: Record<string, unknown>) => Promis
         name.dataset.status = row.suspended ? 'suspended' : 'active'; name.dataset.search = row.name + ' ' + account.username
         isolated.dir = 'ltr'; isolated.textContent = row.name; name.append(isolated)
         const nameCell = document.createElement('td'); nameCell.append(name); tr.append(nameCell)
-        if (page!.querySelector('[data-domain-bulk]')) { const box = document.createElement('input'); box.type = 'checkbox'; box.dataset.domainSelect = row.id; box.dataset.domainName = row.name; box.setAttribute('aria-label', t('Select {name}', { name: row.name })); nameCell.prepend(box, ' ') }
+        if (page!.querySelector('[data-domain-bulk]')) { const box = document.createElement('input'); box.type = 'checkbox'; if (document.documentElement.dataset.uiTheme === 'v2') box.className = 'kt-checkbox kt-checkbox-sm'; box.dataset.domainSelect = row.id; box.dataset.domainName = row.name; box.setAttribute('aria-label', t('Select {name}', { name: row.name })); nameCell.prepend(box, ' ') }
         const values: [string, boolean][] = [[account.username, false], [row.kind, false], [row.siteType, false], [row.docRoot, true], [domainPhpLabel(row), row.siteType === 'php'], [row.wildcard ? t('Yes') : t('No'), false], [row.certificateId ? t('Assigned') : t('Unassigned'), false], [state, false]]
         for (const [value, technical] of values) { const td = document.createElement('td'); if (technical) { const bdi = document.createElement('bdi'); bdi.dir = 'ltr'; bdi.textContent = value; td.append(bdi) } else td.textContent = value; tr.append(td) }
         body.append(tr)

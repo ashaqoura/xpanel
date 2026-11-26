@@ -14990,7 +14990,7 @@ msgstr "أعاد Dovecot مخرجات تعذر التحقق منها."
 msgid "Dovecot search index plugin"
 msgstr "إضافة فهرس البحث في Dovecot"
 
-#: apps/web/src/account-owner-tools-client.ts apps/web/src/whm-home-client.ts
+#: apps/web/src/account-owner-tools-client.ts
 msgid "Down"
 msgstr "متوقف"
 
@@ -26806,7 +26806,7 @@ msgstr "نقل مجلد البيانات"
 msgid "Move database to trash?"
 msgstr "نقل قاعدة البيانات إلى السلة؟"
 
-#: apps/web/src/account-filters-client.ts apps/web/src/board-port/whm-extend-workspace.ts apps/web/src/themes/v2/pages/xwhm/panel/integrations-developer.ts apps/web/src/whm-firewall-client.ts
+#: apps/web/src/account-filters-client.ts apps/web/src/board-port/whm-extend-workspace.ts apps/web/src/themes/v2/pages/xwhm/panel/integrations-developer.ts apps/web/src/whm-firewall-client.ts apps/web/src/whm-home-client.ts
 msgid "Move down"
 msgstr "نقل للأسفل"
 
@@ -26882,7 +26882,7 @@ msgctxt "file-workspace-client"
 msgid "Move to trash"
 msgstr "نقل إلى المهملات"
 
-#: apps/web/src/account-filters-client.ts apps/web/src/board-port/whm-extend-workspace.ts apps/web/src/themes/v2/pages/xwhm/panel/integrations-developer.ts apps/web/src/whm-firewall-client.ts
+#: apps/web/src/account-filters-client.ts apps/web/src/board-port/whm-extend-workspace.ts apps/web/src/themes/v2/pages/xwhm/panel/integrations-developer.ts apps/web/src/whm-firewall-client.ts apps/web/src/whm-home-client.ts
 msgid "Move up"
 msgstr "نقل للأعلى"
 
@@ -63257,7 +63257,7 @@ msgstr "مفتاح غير موثوق"
 msgid "Unverified"
 msgstr "غير متحقق"
 
-#: apps/web/src/account-owner-tools-client.ts apps/web/src/whm-home-client.ts
+#: apps/web/src/account-owner-tools-client.ts
 msgid "Up"
 msgstr "يعمل"
 

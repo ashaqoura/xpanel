@@ -5,23 +5,37 @@ import { projectActionState } from '../../../models/action-state.ts'
 import type { UiTheme, UnavailableProps } from '../../contract.ts'
 import { actionState } from '../components/action-state.ts'
 import { escapeHtml } from '../html.ts'
+import { catalogIcon, icon } from '../icons.ts'
 import { v2Messages } from '../messages.ts'
 import { renderV2Shell } from '../shell/shell.ts'
 import { V2_SECURITY_SLOT } from './slots.ts'
 
 export type V2ReadOnlyPage = (props: UnavailableProps) => string | undefined
 
+// The vertical Metronic menu of the shell sidebar: the same item, link, icon, title and arrow classes.
+const SECTION_LINK = 'kt-menu-link gap-2.5 px-2.5 py-1.5'
+const PAGE_LINK = 'kt-menu-link px-2.5 py-1.5'
+const CHEVRON = icon('chevRight', 14).replace('class="v2-icon', 'class="v2-icon v2-nav__chev')
+
 function registeredSidebar(t: Translate, props: UnavailableProps): string {
   const current = canonicalNavigationRoute(props.route)
   const nav = visibleRegisteredNavigation(props.visibility).find(item => item.surface === props.surface)
-  return `<nav class="v2-nav" aria-label="${escapeHtml(t('navigation'))}"><ul>${(nav?.sections ?? []).map(section => `<li data-nav-section="${escapeHtml(section.id)}"><details${section.pages.some(page => page.route === current) ? ' open' : ''}><summary>${escapeHtml(catalogText(props.locale, `nav.section.${props.surface}.${section.id}.name`, section.name))}</summary><ul>${section.pages.map(page => `<li><a href="${escapeHtml(page.route)}" data-nav-route="${escapeHtml(page.route)}" data-nav-wiring="${props.qualifiedRoutes.has(page.route) ? 'live' : 'soon'}"${page.route === current ? ' aria-current="page"' : ''}>${escapeHtml(catalogText(props.locale, `nav.page.${props.surface}.${page.id}.name`, page.name))}</a></li>`).join('')}</ul></details></li>`).join('')}</ul></nav>`
+  return `<nav class="v2-nav" aria-label="${escapeHtml(t('navigation'))}"><ul class="kt-menu flex-col">${(nav?.sections ?? []).map(section => {
+    const name = catalogText(props.locale, `nav.section.${props.surface}.${section.id}.name`, section.name)
+    return `<li class="kt-menu-item" data-nav-section="${escapeHtml(section.id)}"><details${section.pages.some(page => page.route === current) ? ' open' : ''}><summary class="${SECTION_LINK}"><span class="kt-menu-icon">${icon(catalogIcon(section.icon))}</span><span class="kt-menu-title">${escapeHtml(name)}</span><span class="kt-menu-arrow">${CHEVRON}</span></summary><ul class="kt-menu flex-col" aria-label="${escapeHtml(name)}">${section.pages.map(page => `<li class="kt-menu-item"><a class="${PAGE_LINK}" href="${escapeHtml(page.route)}" data-nav-route="${escapeHtml(page.route)}" data-nav-wiring="${props.qualifiedRoutes.has(page.route) ? 'live' : 'soon'}"${page.route === current ? ' aria-current="page"' : ''}><span class="kt-menu-title">${escapeHtml(catalogText(props.locale, `nav.page.${props.surface}.${page.id}.name`, page.name))}</span></a></li>`).join('')}</ul></details></li>`
+  }).join('')}</ul></nav>`
 }
 
+// The summary is a Metronic general-info card: one row per fact, its label beside its value.
 function workspaceSummary(props: UnavailableProps): string {
   const view = props.summary
   if (!view) return ''
-  return `<section class="v2-card v2-unavailable__summary" data-workspace-identity="true"${props.surface === 'xpanel' ? ' data-workspace-account-overview="true"' : ''} aria-labelledby="v2-workspace-summary-title"><h2 id="v2-workspace-summary-title">${escapeHtml(view.title)}</h2><dl class="v2-unavailable__facts">${view.fields.map(field => `<div data-workspace-field="${escapeHtml(field.key)}"><dt>${escapeHtml(field.label)}</dt><dd>${field.ltr ? `<bdi dir="ltr">${escapeHtml(field.value)}</bdi>` : escapeHtml(field.value)}</dd></div>`).join('')}</dl>${view.accountEmpty && view.accountEmptyText ? `<p data-workspace-account-empty="true">${escapeHtml(view.accountEmptyText)}</p>` : ''}${view.mfaHref && view.mfaText ? `<p data-mfa-optional-link><a href="${escapeHtml(view.mfaHref)}">${escapeHtml(view.mfaText)}</a></p>` : ''}</section>`
+  return `<section class="v2-card v2-unavailable__summary kt-card flex flex-col gap-6 p-4 min-[641px]:p-6" data-workspace-identity="true"${props.surface === 'xpanel' ? ' data-workspace-account-overview="true"' : ''} aria-labelledby="v2-workspace-summary-title"><h2 id="v2-workspace-summary-title" class="text-lg leading-7 rtl:leading-[30px] font-semibold text-mono">${escapeHtml(view.title)}</h2><dl class="v2-unavailable__facts grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-x-6">${view.fields.map(field => `<div class="flex flex-col gap-2 min-w-0 text-start" data-workspace-field="${escapeHtml(field.key)}"><dt class="text-sm leading-[22px] rtl:leading-6 font-normal text-secondary-foreground">${escapeHtml(field.label)}</dt><dd class="text-base leading-6 rtl:leading-[26px] font-normal text-mono break-words">${field.ltr ? `<bdi dir="ltr">${escapeHtml(field.value)}</bdi>` : escapeHtml(field.value)}</dd></div>`).join('')}</dl>${view.accountEmpty && view.accountEmptyText ? `<p class="kt-alert kt-alert-light kt-alert-primary" data-workspace-account-empty="true"><span class="kt-alert-icon text-primary">${icon('info', 18)}</span><span class="kt-alert-title">${escapeHtml(view.accountEmptyText)}</span></p>` : ''}${view.mfaHref && view.mfaText ? `<p class="text-sm font-medium" data-mfa-optional-link><a class="kt-link inline-flex items-center min-h-11" href="${escapeHtml(view.mfaHref)}">${escapeHtml(view.mfaText)}</a></p>` : ''}</section>`
 }
+
+// Without a page layout the route shows as a Metronic empty page: a glyph in a soft circle over the page name.
+const emptyHeading = (heading: string): string =>
+  `<div class="v2-unavailable__empty flex flex-col items-center gap-5 px-5 py-10 text-center"><span class="flex items-center justify-center size-16 rounded-full bg-primary/10 text-primary" aria-hidden="true">${icon('info', 30)}</span><h1 class="text-[26px] leading-[34px] rtl:leading-9 font-semibold text-mono">${escapeHtml(heading)}</h1></div>`
 
 /** Missing qualified renderers are an integration error, never silently replaced by an unavailable card; an admitted caller without realm facts gets the unavailable summary. */
 export function createV2UnavailableRenderer(readOnlyPage: V2ReadOnlyPage): UiTheme['renderUnavailable'] {
@@ -34,7 +48,7 @@ export function createV2UnavailableRenderer(readOnlyPage: V2ReadOnlyPage): UiThe
     const contact = publicContactEmail(props.supportEmail)
     const path = props.route.startsWith('/') ? props.route : '/'
     const href = (locale = props.locale, theme = props.theme) => `${path}?${new URLSearchParams({ lang: locale, theme, density: props.density })}`
-    const content = `<section class="v2-unavailable" data-surface="${props.surface}" data-tool-availability="unverified"${props.securityPage ? ' data-security-page="true"' : ''}${props.surface === 'xpanel' && props.route === '/domains/reverse-proxy' ? ' data-unqualified-route="/domains/reverse-proxy"' : ''}>${layout ?? `<h1>${escapeHtml(props.heading)}</h1>`}${props.securityPage && !layout ? V2_SECURITY_SLOT : ''}${props.actionState ? actionState(projectActionState({ ...props.actionState, locale: props.locale })) : ''}${props.securityPage ? '' : workspaceSummary(props)}${!props.securityPage && contact ? `<p>${escapeHtml(t('Write to'))} <a href="mailto:${escapeHtml(contact)}"><bdi dir="ltr">${escapeHtml(contact)}</bdi></a>.</p>` : ''}<div role="alert" data-auth-error hidden></div><p role="status" data-auth-status></p></section>`
+    const content = `<section class="v2-unavailable flex flex-col gap-8 min-w-0" data-surface="${props.surface}" data-tool-availability="unverified"${props.securityPage ? ' data-security-page="true"' : ''}${props.surface === 'xpanel' && props.route === '/domains/reverse-proxy' ? ' data-unqualified-route="/domains/reverse-proxy"' : ''}>${layout ?? emptyHeading(props.heading)}${props.securityPage && !layout ? V2_SECURITY_SLOT : ''}${props.actionState ? actionState(projectActionState({ ...props.actionState, locale: props.locale })) : ''}${props.securityPage ? '' : workspaceSummary(props)}${!props.securityPage && contact ? `<p class="text-sm font-normal text-secondary-foreground">${escapeHtml(t('Write to'))} <a class="kt-link inline-flex items-center min-h-11" href="mailto:${escapeHtml(contact)}"><bdi dir="ltr">${escapeHtml(contact)}</bdi></a>.</p>` : ''}<div class="kt-alert kt-alert-light kt-alert-destructive block" role="alert" data-auth-error hidden></div><p class="empty:hidden text-sm text-secondary-foreground" role="status" data-auth-status></p></section>`
     return renderV2Shell(t, {
       branding: props.branding, surface: props.surface, activeRoute: props.route, visibility: props.visibility,
       homeHref: props.surface === 'xwhm' ? '/whm' : props.surface === 'xmail' ? '/mail/inbox' : '/home',
@@ -48,6 +62,5 @@ export function createV2UnavailableRenderer(readOnlyPage: V2ReadOnlyPage): UiThe
   }
 }
 
-export const V2_UNAVAILABLE_CSS = `.v2-unavailable,.v2-unavailable__panel,.v2-unavailable__summary{display:flex;flex-direction:column;gap:var(--space-3);min-inline-size:0}.v2-unavailable [data-auth-status]:empty{display:none}.v2-unavailable__panel,.v2-unavailable__summary{gap:var(--space-2);padding:var(--v2-panel-padding)}
-.v2-unavailable__fields,.v2-unavailable__facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v2-unavailable__field,.v2-unavailable__facts>div{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-1);min-inline-size:0;text-align:start}.v2-unavailable__facts>div{gap:4px;padding:12px var(--space-2);border-radius:var(--radius-control);border:1px solid var(--line);background:var(--subtle)}.v2-unavailable__facts dt{font-size:12px;color:var(--muted)}.v2-unavailable__facts dd{font-size:13px;font-weight:500;overflow-wrap:anywhere}.v2-unavailable__facts bdi{display:inline;unicode-bidi:isolate}.v2-unavailable__field>label{padding-inline:13px;font-size:13px;line-height:1.25;font-weight:600}.v2-unavailable__field>input,.v2-unavailable__field>textarea,.v2-unavailable__field>select{inline-size:100%;text-align:var(--v2-control-align,start)}.v2-unavailable__actions{display:flex;flex-wrap:wrap;gap:var(--space-1)}.v2-unavailable [data-workspace-account-empty],.v2-unavailable [data-mfa-optional-link]{font-size:13px;color:var(--text-2)}
-@media(max-width:600px){.v2-unavailable__fields,.v2-unavailable__facts{grid-template-columns:1fr}}`
+/** Cards, rows and notices use Metronic classes in the markup; only the bidi isolation of fact values stays here. */
+export const V2_UNAVAILABLE_CSS = `.v2-unavailable,.v2-unavailable__summary{min-inline-size:0}.v2-unavailable__facts bdi{display:inline;unicode-bidi:isolate}`

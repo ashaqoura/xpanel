@@ -11,7 +11,7 @@ export function renderV2DnsClusterMembers(t: Translate, canRead: boolean, canMan
   const text = (key: string, label: string, maxlength: number, help?: string, password = false) => netField(`dns-cluster-${key}`, t(label), { kind: 'input', ...(password ? { type: 'password' as const } : {}), maxlength, dir: 'ltr', autocomplete: 'off', spellcheck: false, hooks: { 'data-sec-input': key } }, help ? t(help) : undefined)
   const number = (key: string, label: string, min: number, max: number, value: number) => netField(`dns-cluster-${key}`, t(label), { kind: 'input', type: 'number', min, max, value: String(value), dir: 'ltr', hooks: { 'data-sec-input': key } })
   const select = (key: string, label: string, options: [string, string][]) => netField(`dns-cluster-${key}`, t(label), { kind: 'select', hooks: { 'data-sec-input': key }, options: options.map(([value, name]) => ({ value, label: t(name) })) })
-  const check = (key: string, label: string) => `<label><input type="checkbox" data-sec-input="${key}" disabled><span>${escapeHtml(t(label))}</span></label>`
+  const check = (key: string, label: string) => `<label class="flex items-center gap-2 min-h-11 text-sm leading-(--lh-label) text-foreground"><input class="kt-checkbox" type="checkbox" data-sec-input="${key}" disabled><span>${escapeHtml(t(label))}</span></label>`
   const fields = (html: string) => `<div class="v2-whm-network__fields">${html}</div>`
   const actions = (html: string) => `<div class="v2-whm-network__actions">${html}</div>`
   const button = (action: string, label: string, primary = false) => netButton(t(label), { 'data-sec-action': action }, { enabled: false, primary })

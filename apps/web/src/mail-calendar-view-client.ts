@@ -269,9 +269,13 @@ function bindMailCalendarView(askDialog: ((options: Record<string, unknown>) => 
       node.setAttribute('role', 'gridcell'); node.dataset.calviewDay = calendarDayString(day); node.tabIndex = day === focus ? 0 : -1; node.setAttribute('aria-selected', String(day === focus))
       if (day === now) node.setAttribute('aria-current', 'date')
       const values = { weekday: weekdays[calendarWeekday(day)]!, date: iso(day), count }
-      node.setAttribute('aria-label', day === now
+      const text = day === now
         ? t('{weekday} {date}, today, {count, plural, =0 {no events} one {{count} event} other {{count} events}}', values)
-        : t('{weekday} {date}, {count, plural, =0 {no events} one {{count} event} other {{count} events}}', values))
+        : t('{weekday} {date}, {count, plural, =0 {no events} one {{count} event} other {{count} events}}', values)
+      // A theme whose cell carries a visually hidden label slot names the cell from its content (the visible date and
+      // events follow that text), so the accessible name contains the visible text (WCAG 2.5.3).
+      const slot = node.querySelector<HTMLElement>('[data-xp-slot="label"]')
+      if (slot) slot.textContent = text; else node.setAttribute('aria-label', text)
       return node
     }
     const renderMonth = (first: number, last: number, days: CalendarDaySlot<CalendarViewEntry>[], now: number): void => {
@@ -498,7 +502,7 @@ function bindMailCalendarView(askDialog: ((options: Record<string, unknown>) => 
     part('agenda-list').addEventListener('click', event => { const item = (event.target as Element).closest<HTMLElement>('[data-calview-item]'); if (item?.dataset.calviewItem) openEvent(item.dataset.calviewItem) })
     for (const delta of [-1, 1]) button('nav="' + (delta < 0 ? 'prev' : 'next') + '"').addEventListener('click', () => { const next = calendarShift(mode, anchor, delta); if (next >= lowest && next <= highest) { anchor = focus = next; render() } })
     button('nav="today"').addEventListener('click', () => { anchor = focus = today(); render() })
-    for (const key of ['month', 'week', 'day'] as const) button('mode="' + key + '"').addEventListener('click', () => { mode = key; anchor = focus; render(); if (key !== 'month') part('scroll').scrollTop = 8 * 48 })
+    for (const key of ['month', 'week', 'day'] as const) button('mode="' + key + '"').addEventListener('click', () => { mode = key; anchor = focus; render(); if (key !== 'month') { const line = grid.querySelector<HTMLElement>('[data-calview-day]>:last-child'); part('scroll').scrollTop = line?.offsetHeight ? line.offsetHeight / 3 : 8 * 48 } })
     button('refresh').addEventListener('click', () => { void refresh() })
     button('new').addEventListener('click', () => { if (!button('new').disabled) openEditor(null, focus) })
     button('agenda-new').addEventListener('click', () => { if (!button('agenda-new').disabled && panel?.kind === 'agenda') openEditor(null, panel.day) })

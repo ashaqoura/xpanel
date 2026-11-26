@@ -131,7 +131,7 @@ function bindWhmMailQueue(askDialog: Ask | undefined): void {
       for (const item of visible) {
         const row = cloneClientTemplate(clientTemplate(root, 'whm-mail-queue-row'), 'tr', ['select', 'reference', 'queue', 'arrived', 'age', 'bytes', 'sender', 'recipients', 'reason', 'actions'])
         const put = (name: string, ...content: (string | Node)[]): void => clientTemplateSlot(row, name).replaceChildren(...content)
-        const box = document.createElement('input'); box.type = 'checkbox'; box.dataset.whmMailQueueSelect = item.queueId; box.setAttribute('aria-label', t('Select message {id}', { id: item.queueId }))
+        const box = document.createElement('input'); box.type = 'checkbox'; if (document.documentElement.dataset.uiTheme === 'v2') box.className = 'kt-checkbox kt-checkbox-sm'; box.dataset.whmMailQueueSelect = item.queueId; box.setAttribute('aria-label', t('Select message {id}', { id: item.queueId }))
         put('select', box); put('reference', technical(item.queueId)); put('queue', names[item.queue] ?? item.queue, ...(item.forcedExpire ? [' · ' + t('Forced to expire')] : []))
         put('arrived', technical(formatMailDateTime(item.arrivalTime))); put('age', ageText(age(item))); put('bytes', technical(size(item.sizeBytes)))
         put('sender', item.sender ? technical(item.sender) : t('Null sender (bounce)'))

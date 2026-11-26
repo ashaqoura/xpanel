@@ -1,6 +1,6 @@
 import { logsClientTemplates } from '../../../client-templates/team-logs.ts'
 import type { PanelSurfaceProps } from '../../../../contract.ts'
-import { actions, button, check, emailContext, esc, field, fields, header, input, missingAccount, page, panelMailCards, section, select, state, table } from '../email-tools/common.ts'
+import { actions, button, check, emailContext, esc, field, fields, header, input, page, panelMailCards, section, select, state, table } from '../email-tools/common.ts'
 import type { PanelObservationAuthority } from './common.ts'
 
 export function renderV2PanelLogs(props: PanelSurfaceProps, authority?: PanelObservationAuthority): string {
@@ -12,7 +12,7 @@ export function renderV2PanelLogs(props: PanelSurfaceProps, authority?: PanelObs
   const choose = section('v2-site-logs-choose', t(msgid('Choose a log')),
     fields(field('account-logs-domain', t(msgid('Domain')), select('account-logs-domain', (domains ?? []).map(domain => [domain.id, domain.name] as const), { 'data-logs-domain': true }, !enabled, ' dir="ltr"', selectedDomain))
       + `<div data-logs-field="kind">${field('account-logs-kind', t(msgid('Log')), select('account-logs-kind', kinds.map(kind => [kind, kind === 'access' ? t(msgid('Access log')) : t(msgid('Error log'))] as const), { 'data-logs-kind': true }, !enabled))}</div>`)
-    + actions(button(t(msgid('Read log')), { 'data-logs-read': true }, !enabled, true))
+    + actions(button(t(msgid('Read log')), { 'data-logs-read': true }, !enabled, true, { icon: '<i class="ki-filled ki-arrows-circle" aria-hidden="true"></i>' }))
     + `<p>${esc(t(msgid("Shows the last 256 KiB, at most 2000 lines, of the log the web server writes for the site. An alias shares its main site's log. Rotated older logs are not shown.")))}</p>`)
   const entries = section('v2-site-log-entries', t(msgid('Log entries')),
     fields(`<div data-logs-field="class">${field('account-logs-class', t(msgid('Status')), select('account-logs-class', [['all', t(msgid('All responses'))], ['2', '2xx'], ['3', '3xx'], ['4', '4xx'], ['5', '5xx']], { 'data-logs-class': true }))}</div>`
@@ -28,9 +28,9 @@ export function renderV2PanelLogs(props: PanelSurfaceProps, authority?: PanelObs
       + check('account-raw-access-previous', t(msgid("Remove the previous month's archives when a new UTC month starts")), { 'data-raw-access': 'removePreviousMonthArchive' }, !rawAccess))}`
     + fields(field('account-raw-access-days', t(msgid('Keep archives (days)')), input('account-raw-access-days', { 'data-raw-access': 'retentionDays' }, ` type="text" inputmode="numeric" dir="ltr" autocomplete="off" placeholder="${esc(t(msgid('Until removed')))}"`, !rawAccess)))
     + `<p data-raw-access-source>${esc(t(msgid('Settings have not been read.')))}</p>`
-    + actions(button(t(msgid('Save settings')), { 'data-raw-access-save': true }, !rawAccess, true) + button(t(msgid('Use server defaults')), { 'data-raw-access-defaults': true }, !rawAccess))
+    + actions(button(t(msgid('Save settings')), { 'data-raw-access-save': true }, !rawAccess, true, { icon: '<i class="ki-filled ki-check" aria-hidden="true"></i>' }) + button(t(msgid('Use server defaults')), { 'data-raw-access-defaults': true }, !rawAccess))
     + state(rawAccess ? t(msgid('Settings have not been read.')) : t(msgid('Raw access archives are unavailable here. Nothing was read.')), { 'data-raw-access-status': true }) + '</div>'
-    + table('v2-raw-access-current', t(msgid('Current access logs')), [t(msgid('Domain')), t(msgid('Current access log'))], (domains ?? []).map(domain => `<tr><td><bdi dir="ltr" class="v2-mono">${esc(domain.name)}</bdi></td><td>${rawAccess ? `<a class="v2-btn" href="/api/account/logs/${esc(domain.id)}/access/download" download>${esc(t(msgid('Download as gzip')))}</a>` : esc(t(msgid('Unavailable')))}</td></tr>`).join('') || `<tr><td colspan="2">${esc(t(msgid('This account has no domains to read logs for.')))}</td></tr>`, { 'data-raw-access-current': true })
+    + table('v2-raw-access-current', t(msgid('Current access logs')), [t(msgid('Domain')), t(msgid('Current access log'))], (domains ?? []).map(domain => `<tr><td><bdi dir="ltr" class="v2-mono">${esc(domain.name)}</bdi></td><td>${rawAccess ? `<a class="v2-btn kt-btn kt-btn-outline" href="/api/account/logs/${esc(domain.id)}/access/download" download><i class="ki-filled ki-exit-down" aria-hidden="true"></i>${esc(t(msgid('Download as gzip')))}</a>` : esc(t(msgid('Unavailable')))}</td></tr>`).join('') || `<tr><td colspan="2">${esc(t(msgid('This account has no domains to read logs for.')))}</td></tr>`, { 'data-raw-access-current': true })
     + `<p>${esc(t(msgid("The current log is the part not yet rotated today. It is compressed while it downloads; an alias shares its main site's log.")))}</p>`
     + table('v2-raw-access-archives', t(msgid('Archives in ~/logs')), [t(msgid('Archive')), t(msgid('Day (UTC)')), t(msgid('Size')), t(msgid('Download'))], `<tr><td colspan="4">${esc(t(msgid('Archives have not been read.')))}</td></tr>`, { 'data-raw-access-rows': true })
     + `<p data-raw-access-list-status role="status" hidden></p><p data-raw-access-pending role="status" hidden></p>`)

@@ -3,7 +3,8 @@ import { v2ListPasswordSection } from './list-admin.ts'
 import { v2ListModerationSection } from './list-moderation.ts'
 import type { PanelSurfaceProps } from '../../../../contract.ts'
 import { accountMailingListClientTemplates } from './routing-client-templates.ts'
-import { actions, area, button, check, emailContext, esc, facts, field, fields, header, input, missingAccount, page, section, select, state, table, technical, unread, type PanelEmailAuthority } from './common.ts'
+import { icon } from '../../../icons.ts'
+import { actions, area, button, check, emailContext, endActions, esc, facts, field, fields, header, input, page, section, select, state, table, technical, unread, type PanelEmailAuthority } from './common.ts'
 
 export function renderV2PanelMailingLists(props: PanelSurfaceProps, authority?: PanelEmailAuthority): string {
   const { locale, t, account, canManage, domains, plan } = emailContext(props, authority)
@@ -14,22 +15,22 @@ export function renderV2PanelMailingLists(props: PanelSurfaceProps, authority?: 
     facts([{ label: t(msgid('Plan limit')), valueHtml: plan?.caps.mailingLists === undefined ? esc(t(msgid('Not read'))) : technical(plan.caps.mailingLists) }])
     + table('v2-mailing-list-records', title, [t(msgid('Address')), t(msgid('Members')), t(msgid('Moderation')), t(msgid('Archive')), t(msgid('Action'))], unread(t, 5), { 'data-mailing-lists-rows': true })
     + state(t(msgctxt('theme:v2', 'Saved mailing lists have not been read.')), { 'data-mailing-list-status': true })
-    + `<div class="v2-panel-extra__editor" data-mailing-list-form role="group" aria-labelledby="v2-mailing-list-create-heading"><h3 id="v2-mailing-list-create-heading">${esc(t(msgid('Create mailing list')))}</h3>`
+    + `<div class="v2-panel-extra__editor" data-mailing-list-form role="group" aria-labelledby="v2-mailing-list-create-heading"><h3 class="text-base font-semibold text-mono" id="v2-mailing-list-create-heading">${esc(t(msgid('Create mailing list')))}</h3>`
     + fields(field('mailing-list-name', t(msgid('List name')), input('mailing-list-name', { 'data-ml-name': true }, ' type="text" dir="ltr" maxlength="64" autocomplete="off"', !createAllowed))
       + field('mailing-list-domain', t(msgid('Domain')), select('mailing-list-domain', domainOptions, { 'data-ml-domain': true }, !createAllowed, ' dir="ltr"'))
       + field('mailing-list-moderation', t(msgid('Moderation')), select('mailing-list-moderation', [['members', t(msgid('Members'))], ['open', t(msgid('Open'))], ['moderated', t(msgid('Moderated'))]], { 'data-ml-moderation': true }, !createAllowed))
-      + `<div class="v2-field"><span class="v2-field__label">${esc(t(msgid('Archive messages')))}</span>${check('mailing-list-archive', t(msgid('Keep an archive')), { 'data-ml-archive': true }, !createAllowed, true)}</div>`)
+      + `<div class="v2-field"><span class="v2-field__label kt-form-label">${esc(t(msgid('Archive messages')))}</span>${check('mailing-list-archive', t(msgid('Keep an archive')), { 'data-ml-archive': true }, !createAllowed, true)}</div>`)
     + field('mailing-list-members', t(msgid('Members (one address per line, optional)')), area('mailing-list-members', { 'data-ml-members': true }, ' rows="4" dir="ltr"', !createAllowed))
     + `<p>${esc(t(msgid('Saved lists reach delivery when the mail routing applies; the delivery state on this page is read from the host.')))}</p>`
-    + actions(button(t(msgctxt('account-mailing-lists', 'Create list')), { 'data-ml-create': true }, !createAllowed, true)) + '</div>' + accountMailingListClientTemplates(),
+    + endActions(button(t(msgctxt('account-mailing-lists', 'Create list')), { 'data-ml-create': true }, !createAllowed, true, { icon: icon('plus', 16) })) + '</div>' + accountMailingListClientTemplates(),
     { 'data-mailing-lists': true, 'data-account': (account?.id ?? ''), 'data-mailing-can-manage': String(createAllowed) })
   const delivery = section('v2-mailing-list-delivery', t(msgid('List delivery and moderation')),
     `<p>${esc(t(msgid('A list without posting rules is delivered by expanding its address to its members in the Postfix alias table. A list with posting rules reaches its members after the moderation check at delivery.')))}</p>`
-    + actions(button(t(msgid('Refresh')), { 'data-mailx-lists-refresh': true }, !canManage))
+    + actions(button(t(msgid('Refresh')), { 'data-mailx-lists-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
     + state(t(msgid('List delivery has not been read.')), { 'data-mailx-lists-status': true })
     + facts([{ label: t(msgid('Delivery to members')), valueHtml: esc(t(msgid('Not read'))), hooks: { 'data-mailx-tools-fact': 'delivery' } }, { label: t(msgid('Observed at (UTC)')), valueHtml: esc(t(msgid('Not read'))), hooks: { 'data-mailx-tools-fact': 'observed-at' } }])
     + table('v2-list-delivery-records', title, [t(msgid('Address')), t(msgid('Members')), t(msgid('Delivery state'))], unread(t, 3), { 'data-mailx-lists-rows': true })
-    + `<p data-mailx-lists-action-status role="status"></p>` + actions(button(t(msgid('Apply saved lists')), { 'data-mailx-lists-apply': true }, true, true)) + v2MailToolsClientTemplates('lists'),
+    + `<p data-mailx-lists-action-status role="status"></p>` + endActions(button(t(msgid('Apply saved lists')), { 'data-mailx-lists-apply': true }, true, true, { icon: icon('check', 16) })) + v2MailToolsClientTemplates('lists'),
     { 'data-mailx-tools': true, 'data-mailx-tools-section': 'lists', 'data-mailx-can-manage': String(canManage) })
   const inert = !authority?.canRead || authority.presentation === 'read-only' || !account
   return page(locale, route, header(t, route, title, t(msgctxt('theme:v2', 'Manage saved membership, posting policy and the observed delivery state of your account lists.'))) + saved + v2ListPasswordSection(t, createAllowed) + delivery + v2ListModerationSection(t, canManage), inert ? { 'data-readonly': 'true' } : undefined)

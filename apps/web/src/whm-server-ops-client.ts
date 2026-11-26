@@ -94,10 +94,10 @@ function bindWhmServerOps(askDialog: Ask | undefined): void {
       if (!rows) return
       rows.replaceChildren(...list.map(item => {
         const remove = document.createElement('button')
-        remove.type = 'button'; remove.className = root.closest('.v2-server-ops') ? 'v2-btn v2-btn--danger' : 'xp-btn xp-btn--danger'; remove.textContent = t('Remove'); remove.disabled = !manageable()
+        remove.type = 'button'; remove.className = root.closest('.v2-server-ops') ? 'v2-btn v2-btn--danger kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive' : 'xp-btn xp-btn--danger'; remove.textContent = t('Remove'); remove.disabled = !manageable()
         remove.addEventListener('click', () => removeForward(String(item.domain)))
         const secure = document.createElement('button')
-        secure.type = 'button'; secure.className = root.closest('.v2-server-ops') ? 'v2-btn' : 'xp-btn'; secure.textContent = t('Issue certificate'); secure.disabled = !manageable()
+        secure.type = 'button'; secure.className = root.closest('.v2-server-ops') ? 'v2-btn kt-btn kt-btn-sm kt-btn-outline' : 'xp-btn'; secure.textContent = t('Issue certificate'); secure.disabled = !manageable()
         secure.addEventListener('click', () => { void issueForwardCertificate(String(item.domain)) })
         const cell = document.createElement('span'); cell.append(secure, remove)
         return row([String(item.domain), String(item.url), String(item.ip)], cell)

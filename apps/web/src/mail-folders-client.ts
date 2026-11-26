@@ -88,7 +88,7 @@ function bindMailFolders(): void {
       editor.querySelector<HTMLElement>('[data-mail-folders-rename-field]')!.hidden = mode !== 'rename'
       editor.querySelector<HTMLElement>('[data-mail-folders-confirm-field]')!.hidden = mode !== 'delete'
       renameInput.value = folder.leaf; confirmBox.checked = false
-      submit.textContent = mode === 'rename' ? t('Save name') : t('Delete folder')
+      ;(submit.querySelector('[data-xp-slot="label"]') ?? submit).textContent = mode === 'rename' ? t('Save name') : t('Delete folder')
       editor.hidden = false; sync(); editor.focus()
     }
     const paint = (): void => {

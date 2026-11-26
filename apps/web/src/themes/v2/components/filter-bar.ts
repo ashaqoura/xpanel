@@ -24,49 +24,50 @@ export interface FilterBarProps {
   hooks?: HookAttributes
 }
 
-// A bar with a search or a select is a row of labelled fields: each label sits 8px above its 44px control, as on
+/// A bar with a search or a select is a row of labelled fields: each kt-form-label sits above its control, as on
 // the boards. A bar of segments alone (quick filters in a card header) names its group with aria-label.
 const field = (cls: string, labelHtml: string, controlHtml: string): string => `<div class="v2-filter__field ${cls}">${labelHtml}${controlHtml}</div>`
 
+// kt-select draws its own arrow, so the wrapper holds the select alone.
 const select = (item: FilterSelect, off: string): string =>
-  field('v2-filter__select', `<label class="v2-filter__label" for="${escapeHtml(item.id)}">${escapeHtml(item.label)}</label>`, `<span class="v2-select"><select id="${escapeHtml(item.id)}"${attr('name', item.name)}${hookAttrs(item.hooks)}${off}>${item.options.map(option => `<option value="${escapeHtml(option.value)}"${option.selected ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select>${icon('chevDown', 16)}</span>`)
+  field('v2-filter__select', `<label class="v2-filter__label kt-form-label" for="${escapeHtml(item.id)}">${escapeHtml(item.label)}</label>`, `<span class="v2-select"><select id="${escapeHtml(item.id)}"${attr('name', item.name)}${hookAttrs(item.hooks)}${off} class="kt-select max-[959px]:text-base">${item.options.map(option => `<option value="${escapeHtml(option.value)}"${option.selected ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select></span>`)
+
+// The Metronic segmented control is a kt-toggle-group of outline buttons; core toggles aria-pressed, never a class.
+const SEGMENT = 'kt-btn kt-btn-outline aria-pressed:bg-accent aria-pressed:text-accent-foreground'
 
 export function filterBar(props: FilterBarProps): string {
   const off = props.disabled ? ' disabled' : ''
   const fields = Boolean(props.search || props.selects?.length)
+  // The Metronic search input: the magnifier inside the kt-input wrapper, before the borderless input.
   const search = props.search
-    ? field('v2-filter__search', `<label class="v2-filter__label" for="${escapeHtml(props.search.id)}">${escapeHtml(props.search.label)}</label>`, `<span class="v2-filter__input">${icon('search', 16)}<input id="${escapeHtml(props.search.id)}" type="search" autocomplete="off" spellcheck="false"${attr('name', props.search.name)}${attr('placeholder', props.search.placeholder)}${attr('value', props.search.value)}${hookAttrs(props.search.hooks)}${off}></span>`) : ''
-  const chips = (props.chips ?? []).map(chip => `<button type="button" class="v2-chip v2-chip--applied" aria-label="${escapeHtml(chip.removeLabel)}"${hookAttrs(chip.hooks)}${off}>${escapeHtml(chip.label)}${icon('x', 12)}</button>`).join('')
-  const segmentButtons = props.segments?.options.map(option => `<button type="button" aria-pressed="${option.pressed}"${hookAttrs(option.hooks)}${off}>${escapeHtml(option.label)}${option.count === undefined ? '' : `<span class="v2-count v2-num">${option.count}</span>`}</button>`).join('') ?? ''
+    ? field('v2-filter__search', `<label class="v2-filter__label kt-form-label" for="${escapeHtml(props.search.id)}">${escapeHtml(props.search.label)}</label>`, `<span class="v2-filter__input kt-input max-[959px]:text-base"><input id="${escapeHtml(props.search.id)}" type="search" autocomplete="off" spellcheck="false"${attr('name', props.search.name)}${attr('placeholder', props.search.placeholder)}${attr('value', props.search.value)}${hookAttrs(props.search.hooks)}${off}>${icon('search', 16)}</span>`) : ''
+  const chips = (props.chips ?? []).map(chip => `<button type="button" class="v2-chip v2-chip--applied kt-btn kt-btn-outline kt-btn-primary rounded-full" aria-label="${escapeHtml(chip.removeLabel)}"${hookAttrs(chip.hooks)}${off}>${escapeHtml(chip.label)}${icon('x', 12)}</button>`).join('')
+  const segmentButtons = props.segments?.options.map(option => `<button type="button" class="${SEGMENT}" aria-pressed="${option.pressed}"${hookAttrs(option.hooks)}${off}>${escapeHtml(option.label)}${option.count === undefined ? '' : `<span class="v2-count v2-num kt-badge kt-badge-sm kt-badge-outline rounded-[30px]">${option.count}</span>`}</button>`).join('') ?? ''
   const segments = !props.segments ? ''
-    : `<div class="v2-segmented" role="group" aria-label="${escapeHtml(props.segments.label)}">${segmentButtons}</div>`
-  const group = fields && segments ? field('v2-filter__group', `<span class="v2-filter__label" aria-hidden="true">${escapeHtml(props.segments!.label)}</span>`, segments) : segments
-  const clear = props.clear ? `<button type="button" class="v2-btn v2-btn--ghost v2-filter__clear"${hookAttrs(props.clear.hooks)}${off}>${escapeHtml(props.clear.label)}</button>` : ''
+    : `<div class="v2-segmented kt-toggle-group" role="group" aria-label="${escapeHtml(props.segments.label)}">${segmentButtons}</div>`
+  const group = fields && segments ? field('v2-filter__group', `<span class="v2-filter__label kt-form-label" aria-hidden="true">${escapeHtml(props.segments!.label)}</span>`, segments) : segments
+  const clear = props.clear ? `<button type="button" class="v2-btn v2-btn--ghost v2-filter__clear kt-btn kt-btn-ghost"${hookAttrs(props.clear.hooks)}${off}>${icon('x', 14)}${escapeHtml(props.clear.label)}</button>` : ''
   return `<div class="v2-filter${fields ? ' v2-filter--fields' : ''}"${off ? ' aria-disabled="true"' : ''}${hookAttrs(props.hooks)}>${search}${(props.selects ?? []).map(item => select(item, off)).join('')}${group}${chips}${clear}${props.actionsHtml ? `<div class="v2-filter__actions">${props.actionsHtml}</div>` : ''}</div>`
 }
 
-export const FILTER_BAR_CSS = `.v2-filter{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1);padding:10px var(--v2-panel-padding)}
-.v2-filter--fields{align-items:flex-end;gap:10px 12px;padding:12px var(--v2-panel-padding)}
+// The bar itself stays a v2 rule so a page can drop its padding; the controls are Metronic (kt-input, kt-select,
+// kt-btn). A segmented group or a count written with the v2 classes alone keeps the toggle-group and badge look.
+const SEG = '.v2-segmented>button:not(.kt-btn)'
+export const FILTER_BAR_CSS = `.v2-filter{display:flex;flex-wrap:wrap;align-items:center;gap:.625rem;padding:.75rem var(--v2-panel-padding)}
+.v2-card__actions>.v2-filter{padding:0}
+.v2-filter--fields{align-items:flex-end}
 .v2-filter__field{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
-.v2-filter__label{padding-inline:13px;font-size:12px;line-height:1.2;font-weight:600;color:var(--text-2)}
-.v2-filter__search{flex:1 1 200px}
+.v2-filter__label{padding-inline:calc(.75rem + 1px);text-box:trim-end text}
+.v2-filter__search{flex:1 1 200px;max-inline-size:22.5rem}
 .v2-filter__select{flex:0 1 180px}
-.v2-filter__select select{inline-size:100%}
 .v2-filter__group{flex:0 1 auto}
-.v2-filter__input{position:relative;display:block}
-.v2-filter__input>.v2-icon{position:absolute;inset-inline-end:14px;top:50%;margin-top:-8px;color:var(--muted);pointer-events:none}
-.v2-filter__input>input{inline-size:100%;padding-inline-end:40px}
-.v2-filter__clear{padding:0 var(--space-1)}
-.v2-filter__actions{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-inline-start:auto}
-.v2-chip{display:inline-flex;align-items:center;gap:var(--space-1);min-height:var(--target);padding-block:0;padding-inline:14px 12px;border-radius:var(--radius-pill);border:1px solid var(--line-strong);background:var(--surface);color:var(--text-2);font-size:13px;cursor:pointer;transition:background-color .14s ease-out,border-color .14s ease-out}
-.v2-chip:hover:not(:disabled){border-color:var(--muted);background:var(--subtle);color:var(--text)}
-.v2-chip--applied{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent);font-weight:600}
-.v2-chip--applied:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.v2-segmented{display:inline-flex;flex-wrap:wrap;gap:3px;padding:3px;border-radius:var(--radius-control);border:1px solid var(--line);background:var(--sunken)}
-.v2-segmented>button{display:inline-flex;align-items:center;gap:6px;min-height:var(--target);min-inline-size:var(--target);padding:0 12px;border:0;border-radius:var(--radius-chip);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:background-color .14s ease-out,color .14s ease-out}
-.v2-segmented>button:hover:not(:disabled){color:var(--text)}
-.v2-segmented>button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
-.v2-segmented>button[aria-pressed="true"] .v2-count{background:var(--accent-soft);color:var(--accent)}
-.v2-filter :is(.v2-chip,.v2-segmented>button):disabled{opacity:.55;cursor:not-allowed}
-.v2-count{padding:1px 7px;border-radius:var(--radius-pill);background:var(--surface);color:var(--text-2);font-size:12px;font-weight:600;line-height:1.4}
+.v2-filter__actions{display:flex;flex-wrap:wrap;gap:.625rem;margin-inline-start:auto}
+.v2-segmented{display:inline-flex;flex-wrap:wrap}
+${SEG}{display:inline-flex;align-items:center;justify-content:center;gap:.375rem;height:var(--target);margin-inline-start:-1px;padding:0 .75rem;border:1px solid var(--line);background:transparent;color:var(--kt-accent-foreground);font-size:.8125rem;font-weight:500;cursor:pointer}
+${SEG}:first-child{margin-inline-start:0;border-start-start-radius:var(--radius-control);border-end-start-radius:var(--radius-control)}
+${SEG}:last-child{border-start-end-radius:var(--radius-control);border-end-end-radius:var(--radius-control)}
+${SEG}:is(:hover:not(:disabled),[aria-pressed="true"]){background:var(--kt-accent)}
+.v2-segmented>button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:600px){.v2-segmented{flex-wrap:nowrap;max-inline-size:100%;overflow-x:auto;scrollbar-width:none}.v2-segmented>button{flex:none}}
+.v2-count{display:inline-flex;align-items:center;justify-content:center;height:1.25rem;min-inline-size:1.25rem;padding:0 .325rem;border-radius:30px;border:1px solid var(--line);background:var(--sunken);color:var(--text-2);font-size:.8125rem;font-weight:500;line-height:.75rem}
 `

@@ -2957,11 +2957,6 @@ msgctxt "theme:v2"
 msgid "No account history was supplied. No samples or peak values are inferred from a current reading."
 msgstr "لم يتوفر سجل للحساب. لا تُستنتج عينات سابقة أو قيم قصوى من القراءة الحالية."
 
-#: apps/web/src/themes/v2/pages/xpanel/domains/common.ts
-msgctxt "theme:v2"
-msgid "No account is available."
-msgstr "لا يوجد حساب متاح."
-
 #: apps/web/src/themes/v2/pages/xwhm/accounts/create.ts
 msgctxt "theme:v2"
 msgid "No account-creation operation has been observed."

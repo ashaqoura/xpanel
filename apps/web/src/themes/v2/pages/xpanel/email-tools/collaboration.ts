@@ -2,17 +2,18 @@ import { mailxCollectionsClientTemplates } from './mailx-collection-client-templ
 import { accountCollaborationClientTemplates } from './routing-client-templates.ts'
 import type { PanelSurfaceProps } from '../../../../contract.ts'
 import { v2DavConnection } from '../files/dav-connection.ts'
-import { actions, button, emailContext, esc, field, fields, header, input, missingAccount, page, section, select, state, table, unread, type PanelEmailAuthority } from './common.ts'
+import { icon } from '../../../icons.ts'
+import { actions, button, emailContext, endActions, esc, field, fields, header, input, mailGlyph, page, section, select, state, table, unread, type PanelEmailAuthority } from './common.ts'
 
 export function renderV2PanelCalendarsContacts(props: PanelSurfaceProps, authority?: PanelEmailAuthority): string {
   const { locale, t, account, canManage } = emailContext(props, authority)
   const route = '/email/calendars-contacts', title = t(msgid('Calendars and contacts'))
   const empty = t(msgid('Saved mailbox collections have not been read.'))
   const owned = section('v2-collaboration-collections', t(msgid('Mailbox collections')),
-    actions(button(t(msgid('Read saved collections')), { 'data-collaboration-refresh': true }, !canManage))
-    + state(empty, { 'data-collaboration-status': true })
+    state(empty, { 'data-collaboration-status': true })
     + table('v2-collaboration-records', t(msgid('Saved mailbox collections')), [t(msgid('Mailbox')), t(msgid('Name')), t(msgid('Type')), t(msgid('Saved items')), t(msgid('Settings'))], unread(t, 5), { 'data-collaboration-collections': true })
-    + `<p>${esc(t(msgid('This account overview includes only current owned mailbox metadata. Event bodies and contact details are managed in an independently authenticated xMail session.')))}</p>`)
+    + `<p>${esc(t(msgid('This account overview includes only current owned mailbox metadata. Event bodies and contact details are managed in an independently authenticated xMail session.')))}</p>`,
+    undefined, button(t(msgid('Read saved collections')), { 'data-collaboration-refresh': true }, !canManage, false, { icon: icon('refresh', 14), small: true }))
   const creation = section('v2-collaboration-create', t(msgid('Create a calendar')),
     fields(field('collaboration-mailbox', t(msgid('Owner mailbox')), select('collaboration-mailbox', [['', t(msgid('Read mailboxes first'))]], { 'data-collaboration-mailbox': true }, true, ' dir="ltr"'))
       + field('collaboration-type', t(msgid('Collection type')), select('collaboration-type', [['calendar', t(msgctxt('account-collaboration-workspace', 'Calendar'))]]))
@@ -20,11 +21,11 @@ export function renderV2PanelCalendarsContacts(props: PanelSurfaceProps, authori
       + field('collaboration-color', t(msgid('Color (HEX)')), input('collaboration-color', { 'data-collaboration-color': true }, ' type="text" dir="ltr" maxlength="7" value="#4f6bed" autocomplete="off" spellcheck="false"'))
       + field('collaboration-timezone', t(msgid('Time zone')), input('collaboration-timezone', { 'data-collaboration-timezone': true }, ' type="text" dir="ltr" maxlength="100" value="UTC" autocomplete="off" spellcheck="false"')))
     + `<p>${esc(t(msgid('Creates a real saved calendar for the selected mailbox using its existing writer and current ownership. Calendar edit and delete, defaults, descriptions, address books and task lists are in Collection settings below.')))}</p>`
-    + actions(button(t(msgid('Create calendar')), { 'data-collaboration-create': true }, true, true)))
+    + endActions(button(t(msgid('Create calendar')), { 'data-collaboration-create': true }, true, true, { icon: icon('plus', 16) })))
   const sharing = section('v2-collaboration-sharing', t(msgid('Current calendar sharing')),
     table('v2-collaboration-shares', t(msgid('Current same-account sharing')), [t(msgid('Owner')), t(msgid('Calendar')), t(msgid('Recipient')), t(msgctxt('account-collaboration-workspace', 'Permission'))], unread(t, 4), { 'data-collaboration-shares': true })
     + `<p>${esc(t(msgid('Only currently bound grants between mailboxes in this account appear here. Sharing changes require the existing xMail owner workflow; this portal does not change its permissions.')))}</p>`)
-  const handoff = (landing: 'calendar' | 'contacts', label: string): string => `<span class="v2-panel-extra__handoff" data-handoff-control>${button(label, { 'data-handoff': 'xmail', 'data-handoff-mailbox-select': 'collaboration-mailbox', 'data-handoff-landing': landing, 'data-handoff-state': 'idle' }, !canManage)}<span data-handoff-status role="status" aria-live="polite" hidden></span></span>`
+  const handoff = (landing: 'calendar' | 'contacts', label: string): string => `<span class="v2-panel-extra__handoff" data-handoff-control>${button(label, { 'data-handoff': 'xmail', 'data-handoff-mailbox-select': 'collaboration-mailbox', 'data-handoff-landing': landing, 'data-handoff-state': 'idle' }, !canManage, false, { icon: icon(landing === 'calendar' ? 'calendar' : 'users', 16) })}<span class="text-[0.8125rem] leading-[var(--lh-cap)] text-muted-foreground" data-handoff-status role="status" aria-live="polite" hidden></span></span>`
   const clients = section('v2-collaboration-clients', t(msgid('xMail and device setup')),
     actions(handoff('calendar', t(msgid('Open xMail calendars'))) + handoff('contacts', t(msgid('Open xMail contacts'))))
     + `<p>${esc(t(msgid('Opens the selected mailbox in xMail in a new tab with a sign-in link that works once. The account session and password are not transferred; reading messages there still requires the mailbox password.')))}</p>`
@@ -38,9 +39,9 @@ export function renderV2PanelCalendarsContacts(props: PanelSurfaceProps, authori
       + field('mailx-calendar-color', t(msgid('Color (HEX)')), input('mailx-calendar-color', { 'data-mailx-calendar-color': true }, ' type="text" dir="ltr" maxlength="7" autocomplete="off" spellcheck="false"'))
       + field('mailx-calendar-timezone', t(msgid('Time zone')), input('mailx-calendar-timezone', { 'data-mailx-calendar-timezone': true }, ' type="text" dir="ltr" maxlength="100" autocomplete="off" spellcheck="false"')))
     + state(t(msgid('Saved calendars have not been read.')), { 'data-mailx-calendar-status': true })
-    + actions(button(t(msgid('Edit collection')), { 'data-mailx-calendar-save': true }, true, true) + button(t(msgid('Delete collection')), { 'data-mailx-calendar-delete': true })) + `</${tag}>`)
+    + endActions(button(t(msgid('Delete collection')), { 'data-mailx-calendar-delete': true }, true, false, { icon: mailGlyph.trash, kind: 'danger' }) + button(t(msgid('Edit collection')), { 'data-mailx-calendar-save': true }, true, true)) + `</${tag}>`)
   const collectionList = (kind: 'address-books' | 'task-lists', label: string, add: string): string =>
-    `<section class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''}><h3>${esc(label)}</h3>${table(`v2-${kind}`, label, [t(msgid('Name')), t(msgid('Description')), t(msgid('Default')), t(msgid('Actions'))], unread(t, 4), { [`data-mailx-${kind}`]: true })}${actions(button(add, { 'data-mailx-add': kind }))}</section>`
+    `<section class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''}><h3 class="text-base font-semibold text-mono">${esc(label)}</h3>${table(`v2-${kind}`, label, [t(msgid('Name')), t(msgid('Description')), t(msgid('Default')), t(msgid('Actions'))], unread(t, 4), { [`data-mailx-${kind}`]: true })}${actions(button(add, { 'data-mailx-add': kind }, true, false, { icon: icon('plus', 14), small: true }))}</section>`
   const settings = section('v2-mailx-settings', t(msgid('Collection settings')),
     `<${tag} class="v2-panel-extra__editor" data-mailx-collections-form${canManage ? ' novalidate' : ''}><p>${esc(t(msgid('Calendar and contact apps sync these same address books, task lists and descriptions. Defaults are saved for each mailbox.')))}</p>`
     + fields(field('mailx-collections-mailbox', t(msgid('Mailbox')), select('mailx-collections-mailbox', [], { 'data-mailx-collections-mailbox': true }, true, ' dir="ltr"'))
@@ -48,7 +49,7 @@ export function renderV2PanelCalendarsContacts(props: PanelSurfaceProps, authori
     + `<div class="v2-panel-extra__fields" data-mailx-descriptions><p>${esc(t(msgid('Nothing has been read.')))}</p></div>`
     + collectionList('address-books', t(msgid('Address books')), t(msgid('Add address book'))) + collectionList('task-lists', t(msgid('Task lists')), t(msgid('Add task list')))
     + state(t(msgid('Collection settings have not been read.')), { 'data-mailx-collections-status': true })
-    + actions(`<button type="${canManage ? 'submit' : 'button'}" class="v2-btn v2-btn--primary" data-mailx-collections-save disabled>${esc(t(msgid('Save collection settings')))}</button>` + button(t(msgid('Refresh')), { 'data-mailx-collections-refresh': true }, !canManage)) + `</${tag}>`)
+    + endActions(button(t(msgid('Refresh')), { 'data-mailx-collections-refresh': true }, !canManage, false, { icon: icon('refresh', 16) }) + `<button type="${canManage ? 'submit' : 'button'}" class="v2-btn v2-btn--primary kt-btn kt-btn-primary" data-mailx-collections-save disabled>${icon('check', 16)}${esc(t(msgid('Save collection settings')))}</button>`) + `</${tag}>`)
   const davReadable = canManage && props.catalog?.some(tool => tool.id === 'calendars-contacts-config' && tool.status === 'verified') === true
   const dav = section('v2-mailx-dav', t(msgid('Calendar and contact sync (CalDAV and CardDAV)')), v2DavConnection({ t, factsClass: 'v2-panel-extra__facts', actionsClass: 'v2-panel-extra__actions', accountId: account?.id ?? '', canRead: davReadable,
     table: (columns, body) => table('v2-dav-principals', t(msgid('Device connection')), columns, body, { 'data-dav-rows': true }) }))

@@ -3,7 +3,7 @@ import type { PanelSurfaceProps } from '../../../../contract.ts'
 import { formatAsciiBytes, formatAsciiNumber, formatDisplayDateTime } from '../../../../../display-format.ts'
 import { parseWebsiteAnalyticsSnapshot, WEBSITE_ANALYTICS_WINDOWS, type WebsiteAnalyticsWindow } from '../../../../../models/website-analytics.ts'
 import { kpiCard, lineChart, notice, statusPill } from '../../../components/index.ts'
-import { actions, button, emailContext, esc, facts, field, fields, header, missingAccount, page, section, select, table, technical, unread } from '../email-tools/common.ts'
+import { actions, button, emailContext, esc, facts, field, header, page, section, select, table, technical, unread } from '../email-tools/common.ts'
 import { blankState, pair, strip, tableCard, type PanelObservationAuthority } from './common.ts'
 
 export function renderV2PanelTraffic(props: PanelSurfaceProps, authority?: PanelObservationAuthority): string {
@@ -24,17 +24,17 @@ export function renderV2PanelTraffic(props: PanelSurfaceProps, authority?: Panel
   const window = props.websiteAnalyticsWindow && WEBSITE_ANALYTICS_WINDOWS.includes(props.websiteAnalyticsWindow) ? props.websiteAnalyticsWindow : undefined
   const windowLabel = (value: WebsiteAnalyticsWindow): string => value === '1h' ? t(msgid('Last hour')) : value === '24h' ? t(msgid('Last 24 hours')) : value === '7d' ? t(msgid('Last 7 days')) : t(msgid('Last 30 days'))
   const params = new URLSearchParams({ lang: locale, theme: props.theme ?? 'dark', ...(selected ? { domain: selected.name } : {}) })
-  const windowLinks = `<div class="v2-panel-obs-seg" role="group" aria-label="${esc(t(msgid('Range')))}">${WEBSITE_ANALYTICS_WINDOWS.map(value => {
+  const windowLinks = `<div class="v2-panel-obs-seg kt-toggle-group" role="group" aria-label="${esc(t(msgid('Range')))}">${WEBSITE_ANALYTICS_WINDOWS.map(value => {
     const query = new URLSearchParams(params); query.set('window', value)
-    return `<a href="${esc(`${route}?${query}`)}"${value === window ? ' aria-current="true"' : ''}>${esc(windowLabel(value))}</a>`
+    return `<a class="kt-btn kt-btn-outline aria-[current=true]:bg-accent aria-[current=true]:text-mono" href="${esc(`${route}?${query}`)}"${value === window ? ' aria-current="true"' : ''}>${esc(windowLabel(value))}</a>`
   }).join('')}</div>`
   const domainField = field('v2-traffic-domain', t(msgid('Domain')), select('v2-traffic-domain', (domains ?? []).map(domain => [domain.name, domain.name] as const), undefined, !authority?.domainSelectionAvailable, ' name="domain" dir="ltr"', selected?.name))
   const domainForm = authority?.domainSelectionAvailable
-    ? `<form method="get" action="${route}" class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''}>${domainField}<input type="hidden" name="lang" value="${esc(locale)}"><input type="hidden" name="theme" value="${esc(props.theme ?? 'dark')}">${window ? `<input type="hidden" name="window" value="${window}">` : ''}<div class="v2-panel-extra__actions"><button type="submit" class="v2-btn">${esc(t(msgid('Show')))}</button></div></form>`
+    ? `<form method="get" action="${route}" class="v2-panel-extra__groups"${!authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''}>${domainField}<input type="hidden" name="lang" value="${esc(locale)}"><input type="hidden" name="theme" value="${esc(props.theme ?? 'dark')}">${window ? `<input type="hidden" name="window" value="${window}">` : ''}<div class="v2-panel-extra__actions"><button type="submit" class="v2-btn kt-btn kt-btn-outline">${esc(t(msgid('Show')))}</button></div></form>`
     : domainField
   const scope = section('v2-traffic-selection', t(msgid('Traffic selection')),
     `<div class="v2-panel-obs-select">${domainForm}<div class="v2-field"><span class="v2-label">${esc(t(msgid('Range')))}</span>${windowLinks}</div></div>`)
-  const meta = `<ul class="v2-panel-obs-meta"><li>${esc(t(msgid('Observed at')))} ${snapshot ? technical(formatDisplayDateTime(snapshot.at)) : esc(t(msgid('Not read')))}</li><li>${esc(readState === 'empty' ? t(msgid('Empty observation')) : readState === 'loaded' ? t(msgctxt('theme:v2', 'Account-scoped log observation')) : t(msgid('Not read')))}</li></ul>`
+  const meta = `<ul class="v2-panel-obs-meta"><li class="kt-badge kt-badge-outline">${esc(t(msgid('Observed at')))} ${snapshot ? technical(formatDisplayDateTime(snapshot.at)) : esc(t(msgid('Not read')))}</li><li class="kt-badge kt-badge-outline">${esc(readState === 'empty' ? t(msgid('Empty observation')) : readState === 'loaded' ? t(msgctxt('theme:v2', 'Account-scoped log observation')) : t(msgid('Not read')))}</li></ul>`
   const statusCopy = readState === 'empty'
     ? t(msgid('The account-scoped analytics read returned no hourly rows for this range. Request, bandwidth and visitor totals are not shown because a missing row is not a measured zero.'))
     : readState === 'unavailable'
@@ -81,7 +81,7 @@ export function renderV2PanelTraffic(props: PanelSurfaceProps, authority?: Panel
     facts([{ label: t(msgid('Cache Hit Ratio')), valueHtml: totals ? technical(value(totals.cacheHitRatioPercent, 'percent')) : notRead }, { label: t(msgctxt('theme:v2', 'Average request latency')), valueHtml: totals ? technical(value(totals.avgRequestTimeMs, 'ms')) : notRead }, { label: t(msgctxt('theme:v2', 'P95 request latency')), valueHtml: totals ? technical(value(totals.p95RequestTimeMs, 'ms')) : notRead }]))
   const logs = section('v2-traffic-raw-logs', t(msgid('Raw access logs')),
     `<p>${esc(t(msgctxt('theme:v2', 'Read the bounded access log in the site log workspace. Archived log downloads have not been qualified.')))}</p>`
-    + actions(authority?.relatedRoutes?.has('/metrics/logs') ? `<a class="v2-btn" href="/metrics/logs?${esc(params.toString())}">${esc(t(msgid('Read log')))}</a>` : `<button type="button" class="v2-btn" disabled>${esc(t(msgid('Read log')))}</button>`))
+    + actions(authority?.relatedRoutes?.has('/metrics/logs') ? `<a class="v2-btn kt-btn kt-btn-outline" href="/metrics/logs?${esc(params.toString())}"><i class="ki-filled ki-document" aria-hidden="true"></i>${esc(t(msgid('Read log')))}</a>` : `<button type="button" class="v2-btn kt-btn kt-btn-outline" disabled><i class="ki-filled ki-document" aria-hidden="true"></i>${esc(t(msgid('Read log')))}</button>`))
   const readonly = !authority?.canRead || authority.presentation === 'read-only' || !account ? ' data-readonly="true"' : ''
   return page(locale, route, header(t, route, title, t(msgctxt('theme:v2', 'Visitors, requests, bandwidth and errors for your domains, counted from the Nginx access logs.'))) + meta
     + `<div class="v2-panel-extra__groups"${readonly} data-surface-widget="website-analytics" data-chart-state="${readState}"${selected ? ` data-domain="${esc(selected.name)}"` : ''}>${scope}${status}${summary}${requests}${pair(bandwidthChart, bandwidth)}${pair(`<div class="v2-panel-extra__groups">${paths}${errors}</div>`, responses)}${pair(referrers, clients, true)}${strip(latency + visitors + logs)}</div>`)
@@ -91,7 +91,7 @@ export const ftpReport = (props: PanelSurfaceProps, authority: PanelObservationA
   const { t } = emailContext(props, authority), fact = (key: string, label: string): { label: string; valueHtml: string } => ({ label, valueHtml: `<bdi dir="ltr" data-ftp-report-fact="${key}">${esc(t(msgid('Not read')))}</bdi>` })
   const rows = (id: string, label: string, heads: readonly string[], hook: string): string => table(id, label, heads, '', { [hook]: true })
   return `<div data-ftp-report${authority?.canRead && authority.presentation !== 'read-only' ? '' : ' data-readonly="true"'}>` + section('v2-ftp-report', t(msgid('FTP statistics')),
-    `<div class="v2-panel-obs-select">${field('v2-ftp-report-month', t(msgid('Month')), '<input id="v2-ftp-report-month" type="month" dir="ltr" data-ftp-report-month>')}${actions(button(t(msgid('Read FTP report')), { 'data-ftp-report-read': true }, false))}</div>`
+    `<div class="v2-panel-obs-select">${field('v2-ftp-report-month', t(msgid('Month')), '<input class="kt-input max-[959px]:text-base" id="v2-ftp-report-month" type="month" dir="ltr" data-ftp-report-month>')}${actions(button(t(msgid('Read FTP report')), { 'data-ftp-report-read': true }, false))}</div>`
     + `<p role="status" data-state="unread" data-ftp-report-status>${esc(t(msgid('The FTP report has not been read.')))}</p>` + facts([fact('transfers', t(msgid('Transfers'))), fact('downloads', t(msgid('Downloads'))), fact('uploads', t(msgid('Uploads'))), fact('bytes', t(msgid('Data transferred')))])
     + rows('v2-ftp-report-days', t(msgid('Transfers by day')), [t(msgid('Day')), t(msgid('Transfers')), t(msgid('Data transferred'))], 'data-ftp-report-days')
     + rows('v2-ftp-report-hours', t(msgid('Transfers by hour (UTC)')), [t(msgid('Hour')), t(msgid('Transfers')), t(msgid('Data transferred'))], 'data-ftp-report-hours')

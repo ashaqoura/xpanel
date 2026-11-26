@@ -1,7 +1,7 @@
 import { v2SiteCompressionCard } from '../operations/owner-tools.ts'
 import { v2SoftwareOperationTemplates } from '../../xwhm/software/operation-client-templates.ts'
 import type { PanelSurfaceProps } from '../../../../contract.ts'
-import { actions, button, deniedPage, esc, facts, note, page, section, settingsContext, status, table, unreadRow, NO_SETTINGS_AUTHORITY, type PanelSettingsAuthority } from '../settings/common.ts'
+import { actions, button, esc, facts, note, page, section, settingsContext, status, table, unreadRow, NO_SETTINGS_AUTHORITY, type PanelSettingsAuthority } from '../settings/common.ts'
 import { renderV2EdgeCacheSection } from '../security/ip-blocker.ts'
 
 export function renderV2OptimizePage(props: PanelSurfaceProps, authority: PanelSettingsAuthority = NO_SETTINGS_AUTHORITY, cacheAuthority: PanelSettingsAuthority = NO_SETTINGS_AUTHORITY): string {
